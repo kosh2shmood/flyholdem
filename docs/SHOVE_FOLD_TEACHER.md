@@ -35,3 +35,18 @@ The same 5,000-resample Bonferroni suite bootstrap requires every opponent's low
 Add `--profile confirmatory --development-reference runs/shove-fold-teacher-v1-development` only after passing development, and choose a distinct output. Replace `--output RUN` with `--resume RUN` after interruption. Two additional tests cover real paired-game recovery, recomputed summaries and rejected overlap/mismatched training; full suite 143 passed / 2 isolated-oracle skips. Evaluation has not run at this registration checkpoint.
 
 Development passed all four adjusted lower bounds on 512 paired deals each: random +0.355469 BB/hand [0.077625, 0.622452], calling station +0.456055 [0.068478, 0.843512], tight-aggressive +0.330566 [0.225586, 0.433963], equity-bucket +0.276855 [0.079102, 0.472656]. Private-information checks passed and summaries were recomputed from the complete journal. Result SHA-256 735383b3fb45e1f63de219a67907bf791e49698a68dd4b149dd648ebda2eeb0b; manifest 59cb41ad6bbf3bf041d7784c7c9585ad8d8a47f2b5624af1e306b2828f5ea457. This qualifies the fixed table for its predeclared small-game confirmation, not for teaching yet. No parameters or checkpoint changed.
+
+## Small-game confirmation passed
+
+The unchanged table passed all four suite-adjusted confidence bounds on 2,048 paired deals per opponent (16,384 settled hands total):
+
+| Original opponent | BB/hand | Suite-adjusted bootstrap interval |
+|---|---:|---:|
+| Random | 0.349243 | [0.219083, 0.478120] |
+| Calling station | 0.471558 | [0.280330, 0.664283] |
+| Tight-aggressive | 0.349609 | [0.298581, 0.396088] |
+| Equity-bucket | 0.254028 | [0.157745, 0.347778] |
+
+Every pair uses the same deal in swapped seats. Frozen probability sampling, the complete original opponent parameters and 32 private-information probes were unchanged. The full schedule and all bootstrap summaries were independently recomputed before recording qualification. The result sets `allowed_as_small_game_teacher: true` and retains `allowed_as_teacher: false`; no full-hand teacher or fly gate passes as a consequence. No finite-run equilibrium claim is made.
+
+Confirmation result SHA-256 5a224b6f3dc68b744a371a349b9cfbd2a9cd7f2b563632e874320922a780ef98; manifest 317c2eb4942aa5e897db0b26f524616da984b0ff3e10c9fc949d712e83642096; journal head 5be1d9ca02712b4f6990fd7996a796b8a3c86efda641839afc1f9b351ec8704f. Source/config/table identities match the preceding registration. The 169-class strategy is also rendered locally as a labeled conventional-reference figure; it does not depict the fly's strategy. Generated figures/reports/tables remain local and ignored.

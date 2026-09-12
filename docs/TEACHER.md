@@ -139,3 +139,5 @@ Audit a development candidate without authorizing it:
 ```
 
 Omit `--allow-development` to require passing confirmation. The real v4 development evidence recomputed exactly (512 paired deals), and remains failed/unapproved. Seven new numerical-artifact checks cover altered intervals/flags, schedule substitutions, tensor changes, missing opponents and truncation. These synthetic test artifacts are not poker results.
+
+A separate small tabular CFR teacher has now passed development and confirmation for the restricted 10 BB shove/fold subgame. It does not replace the full 20 BB NFSP qualification. See SHOVE_FOLD_TEACHER.md for its registered algorithm, independent paired returns and explicit scope. Full-hand v5 population training remains in progress.

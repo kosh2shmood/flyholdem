@@ -31,10 +31,10 @@ Locked dependencies live in `uv.lock`. The UI uses plain browser APIs plus pinne
 - Software Gate 0: passed locally at M1; 29 tests and the 2,512-hand registered symmetry check. Machine-readable evidence is in `docs/review/software-gate0.json`.
 - Gate 1: circuit and full quarter-strength controllability passed; earlier failures remain documented.
 - Gate 2: full-graph conditioning passed five independent seeds, retention and erasure. This demonstrates engineered cue-dependent readout suppression, not poker skill.
-- Gate 2A: pending. Exact-cue local transfer improved over controls but missed its registered 80% confirmation threshold at 77.8%. Actual teacher-removal inference passed. All conventional poker-teacher candidates so far failed their validation suite.
-- Gates 3–6 and human heads-up play: pending. No strategic poker-learning claim.
+- Gate 2A: pending full-hand teacher/corpus qualification. Local exact-cue transfer failed at 77.8%; the subsequent bounded-edge surrogate confirmed at 94.5%, with actual teacher-removal inference verified. A separate tabular 10 BB shove/fold teacher passed its own confirmation. Full 20 BB NFSP candidates v1–v4 failed; v5 population training is in progress.
+- Human heads-up play: implemented and browser-verified with private cards and legal actions. Poker learning Gates 3–6 remain pending; no strategic fly-learning claim.
 - Native dashboard: all 166,700 retained neurons rendered, annotated positions distinguished from missing-coordinate grid, actual frozen neural scores drive the table. Full data remain local and checksum-verified.
-- Current local suite: 88 passed / 2 isolated-oracle skips; fixture/live/replay/avatar and native desktop/mobile browser checks pass.
+- Current local suite: 143 passed / 2 isolated-oracle skips; fixture/live/replay/avatar, native desktop/mobile and private human-play browser checks pass.
 
 See [PROGRESS.md](PROGRESS.md), [visual gate report](docs/VISUAL_GATE.md), [protocol](docs/PROTOCOL.md), [model card](docs/MODEL_CARD.md), and [browser evidence](docs/review/browser-check.json). Live logs are written to ignored, timestamped `runs/live-*/events.jsonl` directories, flushed at every completed hand. Hash chains detect modifications; seeds regenerate the loop exactly on the same locked runtime. Cross-architecture numerical comparison uses absolute 1e-12 tolerance for floating diagnostics with exact cards/actions/spike counts; recorded playback is byte-exact everywhere. V0 does not yet resume a running neural state from a checkpoint.
 

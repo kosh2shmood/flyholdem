@@ -110,6 +110,7 @@ def evidence(run):
         'learning_mode':result.get('learning_mode',manifest.get('config',{}).get('learning_mode','not applicable')),
         'recorded_learning_claim':bool(result.get('learning_claim',False)),
         'allowed_as_teacher':bool(result.get('allowed_as_teacher',False)),
+        'allowed_as_small_game_teacher':result.get('allowed_as_small_game_teacher'),
         'execution_commit':manifest.get('commit'),'source_hash':manifest.get('source_hash'),
         'graph_hash':manifest.get('graph_hash'),'binary_hash':manifest.get('binary_hash'),
         'files':files,'journal_verification':journals,'summaries':summaries,'seed_values':rows,
@@ -148,6 +149,8 @@ def markdown(report):
         '',f"Run: `{report['run']}`.",'','| Artifact | SHA-256 |','|---|---|']
     lines += [f'| {_cell(k)} | `{v}` |' for k,v in report['files'].items()]
     lines+=['','Journal checks: '+(', '.join(f"{k}: {v['rows']} rows, " + ("full chain verified" if v['chain_verified'] else "legacy file checksum only; no chain") for k,v in report['journal_verification'].items()) or 'No supported journal in this run.'),'']
+    if report.get('allowed_as_small_game_teacher') is not None:
+        lines+=['',f"Qualified specifically for the 10 BB shove/fold subgame: {report['allowed_as_small_game_teacher']}. Full teacher qualification remains separate."]
     return '\n'.join(lines)
 
 
@@ -164,6 +167,7 @@ def html_report(report):
     details=''.join('<div><dt>'+esc(k)+'</dt><dd>'+esc(v)+'</dd></div>' for k,v in {
         'Graph mode':report['mode'],'Learning mode':report['learning_mode'],'Profile':report['profile'],
         'Recorded task learning claim':report['recorded_learning_claim'],'Allowed as poker teacher':report['allowed_as_teacher'],
+        'Small-game teacher qualification':report['allowed_as_small_game_teacher'] if report.get('allowed_as_small_game_teacher') is not None else 'not applicable',
         'Runtime (s)':_number(report['elapsed_seconds']),'Peak RSS (MiB)':_number(None if report['peak_rss_bytes'] is None else report['peak_rss_bytes']/1024**2)}.items())
     return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FlyHoldem evidence report</title><style>body{margin:48px auto;max-width:1040px;padding:0 24px;background:#101a15;color:#deeadf;font:15px/1.6 system-ui}h1{font:46px Georgia,serif;margin:10px 0}h2{font:26px Georgia,serif;margin-top:36px}.eyebrow{letter-spacing:2px;font-size:11px;color:#b4dfc7}.status{display:inline-block;padding:6px 12px;border:1px solid #81967e;border-radius:4px}dl{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;border-top:1px solid #34423a;padding-top:24px;margin-top:32px}dt,.muted{font-size:12px;color:#9db09f}dd{margin:6px 0;font-size:16px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:12px 8px;border-bottom:1px solid #34423a;vertical-align:top}th{color:#b4dfc7}code{overflow-wrap:anywhere;font-size:11px}.note{padding:16px;background:#1d2b22;border-left:3px solid #b4dfc7}.path{overflow-wrap:anywhere}@media(max-width:650px){body{margin:24px auto;padding:0 16px}h1{font-size:34px}dl{grid-template-columns:repeat(2,1fr)}td,th{padding:8px 4px;font-size:11px}}@media print{body{background:white;color:black;margin:0}.muted,dt{color:#444}.note{background:#eee}}</style></head><body><div class="eyebrow">FLYHOLDEM · RECORDED EVIDENCE</div><h1>Experiment report</h1><span class="status">'+esc(report['status'])+'</span><p>'+esc(report['scope'])+'</p><p class="note">'+esc(report['caution'])+'</p><dl>'+details+'</dl>'+table+'<h2>Provenance</h2><p>Execution commit <code>'+esc(report['execution_commit'])+'</code><br>Source hash <code>'+esc(report['source_hash'])+'</code></p><p class="path">'+esc(report['run'])+'</p><table><thead><tr><th>Artifact</th><th>SHA-256</th></tr></thead><tbody>'+hashes+'</tbody></table><p class="muted">Inspected '+str(sum(v['rows'] for v in report['journal_verification'].values()))+' recorded rows. Modern journals have full chain checks; historical controllability has file checksums only. Full paired statistics and exact metadata are included in REPORT.md and report.json.</p></body></html>'
 
