@@ -1,0 +1,19 @@
+schema: flyholdem-config-v1
+mode: fixture
+learning_mode: bio-plastic
+status: development
+encoder: engineered-kc-v1
+mapping_seed: 1729
+run_seed: 20260912
+teacher: disconnected
+stack_chips: 40
+blinds: [1, 2]
+opponent: calling-station
+temperature: 0.65
+decision_ms: {baseline: 50, stimulus: 300, readout: 100, inter_decision: 50}
+reinforcement_ms: 200
+eligibility_tau_ms: 5000
+learning_rate: 0.015
+reward_scale_bb: 10
+weight_bounds: [0.1, 2.0]
+# V0 declares these fixed values in code; general config loading is M0/M2 work.

@@ -1,0 +1,10 @@
+{
+  "scope": "fixture development; no learning evaluation",
+  "hands": 30,
+  "events": 224,
+  "seconds": 1.1527854590094648,
+  "hands_per_second": 26.023922981972387,
+  "virtual_neural_ms": 42500,
+  "python": "3.11.16",
+  "platform": "macOS-26.6.2-arm64-arm-64bit"
+}

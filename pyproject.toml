@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "flyholdem"
+version = "0.1.0"
+description = "Reproducible connectome-constrained play-chip poker experiments"
+requires-python = ">=3.11,<3.12"
+dependencies = ["pokerkit>=0.7.5,<0.8", "numpy>=2.2,<3", "fastapi>=0.115,<1", "uvicorn>=0.34,<1", "websockets>=15,<17", "pyyaml>=6,<7"]
+
+[project.scripts]
+flyholdem = "flyholdem.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "httpx>=0.28,<1", "playwright>=1.50,<2"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/flyholdem"]

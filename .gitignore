@@ -8,3 +8,10 @@ outputs/
 checkpoints/
 node_modules/
 .env
+work/
+runs/
+.pytest_cache/
+*.so
+*.dylib
+*.egg-info/
+__pypackages__/

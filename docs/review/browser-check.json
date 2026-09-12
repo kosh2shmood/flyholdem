@@ -1,0 +1,20 @@
+{
+  "viewport": [
+    1440,
+    1080
+  ],
+  "mobile_viewport": [
+    390,
+    844
+  ],
+  "live_websocket": true,
+  "replay": true,
+  "visible_weight_changes": true,
+  "exact_input_inspection": true,
+  "overflow": false,
+  "browser_errors": [],
+  "live_event_hash": "8903e1967e0295352076b9ffdb213dd1e0429cedcdc5b99b5a059d9b71d99fc2",
+  "replay_event_hash": "c676868dbda1c76fbcb0f4cb5d7e058112c3630a3b94253755d31f8f2761fd8a",
+  "browser": "151.0.7922.34",
+  "scope": "FIXTURE / VISUAL PROTOTYPE / NOT A FULL-CONNECTOME RESULT"
+}
