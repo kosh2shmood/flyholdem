@@ -13,11 +13,15 @@ from .curriculum import CurriculumHand
 
 def poker_hand(player, curriculum, opponent, deal_seed, seat, *, learning=False,
                temperature=0, teacher=None, terminal_reward_override=None,
-               target_permutation_seed=None):
+               target_permutation_seed=None, phase=None):
     if type(seat) is not int or seat not in (0,1):raise ValueError('One heads-up learning seat is required')
-    if not learning and (temperature!=0 or teacher is not None or terminal_reward_override is not None
-                         or target_permutation_seed is not None):
-        raise ValueError('Frozen evaluation has no exploration, teacher or control reward inputs')
+    phase=phase or ('training' if learning else 'evaluation')
+    if phase not in ('training','evaluation') or phase=='evaluation' and learning:
+        raise ValueError('Learning is allowed only during an explicit training phase')
+    if phase=='evaluation' and temperature!=0:
+        raise ValueError('Frozen evaluation has no exploration')
+    if not learning and (teacher is not None or terminal_reward_override is not None or target_permutation_seed is not None):
+        raise ValueError('Frozen weights accept no teacher or control reward inputs')
     distilled=player.mode=='distilled-connectome'
     if learning and distilled and teacher is None:raise ValueError('Distillation requires an independently qualified teacher')
     if not distilled and (teacher is not None or target_permutation_seed is not None):
@@ -76,6 +80,6 @@ def poker_hand(player, curriculum, opponent, deal_seed, seat, *, learning=False,
     return {'deal_seed':deal_seed,'neural_seat':seat,'opponent':opponent,'opponent_version':VERSIONS[opponent],
         'curriculum':curriculum,'neural_return_bb':net_bb,'action_counts':counts.tolist(),
         'neural_decisions':decisions,'public_terminal':table,'private_hand_checkpoint':game.serialize(),
-        'learning':learning,'learning_mode':player.mode,'teacher_connected':learning and distilled,
+        'learning':learning,'phase':phase,'learning_mode':player.mode,'teacher_connected':learning and distilled,
         'terminal_reinforcement':reinforcement,'weights_before_sha256':weights_before,
         'weights_after_sha256':weights_after,'target_permutation_seed':target_permutation_seed}

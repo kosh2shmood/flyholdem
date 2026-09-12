@@ -111,3 +111,31 @@ def test_frozen_and_biological_rollouts_reject_teacher_or_shaping_misuse():
     with pytest.raises(ValueError):poker_hand(player,'hu-20bb-v1','random',90,0,learning=True,teacher=VisibleTeacher())
     _,player=make('distilled-connectome','direct-readout-rate-surrogate-v1')
     with pytest.raises(ValueError):poker_hand(player,'hu-20bb-v1','random',90,0,learning=True)
+
+
+def test_frozen_training_control_can_match_exploration_without_learning():
+    _,player=make()
+    row=poker_hand(player,'hu-20bb-v1','random',17,0,phase='training',temperature=.2)
+    assert row['phase']=='training' and not row['learning']
+    assert row['weights_before_sha256']==row['weights_after_sha256']
+    assert all(value['temperature']==.2 for value in row['neural_decisions'])
+    assert not row['terminal_reinforcement']['reward_delivered']
+    with pytest.raises(ValueError):poker_hand(player,'hu-20bb-v1','random',17,0,phase='evaluation',learning=True)
+
+
+def test_rewired_control_changes_only_endpoint_order_and_preserves_checkpoint_weights():
+    from flyholdem.learning.poker_controls import shuffled_connectome,shuffled_rewards
+    controller,_=make();controller.brain.weights*=1.25
+    original=controller.brain.state();a=shuffled_connectome(controller,42);b=shuffled_connectome(controller,42)
+    assert a.brain.graph_hash==b.brain.graph_hash!=controller.brain.graph_hash
+    assert np.array_equal(a.brain.ptr,controller.brain.ptr)
+    assert np.array_equal(np.sort(a.brain.post),np.sort(controller.brain.post))
+    assert np.array_equal(a.brain.initial,controller.brain.initial)
+    assert np.array_equal(a.brain.weights,controller.brain.weights)
+    assert all(np.array_equal(value,controller.brain.state()[key]) for key,value in original.items())
+    assert a.registration['control']['original_graph_hash']==controller.brain.graph_hash
+    with pytest.raises(ValueError,match='graph mismatch'):NeuralController(a.brain,controller.registration)
+    rewards=np.array([1,-3,5,7,-9,11]);positions=np.array([0,1,0,1,0,1])
+    one=shuffled_rewards(rewards,positions,71);two=shuffled_rewards(rewards,positions,71)
+    assert np.array_equal(one,two) and not np.array_equal(one,rewards)
+    for position in (0,1):assert np.array_equal(np.sort(one[positions==position]),np.sort(rewards[positions==position]))
