@@ -43,3 +43,9 @@ Only a qualifying development policy should advance to the separate confirmatory
 ```
 
 Training, evaluation and corpus commands support `--resume` with unchanged config/source/environment. Public CLI consolidation and actual local/surrogate transfer runners remain subsequent work. Optional teacher tests skip when PyTorch is absent; the core fixture/native separation tests require no full dataset.
+
+## Initial 25,000-hand result — validation failed
+
+The registered run on 3f3069a completed in 112.16 s. Frozen policy SHA-256: 14b3e116392149159bc689889f0e73a83214af3538246d03d244c92bfeab744f. The actual target information-boundary check passed 32 private-data mutations. Development results over 128 paired deals per opponent were +0.635 BB/hand against random, −0.264 against calling station, −0.049 against tight-aggressive and −2.422 against equity-bucket. None had a positive suite-adjusted lower confidence bound, so the policy is barred from teaching and no corpus was generated. This is a negative teacher result, not a fly result. Exact machine-readable evidence remains local in ignored runs/teacher-nfsp-v1 and runs/teacher-nfsp-v1-development.
+
+Register a longer 250,000-hand development run in configs/teacher_nfsp_250k.yaml. Only duration and progress-print cadence change; architecture, seeds, optimization and information boundary remain fixed. Start from the same initialization, preserving the old checkpoint contract rather than silently changing its configured horizon. Use a separate run directory and the same held-out development suite; confirmatory teacher seeds remain untouched. Resume command: `.venv/bin/python -m flyholdem.teacher.training --config configs/teacher_nfsp_250k.yaml --output runs/teacher-nfsp-250k-v1 --resume`.
