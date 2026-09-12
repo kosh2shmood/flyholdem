@@ -79,7 +79,6 @@ def evaluate(policy_path, config, output, profile='development', resume=False):
     import json
     from pathlib import Path
     import signal
-    import torch
     from flyholdem.connectome.registry import digest
     from flyholdem.neural.checkpoint import atomic_json
     from flyholdem.experiments.journal import Journal
@@ -87,8 +86,10 @@ def evaluate(policy_path, config, output, profile='development', resume=False):
     from .loaders import load_policy, sampling
     if profile not in config['profiles'] or set(config['opponents']) != set(VERSIONS):
         raise ValueError('Use the complete registered opponent suite and profile')
-    torch.set_num_threads(1); torch.use_deterministic_algorithms(True)
     policy, policy_record = load_policy(policy_path)
+    if policy_record['schema'] != 'teacher-external-regret-policy-v1':
+        import torch
+        torch.set_num_threads(1); torch.use_deterministic_algorithms(True)
     if policy_record['provenance'].get('stack_bb') != config['stack_bb']:
         raise ValueError('Teacher evaluation stack differs from the trained stack')
     selected = config['profiles'][profile]

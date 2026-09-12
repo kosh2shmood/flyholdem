@@ -64,7 +64,14 @@ def test_full_fixed_population_training_recovers_exact_table_rng_and_traversals(
     with pytest.raises(ValueError,match='numeric regret files changed'):load_policy(tmp_path/'policy')
 
 
-def test_regret_policy_uses_the_original_full_teacher_qualification_path(tmp_path):
+def test_regret_policy_uses_the_original_full_teacher_qualification_path(tmp_path,monkeypatch):
+    import builtins
+    original_import=builtins.__import__
+    def without_torch(name,*args,**kwargs):
+        if name=='torch' or name.startswith('torch.'):
+            raise ModuleNotFoundError('Tabular evaluation must work without the optional neural-teacher dependency')
+        return original_import(name,*args,**kwargs)
+    monkeypatch.setattr(builtins,'__import__',without_torch)
     cfg=config();cfg['iterations']=2
     train(cfg,tmp_path/'training');export_policy(tmp_path/'training',tmp_path/'policy')
     suite={'stack_bb':20,'opponents':list(VERSIONS),'bootstrap_seed':91900,'bootstrap_repeats':100,
