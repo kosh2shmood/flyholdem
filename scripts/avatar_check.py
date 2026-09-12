@@ -22,10 +22,35 @@ with sync_playwright() as p:
     page.get_by_role('button',name='Recorded replay',exact=True).click()
     page.wait_for_function('window.flyholdem.mode === "replay" && window.flyholdem.latest.sequence === 0')
     assert page.locator('#changed').inner_text()=='—', 'Replay must clear previous live plasticity'
-    found={};deadline=time.monotonic()+65
-    while time.monotonic()<deadline and len(found)<6:
+    initial=page.evaluate('window.flyholdem.avatar.snapshot()')
+    assert initial['position'][0]<0<initial['opponent']['position'][0]
+    for card in initial['cards']:
+        assert card['bend']>0 and card['holder_facing']>0 and card['viewer_facing']>0
+        assert card['printed_side']=='front-only' and card['back']=='pattern'
+    assert initial['opponent']['hole']==['??','??']
+    natural_cards=initial['cards']
+    found={};opponent_found={};deadline=time.monotonic()+65
+    while time.monotonic()<deadline and (len(found)<6 or len(opponent_found)<2):
         state=page.evaluate('({event:window.flyholdem.latest,avatar:window.flyholdem.avatar.snapshot()})')
         a,e=state['avatar'],state['event']
+        opponent=a['opponent']
+        assert opponent['hole']==e['table']['opponent_hole'], 'Never reveal private opponent cards'
+        if e['kind']=='opponent_action' and .15<opponent['elapsed']<.72:
+            label='check' if opponent['check'] else 'call'
+            if label not in opponent_found:
+                assert opponent['action_hash']==e['hash'] and opponent['action']==e['action']['action']
+                assert opponent['paid']==e['action']['paid'] and opponent['action_frames']>0
+                displacement=math.dist(opponent['right'],[.43,1.13,-.27])
+                assert displacement>.025
+                opponent_found[label]={'event_hash':e['hash'],'sequence':e['sequence'],
+                    'right_displacement':displacement,'action_frames':opponent['action_frames']}
+                page.get_by_role('button',name='Pause display').click()
+                page.locator('#avatar-stage').screenshot(path=str(out/f'opponent-{label}.png'))
+                before=page.evaluate('window.flyholdem.avatar.snapshot().opponent')
+                page.wait_for_timeout(150)
+                after=page.evaluate('window.flyholdem.avatar.snapshot().opponent')
+                assert before['left']==after['left'] and before['right']==after['right'] and before['elapsed']==after['elapsed']
+                page.get_by_role('button',name='Resume display').click()
         label='check' if a['check'] else {0:'fold',1:'call',2:'half-pot',3:'pot',4:'all-in'}.get(a['action'])
         if label and label not in found and e['kind']=='decision' and .15<a['elapsed']<.72:
             assert a['action_hash']==e['hash']
@@ -52,21 +77,33 @@ with sync_playwright() as p:
             page.get_by_role('button',name='Resume display').click()
         page.wait_for_timeout(40)
     assert len(found)==6, f'Missing real gesture coverage: {found.keys()}'
+    assert len(opponent_found)==2, f'Missing opponent gestures: {opponent_found.keys()}'
     page.get_by_role('button',name='Pause display').click()
     page.get_by_role('button',name='Table view',exact=True).click()
     assert page.locator('#table-map').is_visible() and not page.locator('#avatar-stage').is_visible()
     page.get_by_role('button',name='3D fly',exact=True).click()
     assert page.locator('#avatar-stage').is_visible()
     page.get_by_role('button',name='Reset view').click()
+    def visible_models():
+        state=page.evaluate('window.flyholdem.avatar.snapshot()')
+        for player in [state,state['opponent']]:
+            bounds=player['screen_bounds']
+            assert -1<bounds['left']<bounds['right']<1 and -1<bounds['bottom']<bounds['top']<1, bounds
+        return {key:player['screen_bounds'] for key,player in [('fly',state),('opponent',state['opponent'])]}
+    page.wait_for_timeout(100)
+    desktop_bounds=visible_models()
     page.set_viewport_size({'width':390,'height':844})
     page.wait_for_timeout(300)
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    mobile_bounds=visible_models()
     page.screenshot(path=str(out/'fly-mobile.png'),full_page=True)
     assert not errors and not page.evaluate('window.flyholdem.errors')
     snapshot=page.evaluate('window.flyholdem.avatar.snapshot()')
     report={'status':'pass','scope':'illustrative action-driven avatar, not a body simulation',
-        'live_event_card_match':True,'replay_event_card_match':True,'six_gestures':found,
-        'pause_freezes_pose':True,'camera_reset':True,'table_toggle':True,
+        'live_event_card_match':True,'replay_event_card_match':True,'six_gestures':found,'opponent_gestures':opponent_found,
+        'curved_holder_and_viewer_facing_cards':natural_cards,'opponent_information_boundary':True,
+        'full_silhouette_bounds':{'desktop':desktop_bounds,'mobile':mobile_bounds},
+        'pause_freezes_both_players':True,'camera_reset':True,'table_toggle':True,
         'desktop':[1440,1080],'mobile':[390,844],'browser':browser.version,
         'webgl':snapshot['renderer'],'three_revision':snapshot['revision'],
         'triangles':snapshot['triangles'],'draw_calls':snapshot['draw_calls'],'errors':errors}

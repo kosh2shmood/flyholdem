@@ -1,7 +1,7 @@
 # FlyHoldem progress
 
 ## Current phase
-M2 numerical/checkpoint submilestone passed; save/push this checkpoint. Next: user-requested side-by-side scene revision (fly fully visible at the table side, naturally oriented curved cards, abstract opponent, both actors animated), then resume M2 full-data import. V0 commit 2bd2d3c and visual-demo-v0 are pushed. Official source registry/provenance checks, import policy, repository contract and data-free CI are implemented. No MaleCNS source download or teacher/poker training started.
+Latest requested two-player scene revision passed local browser checks and is ready to save/push. Fly stands at the table side with curved, holder-facing cards; an abstract opponent makes its actual poker gestures. M2 numerical checkpoint 8d6f69c is published and CI passed. Next: checksum-verified official MaleCNS download, streaming import/preparation and audit. No teacher or poker training started.
 
 ## Completed acceptance checks
 - Read execution brief/specification/setup context and applicable ancestor AGENTS.md paths (none existed).
@@ -39,6 +39,13 @@ uv run python scripts/avatar_check.py
 ```
 Demo URL: http://127.0.0.1:8766. Default seed 20260912, graph/mapping seed 1729. One command serves backend/UI. Browser check expects running server.
 
+## Current visual revision evidence
+- Core: 36 passed, two Brian2 tests intentionally skipped in the base environment; both run and pass in the separate Python 3.12 oracle, including CI.
+- Browser: all six fly gestures plus actual opponent check/call, matching action/event hashes and cards, opponent privacy including mucked cards, pause for both players, table toggle, camera reset, desktop 1440×1080 and mobile 390×844 full silhouette bounds. No browser errors.
+- Cards have distinct single-sided front/back materials and a 0.12 scene-unit curve. Both printed faces have positive orientation toward the fly and default camera. Screenshot inspection corrected all-in card placement to the felt.
+- Compact evidence: docs/review/avatar/avatar-check.json and three screenshots. Full video and per-gesture screenshots remain generated/ignored.
+- User explicitly permits Python upgrades and other visualization/runtime languages when useful. Current Three.js viewer and isolated Python 3.12 numerical oracle are retained; no artificial Python-only constraint.
+
 ## Latest user steering
 The user wants the fly moved to the side of the table so its whole body is visible, its cards oriented toward itself and slightly bent toward the spectator for readability, and an abstract opponent across the table. Both actors must make physical-looking gestures based on their actual poker actions. Implement after the current numerical/CI issues are resolved (they now are).
 
@@ -59,10 +66,10 @@ The user requested a visible animated fly like the Doom/döner examples, with it
 - Atomic native-state checkpoint infrastructure is verified; full experiment/controller/game integration remains a runner milestone; V0 live logs are append-only, fsynced after completed hands, and ignored.
 
 ## Last stable commit
-V0: 2bd2d3c2fc6158248c4f633690b5d170add14b32 (visual-demo-v0), pushed. M0: fa873a6, pushed. Animated fly: 6aa7895, pushed. M1: c2f2ffe, pushed and CI green. Numerical runtime is the following `feat: verify sparse neural runtime and atomic checkpoints` checkpoint.
+V0: 2bd2d3c2fc6158248c4f633690b5d170add14b32 (visual-demo-v0), pushed. M0: fa873a6, pushed. Animated fly: 6aa7895, pushed. M1: c2f2ffe, pushed and CI green. Numerical: 8d6f69c, pushed and CI green (run 34676666552). The next visual checkpoint is `feat: seat both animated players beside the table`.
 
 ## Resumable experiment command
 No long training experiment started. Reproduce visual run with `make demo`; replay with `make replay`. Current local live worker logs into a timestamped ignored runs/live-* directory.
 
 ## Next step
-Implement the latest requested scene revision and browser-test both actors, full fly visibility and physically sensible curved card presentation. Save/push the visual checkpoint. Then resume M2: explicit checksum-verified MaleCNS fetch, streaming import/preparation/audit and full-graph memory/throughput measurement. No biological conditioning or poker training gate is yet passed.
+Save/push the verified visual revision, then run `make fetch-malecns`. Expected source lock is already committed at data-provenance/malecns_v1/source.lock.json (1,109,008,094 bytes); registry refuses any mismatch. Download outputs stay in ignored connectome_data/malecns_v1 and resume partial files. Before import, implement/test streaming retention and CSR preparation, and commit the exact import/runtime config. Hardware measured: 16 GiB RAM, 77 GiB free disk. Run only one full-data/runtime worker at a time. Full biological conditioning and all poker-learning gates remain pending.

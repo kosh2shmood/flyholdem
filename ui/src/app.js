@@ -41,7 +41,11 @@ function render(event){
   const d=event.decision;$("avatar-action").textContent=names[d.selected];
   $("avatar-motion").textContent=d.selected===0?"Slides both cards into the muck":d.selected===1?(d.observation.to_call===0?"Taps the felt to check":"Pushes chips forward to call"):d.selected===4?"Both hands push the stack in":"Reaches forward with a raise";
  }
- if(event.kind==='hand_start')resetDecision();
+ if(event.kind==='hand_start'){$('avatar-opponent-action').textContent='Looking at its cards';$('avatar-opponent-motion').textContent='Waiting for its turn';resetDecision()}
+ if(event.kind==='opponent_action'){
+  const a=event.action;$('avatar-opponent-action').textContent=a.action===1?(a.paid?'Call':'Check'):names[a.action];
+  $('avatar-opponent-motion').textContent=a.action===0?'Slides its cards away':a.action===1?(a.paid?'Pushes chips forward':'Taps the felt'):a.action===4?'Both hands push the stack in':'Reaches forward with a raise';
+ }
  const t=event.table;
  $('hand').textContent=`HAND ${String(event.hand).padStart(4,'0')}`;
  $('street').textContent=t.street;$('pot').textContent=t.pot;
