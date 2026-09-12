@@ -1,0 +1,8 @@
+schema: final-positive-regret-extraction-v1
+status: development
+aggregation: normalized-positive-final-regrets-uniform-if-nonpositive-v1
+training_run: runs/teacher-external-regret-v11
+training_manifest_sha256: 1276bb4b27357c9b33a9ed08ae3e048e6ac0ec896d3a82f6c110b783a99b88a3
+training_source_sha256: d16984f8442b6fb8fec62f962ff4992d74dc3bedbca69ee7da017249a60ed48a
+training_config_sha256: 20ccf17530b068046051e8b2ccc85115642475a8a6fe7bcb17675687d9eadde9
+iterations: 100000

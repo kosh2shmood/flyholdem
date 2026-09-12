@@ -92,6 +92,8 @@ def parser():
     regret.add_argument('--config',default='configs/teacher_external_regret_v10.yaml');regret.add_argument('--stop-after',type=int);_output_options(regret)
     export_regret=ts.add_parser('export-regret',help='Export the completed numeric regret-average policy, still unvalidated')
     export_regret.add_argument('--run',required=True);export_regret.add_argument('--output',required=True)
+    current=ts.add_parser('export-final-regret',help='Export a separately registered fixed-final positive-regret candidate')
+    current.add_argument('--config',required=True);current.add_argument('--output',required=True)
     small=ts.add_parser('train-shove-fold',help='Train the separate small tabular 10 BB reference')
     small.add_argument('--config',default='configs/shove_fold_teacher.yaml');small.add_argument('--stop-after',type=int);_output_options(small)
     small_export=ts.add_parser('export-shove-fold',help='Export the small tabular reference; does not qualify a full teacher')
@@ -190,6 +192,9 @@ def dispatch(args):
         result=run(config,out,args.profile,args.learning_rate,resume,args.development_reference,args.stop_after)
     elif args.command=='teacher':
         action=args.teacher_command
+        if action=='export-final-regret':
+            from flyholdem.teacher.regret_current_policy import export_current
+            return export_current(configuration(args.config),args.output)
         if action=='export-regret':
             from flyholdem.teacher.regret_policy import export_policy
             return export_policy(args.run,args.output)

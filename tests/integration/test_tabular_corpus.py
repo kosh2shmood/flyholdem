@@ -6,7 +6,8 @@ import numpy as np
 import pytest
 
 
-def test_tabular_corpus_exports_replays_and_resumes_without_torch(tmp_path,monkeypatch):
+@pytest.mark.parametrize('strategy',['average','final-current'])
+def test_tabular_corpus_exports_replays_and_resumes_without_torch(tmp_path,monkeypatch,strategy):
     original_import=builtins.__import__
     def without_torch(name,*args,**kwargs):
         if name=='torch' or name.startswith('torch.'):
@@ -18,14 +19,23 @@ def test_tabular_corpus_exports_replays_and_resumes_without_torch(tmp_path,monke
     from flyholdem.neural.checkpoint import atomic_json
     from flyholdem.poker.observation import canonical_bytes
     from flyholdem.teacher.regret_training import train
-    from flyholdem.teacher.regret_policy import export_policy,load_policy
+    from flyholdem.teacher.regret_policy import export_policy
+    from flyholdem.teacher.loaders import load_policy
     from flyholdem.teacher.corpus import export_corpus,verify_corpus
     from flyholdem.teacher.corpus_validation import replay_corpus,verify_qualified_corpus
     settings=yaml.safe_load((ROOT/'configs/teacher_external_regret_v11.yaml').read_text())
     settings.update(iterations=4,deal_seed_start=991700000,sampling_seed=97700)
     settings['abstraction']['equity_samples']=16
     training=tmp_path/'training';policy_path=tmp_path/'policy'
-    train(settings,training);export_policy(training,policy_path)
+    train(settings,training)
+    if strategy=='average':export_policy(training,policy_path)
+    else:
+        from flyholdem.teacher.regret_current_policy import export_current,EXTRACTION,AGGREGATION
+        saved=json.loads((training/'manifest.json').read_text())
+        export_current({'schema':EXTRACTION,'status':'development','aggregation':AGGREGATION,
+            'training_run':str(training),'iterations':settings['iterations'],
+            'training_manifest_sha256':digest(training/'manifest.json'),
+            'training_source_sha256':saved['source_hash'],'training_config_sha256':saved['config_hash']},policy_path)
     policy,policy_record=load_policy(policy_path)
     assert policy_record['allowed_as_teacher'] is False
     validation=tmp_path/'validation';validation.mkdir();result=validation/'result.json'

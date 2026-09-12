@@ -264,3 +264,8 @@ After checked publication, freeze exact src/lock/configs and a separate existing
 Corpus provenance now records the loaded policy's declared inference backend, matching evaluation, instead of always labeling it pytorch-cpu. Actual numeric regret-policy collection, canonical split/target replay, completed resume and rehashed-target rejection pass with Torch imports blocked. A separate fresh-process execution confirmed that no Torch module was loaded before or after these operations. The test alone substitutes a qualification guard to reach collection; restoring the real verifier rejects the artificial flags before a new corpus directory is created. This does not qualify any full teacher or create a scientific teaching corpus.
 
 Twenty relevant tabular/neural corpus, regret-policy and qualification checks passed in 13.48 seconds. The previous complete suite passed 237 tests with two isolated-oracle skips in 140.47 seconds, and traversal milestone a93c8b1b1ff7e5b21629659df2b95081af8e00a6 passed CI 34711208643. Existing frozen source snapshots retain their own metadata and implementation; this correction applies to future corpus execution snapshots.
+
+
+## V12: fixed final regret-matching candidate
+
+The user-observed shove/fold collapse is now quantified from the live frozen model. Poker strength takes priority. A separate positive-final-regret extraction is registered before V11 completes; its numeric/source/recovery checks and conditional execution order are in [POKER_STRENGTH.md](POKER_STRENGTH.md). It has no qualified result and does not alter V11 training, original average export or the visible neural model.

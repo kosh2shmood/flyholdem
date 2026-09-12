@@ -98,3 +98,6 @@ Native training and its replay now keep detailed hand records on disk, with stre
 A future conventional teacher runtime can use [exact PokerKit traversal reuse](POKER_TREE_PERFORMANCE.md). A small prototype workload ran about twice as fast with identical recorded and numeric results; the final helper reproduced all first 128 original training records. V11 continues its original frozen source.
 
 Twenty focused corpus/regret/qualification checks and a fresh process with no Torch module loaded also passed after correcting tabular corpus backend provenance. These integration fixtures do not constitute a qualified teacher or scientific corpus.
+
+
+The current spectator model uses folds or all-ins on 99.7% of its audited live decisions. This is an observed limitation, not competent full-hand strategy. See [POKER_STRENGTH.md](POKER_STRENGTH.md) for the descriptive counts and separately registered final-strategy teacher candidate. The visible model has not yet been upgraded.

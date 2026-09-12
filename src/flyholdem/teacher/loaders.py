@@ -4,6 +4,7 @@ from pathlib import Path
 
 
 def sampling(record):
+    if record['schema']=='teacher-final-regret-policy-v1':return 'frozen-normalized-positive-final-regrets'
     if record['schema']=='teacher-external-regret-policy-v1':return 'frozen-reach-weighted-regret-average-fixed-population'
     if record['schema']=='teacher-average-policy-v1':return 'frozen-average-policy-probabilities'
     if record['schema']=='teacher-best-response-policy-v1':return 'frozen-equal-mixture-of-legal-greedy-Q-policies'
@@ -16,6 +17,8 @@ def load_policy(path):
     sampling(record)
     if record['schema']=='teacher-external-regret-policy-v1':
         from .regret_policy import load_policy as load
+    elif record['schema']=='teacher-final-regret-policy-v1':
+        from .regret_current_policy import load_policy as load
     elif record['schema']=='teacher-average-policy-v1':
         from .policy import load_policy as load
     elif record['schema']=='teacher-potential-boundary-policy-v1':
