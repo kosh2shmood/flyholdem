@@ -338,3 +338,12 @@ Enabled terminal-return fine-tuning while retaining the distilled-connectome ori
 Two added integration checks pass; full suite 162 passed / 2 isolated-oracle skips. Published corpus and Gate 2A source CI passed (34695976274 / 34696368167). No biological poker training or concurrent full-graph snapshot match has run. Existing model/inference-core files, environment and binaries remain unchanged.
 
 V7 remains active on its immutable source, last inspected 220,000 / 500,000 hands; use its earlier recorded command plus --resume for recovery. Next: finish the actual multi-seed training/control orchestrator, including genuinely disconnected evaluation phases and registered curriculum endpoints. No full Gate 2A certificate, full teacher/corpus or poker-learning claim exists yet; Gates 3–6 remain pending.
+
+
+## Frozen poker evaluation in an isolated runtime
+
+Implemented evaluate --disconnected: minimal source-pinned native/PokerKit/evaluator package, separate verified binary and numeric model, no teacher source or bytecode caches, graph-only data link, active teacher-import and original project training-file denial. Both denials are checked before native inference. Resume verifies exact source/config/model/graph/binary inputs and retains complete-hand journals/checkpoints; parent interruption forwards to the worker.
+
+Actual native fixture evaluation matched every ordinary journal byte and recovered exactly after seven of sixteen hands; changed isolated source is rejected. Full suite: 163 passed / 2 isolated-oracle skips. Also compared sixteen actual circuit-model hands (all four original opponents) through ordinary and isolated inference: every journal byte matched, weights unchanged, teacher denied. Isolation manifest SHA 7c68cf537166fcc306f0aba77f8537127815f2f1cc90b7d572931093092f7b5d; this short integration check is not a poker result or parameter-selection experiment. Local evidence: runs/disconnected-circuit-v1; output audit saved locally. No second full-graph worker or environment/shared binary change.
+
+V7 remains active from its immutable 5a6ebe8 snapshot, last inspected 300,000 / 500,000 hands. Resume with the earlier recorded command plus --resume. General multi-seed orchestration still needs to combine the verified training observer, matched controls, frozen snapshot opponents and isolated evaluation phases into registered curricula/endpoints. Full Gate 2A and Gates 3–6 remain pending; no biological poker learning has run.

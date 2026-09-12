@@ -49,7 +49,7 @@ def parser():
     record.add_argument('--output',default='examples/fixture-demo.jsonl')
     evaluate=sub.add_parser('evaluate',help='Measure a frozen native model on fixed paired deals; no learning or gate claim')
     evaluate.add_argument('--config',default='configs/frozen_poker_evaluation.yaml');evaluate.add_argument('--model')
-    evaluate.add_argument('--stop-after',type=int);_output_options(evaluate)
+    evaluate.add_argument('--stop-after',type=int);evaluate.add_argument('--disconnected',action='store_true',help='Evaluate an exported model in an isolated runtime with teacher access denied');_output_options(evaluate)
     report=sub.add_parser('report',help='Verify recorded artifact chains and generate Markdown/HTML/JSON reports')
     report.add_argument('--run',required=True);report.add_argument('--output')
     preregister=sub.add_parser('preregister',help='Run registered controllability candidates and freeze the first passing mapping')
@@ -145,6 +145,11 @@ def dispatch(args):
     elif args.command=='evaluate':
         from flyholdem.experiments.evaluate import evaluate
         out,resume=run_path(args,'native-frozen-evaluation')
+        if args.disconnected:
+            from flyholdem.experiments.disconnected_evaluation import evaluate_disconnected
+            from flyholdem.experiments.reports import write_report
+            result=evaluate_disconnected(configuration(args.config),out,args.model,resume=resume,stop_after=args.stop_after)
+            return {**result,'report':write_report(result['run'])}
         result=evaluate(configuration(args.config),out,args.model,resume,args.stop_after)
     elif args.command in ('train','distill'):
         config=configuration(args.config);out,resume=run_path(args,args.command+'-'+args.profile)

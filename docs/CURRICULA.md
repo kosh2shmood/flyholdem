@@ -58,3 +58,16 @@ Two additional integration checks verify these invariants, deterministic reconst
 PokerLearningPlayer now supports terminal-local-eligibility with the distilled-connectome label: it retains the origin of transferred weights but accepts only the actual terminal chip reward. It rejects teacher targets and uses the same declared local rule, past-only position baseline and bounded existing edges as the strict terminal path. Actual fixture hands and complete checkpoint continuation are identical to that terminal mechanism, apart from the explicit mode label. This enables later fine-tuning; it is not evidence that poker distillation occurred.
 
 FrozenNeuralOpponent.load loads a hash-pinned native snapshot. The opponent consumes only its own canonical observation, uses the actual deterministic legal native argmax, resets dynamics per hand and checks unchanged weights at hand boundaries. Complete opponent decisions and hashes are logged. The rollout rejects shared mutable weights with the learning player, preserving one learning seat per match. Native fixture matches and recovery pass; no concurrent full-graph opponent experiment has been run. General gated multi-seed orchestration remains subsequent work.
+
+
+## Isolated frozen evaluation
+
+Add `--disconnected` to the frozen `evaluate` command when evaluating an exported model. A minimal copied package includes the exact frozen inference code, PokerKit wrapper, curriculum and evaluator, with a separate verified native binary copy and numeric model. It excludes teacher code and disables Python bytecode caches. A fresh subprocess actively rejects teacher imports and reads of the original project's training files; both denials are checked before native inference. The graph is the only prepared-data link, and the existing Python environment supplies locked dependencies. The isolated source/config/model/graph/binary identities are checked again on resume.
+
+The worker preserves the complete-hand append-only journal and atomic neural checkpoints, including interruption forwarding. CI verifies that all decision/journal bytes match ordinary native evaluation and exact recovery after seven of sixteen fixture hands. A separate 16-hand check with the actual exported circuit model also matched exactly while teacher access was denied. Both are frozen integration checks; neither is evidence of poker learning. No extra full-graph worker was launched for these checks.
+
+```sh
+.venv/bin/flyholdem evaluate --config configs/frozen_poker_evaluation.yaml --model runs/conditioning-full-confirm-v1-model --disconnected --output runs/disconnected-full-baseline
+```
+
+Resume by replacing `--output` with `--resume` naming the same outer run directory. The actual evaluation and report live under `evaluation/`; `isolation.json` pins runtime inputs and `isolation-result.json` records enforced denials. Use resource-aware scheduling before launching another full graph alongside the dashboard.

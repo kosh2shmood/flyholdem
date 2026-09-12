@@ -44,3 +44,6 @@ To qualify a completed full-hand corpus from its measured teacher, use `.venv/bi
 
 
 Gate prerequisite commands are documented in GATES.md. `gate certify-transfer` requires complete confirmed full-teacher/corpus evidence and actual native cue transfer/removal; `gate verify-transfer` repeats every check. `gate verify-cues --run RUN --config PROTOCOL` rederives registered confirmation statistics; add `--allow-failed` only for read-only negative audits. These commands do not claim that the pending poker learning gates passed.
+
+
+`evaluate --disconnected` requires `--model` and runs the frozen native evaluator in a separate minimal package/process. Teacher import and original project training-file access are actively denied and checked. The outer run preserves its immutable runtime; actual hand evidence is under `evaluation/`. Resume with `--resume OUTER_RUN`, retaining the same config/model. This remains a baseline workflow and grants no poker-learning claim.
