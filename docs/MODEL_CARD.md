@@ -14,7 +14,7 @@ Full local conditioning passed five independent seeds: 82.3% versus 47.2% frozen
 
 Local exact-cue transfer qualified in development but **failed** confirmation at 77.8%, below 80%. A separately registered, explicitly nonbiological direct-readout surrogate subsequently passed circuit confirmation: 94.5% versus 55.2% frozen and 52.2% shuffled-teacher. It changes only bounded multipliers on 10,450 existing registered KC-to-readout edges, uses actual native forward scores and adds no adapter/decoder/bypass. The backward approximation omits recurrent and threshold derivatives. Silent ties still contribute. All 128 actual exported-model decisions remained byte-identical after teacher/corpus deletion, and changed cue source was rejected. See TRANSFER.md.
 
-The 25k v1, 250k v1 250k visible-card v2 and 250k visible-equity v3 conventional NFSP policies failed the complete held-out opponent suite; none may teach the fly. No validated poker teacher/corpus or poker-trained student exists yet. Whole Gate 2A and poker Gates 3–6 remain pending. The full model shown in the dashboard and available for human play is the cue-conditioned model, **unvalidated for poker**.
+The 25k v1, 250k v1 250k visible-card v2 and 250k visible-equity v3 and Double DQN v4 conventional NFSP policies failed the complete held-out opponent suite; none may teach the fly. No validated poker teacher/corpus or poker-trained student exists yet. Whole Gate 2A and poker Gates 3–6 remain pending. The full model shown in the dashboard and available for human play is the cue-conditioned model, **unvalidated for poker**.
 
 ## Reproducibility and intended use
 
@@ -27,3 +27,6 @@ The default fixture is a synthetic Euler prototype with schematic engineering ro
 “A simulated network using the wiring of one reconstructed male fruit-fly central nervous system controls an engineered heads-up no-limit Hold'em interface.”
 
 This describes the native full-data controller, not the synthetic fixture. No living fly, consciousness, faithful whole-brain emulation or proven poker learner is claimed.
+
+
+The first 256-hand full-model baseline completed with unchanged weights and only fold/all-in actions. Its small-sample positive returns are explicitly not a poker-learning claim. Four genuine PokerKit curriculum environments and teacher-free paired evaluation exist; gated poker learning/control experiments remain subsequent work. See CURRICULA.md.

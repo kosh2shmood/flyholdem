@@ -28,3 +28,14 @@ The registered first full baseline is configs/frozen_poker_evaluation.yaml: 32 p
 Commit exact source/config before running. Stop the advancing full native spectator first; no concurrent full-graph workers. Use `--resume runs/native-full-frozen-baseline-v1` with the same frozen runtime after interruption. A snapshot of source/lock/config plus immutable data/binary references permits independent checkout work during execution. Generated logs, checkpoints, results and reports stay ignored/local. Core rollout and recovery tests use a clearly labeled seven-neuron native numerical fixture without downloading MaleCNS.
 
 Actual poker learning/control runners and Gates 3–6 remain pending. Implementing a 100 BB environment does not permit 100 BB learning before Gate 5. Whole Gate 2A is still awaiting a validated conventional teacher/corpus; its small exact-transfer/removal components have passed. Current baseline evaluation does not bypass those requirements.
+
+
+## First full frozen baseline completed
+
+The registered 256-hand / 32-pair-per-opponent run completed in 17.32 s with no weight changes. Mean BB/hand: random +0.7734375 (adjusted interval −0.515625 to +2.390625), station +2.25 (−2.125 to +6.3125), TAG +0.3671875 (+0.0234375 to +1.2890625), equity +1.046875 (+0.09375 to +2.4765625). This small development sample is a baseline only. Across 220 neural decisions, the model selected fold 149 times and all-in 71 times, with no other action. Action collapse and cue-only prior training rule out interpreting these returns as demonstrated poker learning or a Gate 3–5 pass. No policy or biological parameter was selected from these results.
+
+Model SHA-256 9e0f94abdd1cce92fc93c16dbbe9597d99456b01c3d09076784d2e51f8cf0259; result manifest cebed8d2bdcfafa19572fcf09f33000220d54b923e4b0b5d5545c71431ba9522; source hash 0053df4112958f6c900c529b4109f99687824db78cc49b59958a79dd9dd9f8e1. Generated evidence: runs/native-full-frozen-baseline-v1, with local reports. The full dashboard was restored after the one full worker completed.
+
+## Poker learning observer engineering
+
+A separate training observer now wraps the unchanged native controller, accumulating the registered five-millisecond eligibility bins. Its returned counts, scores, masks and chosen actions are byte-identical to observer-free native decisions when weights are frozen. Terminal local chip reward, post-action local teacher advantage and the separately labeled bounded-edge surrogate are implemented. Targets cannot enter the controller's observation or decoder, and frozen/bio-plastic calls reject teacher targets. Complete neural/eligibility/baseline/RNG state restores exactly. This is numerical-fixture engineering evidence; no actual poker training/control run or learning gate has executed yet.

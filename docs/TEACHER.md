@@ -103,3 +103,8 @@ PYTHONPATH="$PWD/runs/teacher-runtime-v4/src" .venv/bin/python -m flyholdem.teac
 ```
 
 Add --resume after interruption. Export/evaluation must use the same PYTHONPATH. Do not change the snapshot, installed environment or copied binary while it runs. A passing development suite is required before reserved confirmation and corpus creation; no fly learning claim follows from conventional teacher training.
+
+
+## Double DQN v4 result — development failed
+
+The controlled v4 candidate completed 250,000 hands in 1,620.01 s and failed the complete original development suite: +1.064453125 / −0.216796875 / −0.263671875 / −1.80859375 BB per hand against random/station/TAG/equity. No suite-adjusted lower bound was positive. Hidden-information mutation checks passed all 32 decisions. The frozen average policy SHA-256 is 372e5ee1a74b83750ad945dbe62c2fc6dcd316ca00cada307aa2c3138402cf9a; evaluation manifest bf99368c38b7d64937e05ba2f85932a8383a41825b2832b05bdef79057401395. All generated records remain local. No confirmation or corpus is allowed. Double DQN alone did not solve teacher robustness; the next candidate will require a separately registered training-population change, preserving all original evaluation opponents and reserved deals.
