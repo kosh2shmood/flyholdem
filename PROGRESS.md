@@ -1,7 +1,9 @@
 # FlyHoldem progress
 
 ## Current phase
-M2 connectome runtime is complete: exact source hashes, reproducible full/circuit graph counts and all prepared-file hashes, independent numerical verification, atomic native-state checkpoints and measured sequential resource runs. Save/push this evidence checkpoint, then start M3 neural mapping and controllability. The public/live poker scene is still the labeled synthetic fixture. No conditioning, trained teacher, transfer or learned poker result exists yet.
+M3 fixed native population interface and controllability runner are implemented; three data-free tests pass for balanced mapping/leakage, disjoint connectivity selection and neural-only masked decoding. Save this protocol/code checkpoint, then run the circuit controllability experiment. No Gate 1 outcome exists yet.
+
+M2 connectome runtime is complete: exact source hashes, reproducible full/circuit graph counts and all prepared-file hashes, independent numerical verification, atomic native-state checkpoints and measured sequential resource runs. Evidence checkpoint ab9a658 is published. The public/live poker scene is still the labeled synthetic fixture. No conditioning, trained teacher, transfer or learned poker result exists yet.
 
 ## Latest user steering — implemented
 - Three.js fly at the side of the table, fully visible, with curved cards oriented toward itself and the spectator.
@@ -57,7 +59,7 @@ Code/config fixed at 04b86b2; execution commit 0dc8111, clean tree. Config confi
 - No agents delegated. Keep original checkout and astra/visual-first history; no squash/rewrite.
 
 ## Last stable commits and publication
-V0 2bd2d3c / visual-demo-v0; M0 fa873a6; first avatar 6aa7895; rules c2f2ffe; numerical 8d6f69c; side seating 80a32fd; card readability 0b05d88; importer 04b86b2; registered M2 execution 0dc8111. All pushed. Next evidence commit is feat: verify complete MaleCNS runtime milestone.
+V0 2bd2d3c / visual-demo-v0; M0 fa873a6; first avatar 6aa7895; rules c2f2ffe; numerical 8d6f69c; side seating 80a32fd; card readability 0b05d88; importer 04b86b2; registered M2 execution 0dc8111. All pushed. M2 evidence ab9a658 is pushed. Next checkpoint is feat: register neural controllability experiments.
 
 User explicitly approved publication of checked milestones and tags to public kosh2shmood/flyholdem on astra/visual-first. Earlier automatic-review publication rejections are resolved; do not request approval again. Generated data/checkpoints/large logs/secrets stay ignored.
 
@@ -66,3 +68,6 @@ No native graph poker controller or biological learning result yet. The full neu
 
 ## Next step
 Commit/push this actual M2 evidence, then implement M3 fixed symbolic population mapping, annotation/connectivity-selected disjoint readout ensembles, candidate/calibration artifacts and the controllability gate. Record black/no-input and shuffled-input controls. Freeze valid preregistration before any poker evaluation. Then proceed to M4 conditioning and teacher work under the registered gates.
+
+## Next registered M3 run
+Configuration: configs/controllability.yaml. Circuit command: `uv run --frozen --extra data python -m flyholdem.interface.preregister --mode circuit --output runs/controllability-circuit-v1`. Add `--resume` after graceful interruption, using unchanged code/config/environment. Full-mode follow-up uses `--mode full --output runs/controllability-full-v1` only after inspecting circuit engineering/controls. Each run records exact commit/config/source/graph/encoder/decoder/binary/environment identities before its first trial. No poker information or profit is inspected during this registration. Candidate/selected artifacts, append-only trials, checkpoints and results stay ignored in runs/; publish compact evidence after checking it.

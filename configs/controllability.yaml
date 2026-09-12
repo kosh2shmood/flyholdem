@@ -1,0 +1,22 @@
+schema: neural-controllability-v1
+encoder: engineered-kc-v1
+mapping_seed: 1729
+fanout: 32
+readout_class: MBON
+input_class: Kenyon_Cell
+ensemble_size: 3
+minimum_presynaptic_inputs: 8
+selection: diverse-direct-KC-connectivity-v1
+score_scale_hz: 100.0
+decision_ms: {baseline: 50, stimulus: 300, readout: 100, inter_decision: 50}
+calibration:
+  gains: [12.0, 20.0, 32.0]
+  control_cell_counts: [64, 32, 128]
+  trials_per_action: 5
+  seed: 32100
+confirmatory:
+  trials_per_action: 20
+  seed: 32200
+  minimum_success: 0.95
+amplitude_jitter: 0.10
+# Input-population interventions only; no poker states or rewards are inspected.
