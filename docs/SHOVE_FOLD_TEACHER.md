@@ -33,3 +33,5 @@ The same 5,000-resample Bonferroni suite bootstrap requires every opponent's low
 ```
 
 Add `--profile confirmatory --development-reference runs/shove-fold-teacher-v1-development` only after passing development, and choose a distinct output. Replace `--output RUN` with `--resume RUN` after interruption. Two additional tests cover real paired-game recovery, recomputed summaries and rejected overlap/mismatched training; full suite 143 passed / 2 isolated-oracle skips. Evaluation has not run at this registration checkpoint.
+
+Development passed all four adjusted lower bounds on 512 paired deals each: random +0.355469 BB/hand [0.077625, 0.622452], calling station +0.456055 [0.068478, 0.843512], tight-aggressive +0.330566 [0.225586, 0.433963], equity-bucket +0.276855 [0.079102, 0.472656]. Private-information checks passed and summaries were recomputed from the complete journal. Result SHA-256 735383b3fb45e1f63de219a67907bf791e49698a68dd4b149dd648ebda2eeb0b; manifest 59cb41ad6bbf3bf041d7784c7c9585ad8d8a47f2b5624af1e306b2828f5ea457. This qualifies the fixed table for its predeclared small-game confirmation, not for teaching yet. No parameters or checkpoint changed.
