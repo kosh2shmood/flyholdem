@@ -29,11 +29,17 @@ with sync_playwright() as p:
         assert card['printed_side']=='front-only' and card['back']=='pattern'
     assert initial['opponent']['hole']==['??','??']
     natural_cards=initial['cards']
-    found={};opponent_found={};deadline=time.monotonic()+65
+    found={};opponent_found={};board_lengths=set();deadline=time.monotonic()+65
     while time.monotonic()<deadline and (len(found)<6 or len(opponent_found)<2):
         state=page.evaluate('({event:window.flyholdem.latest,avatar:window.flyholdem.avatar.snapshot()})')
         a,e=state['avatar'],state['event']
         opponent=a['opponent']
+        board_lengths.add(len(e['table']['board']))
+        # The browser may advance between tool reads; compare within one JS task.
+        inset=page.evaluate("({board:window.flyholdem.latest.table.board,shown:[...document.querySelectorAll('#avatar-community-cards .card')].map(n=>n.dataset.card).filter(Boolean)})")
+        assert inset['board']==inset['shown']
+        assert (a['visible_chip_count']>0)==(e['table']['stacks'][0]>0)
+        assert (opponent['visible_chip_count']>0)==(e['table']['stacks'][1]>0)
         assert opponent['hole']==e['table']['opponent_hole'], 'Never reveal private opponent cards'
         if e['kind']=='opponent_action' and .15<opponent['elapsed']<.72:
             label='check' if opponent['check'] else 'call'
@@ -77,6 +83,7 @@ with sync_playwright() as p:
             page.get_by_role('button',name='Resume display').click()
         page.wait_for_timeout(40)
     assert len(found)==6, f'Missing real gesture coverage: {found.keys()}'
+    assert {0,3,5}.issubset(board_lengths), board_lengths
     assert len(opponent_found)==2, f'Missing opponent gestures: {opponent_found.keys()}'
     page.get_by_role('button',name='Pause display').click()
     page.get_by_role('button',name='Table view',exact=True).click()
@@ -101,7 +108,8 @@ with sync_playwright() as p:
     snapshot=page.evaluate('window.flyholdem.avatar.snapshot()')
     report={'status':'pass','scope':'illustrative action-driven avatar, not a body simulation',
         'live_event_card_match':True,'replay_event_card_match':True,'six_gestures':found,'opponent_gestures':opponent_found,
-        'curved_holder_and_viewer_facing_cards':natural_cards,'opponent_information_boundary':True,
+        'curved_holder_and_viewer_facing_cards':natural_cards,'opponent_information_boundary':True,'community_inset_matches_events':True,
+        'community_card_counts_seen':sorted(board_lengths),'both_chip_stacks_match_zero_or_positive_balance':True,
         'full_silhouette_bounds':{'desktop':desktop_bounds,'mobile':mobile_bounds},
         'pause_freezes_both_players':True,'camera_reset':True,'table_toggle':True,
         'desktop':[1440,1080],'mobile':[390,844],'browser':browser.version,

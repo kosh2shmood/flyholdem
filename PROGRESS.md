@@ -1,7 +1,7 @@
 # FlyHoldem progress
 
 ## Current phase
-Latest requested two-player scene revision passed local browser checks and is ready to save/push. Fly stands at the table side with curved, holder-facing cards; an abstract opponent makes its actual poker gestures. M2 numerical checkpoint 8d6f69c is published and CI passed. Next: checksum-verified official MaleCNS download, streaming import/preparation and audit. No teacher or poker training started.
+Card-readability revision passed local browser checks and is ready to save/push. Larger 3D cards, matched fly/community insets and visible opponent chip piles now work on desktop/mobile. Previous side-seating checkpoint 80a32fd passed CI (run 34677267958). All three official MaleCNS files have downloaded and independently matched the committed byte counts/SHA-256 expectations. Import/preparation code is a tested draft, not yet run on the full data; save its own checkpoint/config before starting the import. No teacher or poker training started.
 
 ## Completed acceptance checks
 - Read execution brief/specification/setup context and applicable ancestor AGENTS.md paths (none existed).
@@ -39,6 +39,11 @@ uv run python scripts/avatar_check.py
 ```
 Demo URL: http://127.0.0.1:8766. Default seed 20260912, graph/mapping seed 1729. One command serves backend/UI. Browser check expects running server.
 
+## Latest readability evidence
+- All six fly gestures and both real opponent gestures still pass Chromium checks. Community inset matches actual events for 0/3/4/5 dealt cards. Both players show chips iff their balance is positive. Full models remain in the desktop/mobile camera frame; no page errors or horizontal overflow.
+- Existing 36 core tests pass; four additional importer-draft tests also pass (40 total with the optional data packages installed). The two independent Brian2 tests remain in their separate passing oracle environment.
+- Data download verified: annotations 14,483,314 bytes, neurotransmitters 43,282,834 bytes, edges 1,051,241,946 bytes. Exact digests match data-provenance/malecns_v1/source.lock.json. Raw data stays ignored.
+
 ## Current visual revision evidence
 - Core: 36 passed, two Brian2 tests intentionally skipped in the base environment; both run and pass in the separate Python 3.12 oracle, including CI.
 - Browser: all six fly gestures plus actual opponent check/call, matching action/event hashes and cards, opponent privacy including mucked cards, pause for both players, table toggle, camera reset, desktop 1440×1080 and mobile 390×844 full silhouette bounds. No browser errors.
@@ -66,10 +71,10 @@ The user requested a visible animated fly like the Doom/döner examples, with it
 - Atomic native-state checkpoint infrastructure is verified; full experiment/controller/game integration remains a runner milestone; V0 live logs are append-only, fsynced after completed hands, and ignored.
 
 ## Last stable commit
-V0: 2bd2d3c2fc6158248c4f633690b5d170add14b32 (visual-demo-v0), pushed. M0: fa873a6, pushed. Animated fly: 6aa7895, pushed. M1: c2f2ffe, pushed and CI green. Numerical: 8d6f69c, pushed and CI green (run 34676666552). The next visual checkpoint is `feat: seat both animated players beside the table`.
+V0: 2bd2d3c2fc6158248c4f633690b5d170add14b32 (visual-demo-v0), pushed. M0: fa873a6, pushed. Animated fly: 6aa7895, pushed. M1: c2f2ffe, pushed and CI green. Numerical: 8d6f69c, pushed and CI green (run 34676666552). Side seating: 80a32fd, pushed and CI green. The next visual checkpoint is `feat: clarify community cards and both chip stacks`.
 
 ## Resumable experiment command
 No long training experiment started. Reproduce visual run with `make demo`; replay with `make replay`. Current local live worker logs into a timestamped ignored runs/live-* directory.
 
 ## Next step
-Save/push the verified visual revision, then run `make fetch-malecns`. Expected source lock is already committed at data-provenance/malecns_v1/source.lock.json (1,109,008,094 bytes); registry refuses any mismatch. Download outputs stay in ignored connectome_data/malecns_v1 and resume partial files. Before import, implement/test streaming retention and CSR preparation, and commit the exact import/runtime config. Hardware measured: 16 GiB RAM, 77 GiB free disk. Run only one full-data/runtime worker at a time. Full biological conditioning and all poker-learning gates remain pending.
+Save/push the verified card-readability revision. Then finalize/importer audit tests and the exact runtime config, commit them, and run `make prepare-malecns`. Sources are verified and remain in ignored connectome_data/malecns_v1. Hardware measured: 16 GiB RAM, 77 GiB free before download. Run one full-data/runtime worker at a time; measure real peak memory and throughput before conditioning. No biological or poker learning gate has passed yet.

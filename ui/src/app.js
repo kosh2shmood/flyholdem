@@ -8,7 +8,7 @@ const errors=[];
 window.addEventListener('error', e => errors.push(e.message));
 window.flyholdem = {get latest(){return latest}, get mode(){return mode}, get avatar(){return avatar}, errors};
 function card(value){
- const el=document.createElement('span'); el.className='card';
+ const el=document.createElement('span'); el.className='card';el.dataset.card=value||'';
  if(value==='??'){el.classList.add('back');el.textContent='◇';return el}
  if(!value){el.classList.add('empty');return el}
  if(!/^[2-9TJQKA][cdhs]$/.test(value))throw Error('Invalid event card');
@@ -34,7 +34,7 @@ function render(event){
  latest=event;
  if(event.sequence===0)resetPlasticity();
  avatar?.update(event);
- cards("avatar-cards",event.table.hole,2);
+ cards("avatar-cards",event.table.hole,2);cards("avatar-community-cards",event.table.board,5);$("avatar-board-stage").textContent=event.table.street;
  $("avatar-stack-fly").textContent=event.table.stacks[0];$("avatar-stack-other").textContent=event.table.stacks[1];$("avatar-pot").textContent=event.table.pot;
  if(event.kind==="hand_start"){$("avatar-action").textContent="Looking at its cards";$("avatar-motion").textContent="A new hand. Waiting for neural output."}
  if(event.decision){

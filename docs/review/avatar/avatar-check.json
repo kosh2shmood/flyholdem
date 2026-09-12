@@ -9,99 +9,99 @@
       "sequence": 1,
       "hand": 1,
       "left_displacement": 0.0,
-      "right_displacement": 0.7097659898968559,
+      "right_displacement": 0.6469676973357057,
       "cards": [
         "3h",
         "4c"
       ],
       "action_frames": 5,
-      "elapsed": 0.18420000000000025
+      "elapsed": 0.1650999999999999
     },
     "all-in": {
       "event_hash": "3e9e69242d40fde167027ff5e549552d00c87045194e85c4855416a2e14259a7",
       "sequence": 4,
       "hand": 1,
-      "left_displacement": 0.695104123952102,
-      "right_displacement": 0.695104123952102,
+      "left_displacement": 0.8171491676878356,
+      "right_displacement": 0.8171491676878356,
       "cards": [
         "3h",
         "4c"
       ],
       "action_frames": 5,
-      "elapsed": 0.15910000000000035
+      "elapsed": 0.19269999999999984
     },
     "pot": {
       "event_hash": "0ca5a0f298d40ab2a6ee4b0cc432fc2c258a269f59f6a6f87c6366b44fdc51dd",
       "sequence": 9,
       "hand": 2,
       "left_displacement": 0.0,
-      "right_displacement": 0.9143392519349928,
+      "right_displacement": 1.1400311155530747,
       "cards": [
         "8s",
         "9d"
       ],
       "action_frames": 6,
-      "elapsed": 0.19170000000000076
+      "elapsed": 0.25820000000000076
     },
     "fold": {
       "event_hash": "7355beb7deeb65ae76b3b17249ddb14485f3955e66be09dcc46b44263b1807d5",
       "sequence": 15,
       "hand": 3,
-      "left_displacement": 0.2170496664407429,
-      "right_displacement": 0.2788032125086462,
+      "left_displacement": 0.39043444433411434,
+      "right_displacement": 0.36819397035521995,
       "cards": [
         "Qs",
         "Ac"
       ],
       "action_frames": 5,
-      "elapsed": 0.15840000000000146
+      "elapsed": 0.22259999999999855
     },
     "check": {
       "event_hash": "3da48677a37b5d6881f4980ca640a37310f007ca20031a15b927723490fd0cdb",
       "sequence": 19,
       "hand": 4,
       "left_displacement": 0.0,
-      "right_displacement": 0.44428197925415636,
+      "right_displacement": 0.40272420307833795,
       "cards": [
         "Ad",
         "8c"
       ],
-      "action_frames": 5,
-      "elapsed": 0.15010000000000218
+      "action_frames": 6,
+      "elapsed": 0.2595000000000036
     },
     "half-pot": {
       "event_hash": "005c2126b97f78803e6dee1065c247c37cf40a7bf19561a9efffd0cafadb3f1b",
       "sequence": 24,
       "hand": 4,
       "left_displacement": 0.0,
-      "right_displacement": 0.7285031444734322,
+      "right_displacement": 0.8087941091640687,
       "cards": [
         "Ad",
         "8c"
       ],
       "action_frames": 5,
-      "elapsed": 0.18269999999999711
+      "elapsed": 0.208
     }
   },
   "opponent_gestures": {
     "check": {
       "event_hash": "66a2b7b59012fa8fa75fac36e6018954d8aa505df228649bc9a1975c13ca6e66",
       "sequence": 2,
-      "right_displacement": 0.43022773933031844,
+      "right_displacement": 0.4252166939861762,
       "action_frames": 5
     },
     "call": {
       "event_hash": "01d756222f19824f0faaee8e6748056ee8b78c55fd8e105cf3e86c03c1bef351",
       "sequence": 5,
-      "right_displacement": 0.7330929809784119,
-      "action_frames": 6
+      "right_displacement": 0.6766814629681545,
+      "action_frames": 4
     }
   },
   "curved_holder_and_viewer_facing_cards": [
     {
       "bend": 0.12,
       "holder_facing": 0.31847343063988554,
-      "viewer_facing": 0.336147165201949,
+      "viewer_facing": 0.2784244998008837,
       "printed_side": "front-only",
       "back": "pattern",
       "position": [
@@ -113,7 +113,7 @@
     {
       "bend": 0.12,
       "holder_facing": 0.5419712080896631,
-      "viewer_facing": 0.35778010249247705,
+      "viewer_facing": 0.3069203772787966,
       "printed_side": "front-only",
       "back": "pattern",
       "position": [
@@ -124,33 +124,41 @@
     }
   ],
   "opponent_information_boundary": true,
+  "community_inset_matches_events": true,
+  "community_card_counts_seen": [
+    0,
+    3,
+    4,
+    5
+  ],
+  "both_chip_stacks_match_zero_or_positive_balance": true,
   "full_silhouette_bounds": {
     "desktop": {
       "fly": {
-        "left": -0.801501118721836,
-        "right": -0.25751559921789674,
-        "top": 0.7313257063621075,
-        "bottom": -0.580918732684846
+        "left": -0.7827331923959711,
+        "right": -0.22917571967353198,
+        "top": 0.8870396431660553,
+        "bottom": -0.7335134340908636
       },
       "opponent": {
-        "left": 0.2781719056300922,
-        "right": 0.6849990528520157,
-        "top": 0.5437790044180377,
-        "bottom": -0.5265768163327242
+        "left": 0.19131017156094868,
+        "right": 0.691870050892489,
+        "top": 0.6898457136587892,
+        "bottom": -0.7319077628383837
       }
     },
     "mobile": {
       "fly": {
-        "left": -0.8807857512877075,
-        "right": -0.282989087884426,
-        "top": 0.39717831598375863,
-        "bottom": -0.31549325008540585
+        "left": -0.9637101277188852,
+        "right": -0.2821637873827615,
+        "top": 0.5773038443724363,
+        "bottom": -0.47738579516925883
       },
       "opponent": {
-        "left": 0.30568871978401524,
-        "right": 0.7527592804359157,
-        "top": 0.2953229010866226,
-        "bottom": -0.28598050270581465
+        "left": 0.2355432881344521,
+        "right": 0.8518383806741251,
+        "top": 0.4489659347102176,
+        "bottom": -0.47634079093072634
       }
     }
   },
@@ -168,7 +176,7 @@
   "browser": "151.0.7922.34",
   "webgl": "three-webgl2",
   "three_revision": "186",
-  "triangles": 28844,
+  "triangles": 27116,
   "draw_calls": 640,
   "errors": []
 }

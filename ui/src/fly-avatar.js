@@ -150,7 +150,7 @@ function cardTexture(code){
  }else if(/^[2-9TJQKA][cdhs]$/.test(code)){
   const rank=code[0]==='T'?'10':code[0],suit={c:'♣',d:'♦',h:'♥',s:'♠'}[code[1]];
   ctx.fillStyle='dh'.includes(code[1])?'#a64234':'#20372a';ctx.font='bold 55px Georgia';ctx.fillText(rank,24,65);ctx.font='44px Georgia';ctx.fillText(suit,25,113);
-  ctx.textAlign='center';ctx.font='116px Georgia';ctx.fillText(suit,128,230);
+  ctx.textAlign='center';ctx.font='bold 80px Georgia';ctx.fillText(rank,128,209);ctx.font='68px Georgia';ctx.fillText(suit,128,278);
   ctx.save();ctx.translate(256,356);ctx.rotate(Math.PI);ctx.textAlign='left';ctx.font='bold 55px Georgia';ctx.fillText(rank,24,65);ctx.font='44px Georgia';ctx.fillText(suit,25,113);ctx.restore();
  }
  const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;texture.anisotropy=4;textureCache.set(code,texture);return texture;
@@ -163,7 +163,7 @@ function changeCard(mesh,code){
  const front=mesh.userData.front||mesh.material[4];front.map=cardTexture(code);front.needsUpdate=true;mesh.userData.card=code;
 }
 function curvedCard(code){
- const group=new T.Group(),geometry=new T.PlaneGeometry(.48,.67,8,20);
+ const group=new T.Group(),geometry=new T.PlaneGeometry(.56,.78,8,20);
  const front=material(0xffffff,{map:cardTexture(code),roughness:.84,side:T.FrontSide});
  const back=material(0xffffff,{map:cardTexture('??'),roughness:.84,side:T.BackSide});
  const face=new T.Mesh(geometry,front),reverse=new T.Mesh(geometry,back);face.castShadow=true;
@@ -173,7 +173,7 @@ function curvedCard(code){
 function bendCard(card,bend){
  if(Math.abs(card.userData.bend-bend)<.0001)return;
  const geometry=card.userData.geometry,p=geometry.attributes.position;
- for(let i=0;i<p.count;i++){const v=p.getY(i)/.67+.5;p.setZ(i,-bend*v*v)}
+ for(let i=0;i<p.count;i++){const v=p.getY(i)/.78+.5;p.setZ(i,-bend*v*v)}
  p.needsUpdate=true;geometry.computeVertexNormals();card.userData.bend=bend;
 }
 
@@ -204,7 +204,10 @@ function playerRig(model,x,yaw,color){
  const seat=new T.Group();seat.position.set(x,0,0);seat.rotation.y=yaw;seat.add(model.root);
  const cards=[curvedCard('??'),curvedCard('??')];cards.forEach(c=>seat.add(c));
  const holding=cardOrientation(x<0?-1:1),faceDown=new T.Quaternion().setFromEuler(new T.Euler(Math.PI/2,0,0)),faceUp=new T.Quaternion().setFromEuler(new T.Euler(-Math.PI/2,0,0));
- const bank=pile(seat,.63,-.20,color,12),flying=new T.Group();seat.add(flying);
+ const bank=new T.Group();seat.add(bank);
+ // Three readable stacks sit within the rail, mirrored for the second seat.
+ for(let i=0;i<18;i++){const stack=i%3,layer=Math.floor(i/3);chip(bank,color,[(x<0?1:-1)*(.63+(stack-1)*.23),.81+layer*.033,.15+(stack===1?.19:0)])}
+ const flying=new T.Group();seat.add(flying);
  const movingLeft=pile(flying,-.27,0,color,6),movingRight=pile(flying,.27,0,color,6);flying.visible=false;
  return {seat,model,cards,holding,faceDown,faceUp,bank,flying,movingLeft,movingRight,action:null,elapsed:0,actionHash:null,
   actionFrames:0,left:[...restLeft],right:[...restRight],folded:false,laidDown:false};
@@ -252,7 +255,7 @@ export function createFlyViewer(canvas,onFailure){
  const camera=new T.PerspectiveCamera(36,1,.1,50);
  const controls=new OrbitControls(camera,canvas);controls.enableDamping=true;controls.enablePan=false;controls.minDistance=5;controls.maxDistance=16;
  controls.minPolarAngle=.28;controls.maxPolarAngle=1.40;controls.minAzimuthAngle=-.85;controls.maxAzimuthAngle=.85;
- function resetCamera(){camera.position.set(0,3.9,7.8);controls.target.set(0,1.35,-.12);controls.update()}
+ function resetCamera(){camera.position.set(0,3.42,6.25);controls.target.set(0,1.35,-.12);controls.update()}
  resetCamera();
  const floor=new T.Mesh(new T.CircleGeometry(8,80),material(0x18221b,{roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=.015;floor.receiveShadow=true;scene.add(floor);
  const table=new T.Mesh(new T.CylinderGeometry(2.35,2.38,.14,96),material(0x1d3528,{roughness:.95}));table.position.set(0,.70,.22);table.scale.set(1,1,.66);table.receiveShadow=true;scene.add(table);
@@ -263,10 +266,10 @@ export function createFlyViewer(canvas,onFailure){
  const fly=playerRig(makeFly(),-1.95,.95,0xa16d4e),other=playerRig(makeOpponent(),1.95,-.95,0x8eab9c);
  // Mirror the abstract player's card fan so both hands face their holder.
  const players=[fly,other];players.forEach(p=>scene.add(p.seat));
- const board=Array.from({length:5},(_,i)=>{const c=cardMesh('??',.36,.51);c.position.set((i-2)*.42,.785,.58);c.rotation.x=-Math.PI/2;c.visible=false;scene.add(c);return c});
+ const board=Array.from({length:5},(_,i)=>{const c=cardMesh('??',.46,.65);c.position.set((i-2)*.51,.785,.58);c.rotation.x=-Math.PI/2;c.visible=false;scene.add(c);return c});
  const pot=pile(scene,0,-.28,0xb7b189,12);
  let event=null,clock=0,last=performance.now(),paused=false,frame=0,disposed=false,visible=true,lastEventHash=null;
- function setStack(group,value){group.children.forEach((c,i)=>c.visible=i<Math.min(12,Math.ceil(value/2)))}
+ function setStack(group,value){group.children.forEach((c,i)=>c.visible=i<Math.min(group.children.length,Math.ceil(value/2)))}
  function update(e){
   if(e.hash===lastEventHash)return;event=e;lastEventHash=e.hash;const t=e.table;
   fly.cards.forEach((c,i)=>{changeCard(c,t.hole[i]||'??');c.visible=Boolean(t.hole[i])});
@@ -288,7 +291,7 @@ export function createFlyViewer(canvas,onFailure){
    if(canvas.width!==Math.round(rect.width*renderer.getPixelRatio())||canvas.height!==Math.round(rect.height*renderer.getPixelRatio())){
     renderer.setSize(rect.width,rect.height,false);camera.aspect=rect.width/rect.height;
     // Fit the same two complete silhouettes on a narrow screen.
-    camera.fov=2*Math.atan(Math.tan(36*Math.PI/360)*Math.max(1,1.80/camera.aspect))*180/Math.PI;camera.updateProjectionMatrix();
+    camera.fov=2*Math.atan(Math.tan(36*Math.PI/360)*Math.max(1,2.15/camera.aspect))*180/Math.PI;camera.updateProjectionMatrix();
    }
    players.forEach(p=>animatePlayer(p,clock,paused));
    controls.update();renderer.render(scene,camera);
@@ -300,7 +303,7 @@ export function createFlyViewer(canvas,onFailure){
   const head=p.seat.localToWorld(V(0,2.28,-.91));
   return {action_hash:p.actionHash,action:p.action?.id??null,check:p.action?.check??false,paid:p.action?.paid??0,
    hole:p.cards.filter(c=>c.visible).map(c=>c.userData.card),left:[...p.left],right:[...p.right],elapsed:p.elapsed,action_frames:p.actionFrames,
-   position:p.seat.position.toArray(),yaw:p.seat.rotation.y,
+   position:p.seat.position.toArray(),yaw:p.seat.rotation.y,visible_chip_count:p.bank.children.filter(c=>c.visible).length,
    cards:p.cards.map(c=>{const position=c.getWorldPosition(V(0,0,0)),normal=V(0,0,1).applyQuaternion(c.getWorldQuaternion(new T.Quaternion()));return {
     bend:c.userData.bend,holder_facing:normal.dot(head.clone().sub(position).normalize()),viewer_facing:normal.dot(camera.position.clone().sub(position).normalize()),
     printed_side:'front-only',back:'pattern',position:position.toArray()};}),

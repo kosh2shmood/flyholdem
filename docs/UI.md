@@ -19,3 +19,9 @@ The scene and its readable card/stack inset use the same event hash as the decis
 Three.js 0.186.0 is installed from the Node lockfile and served locally. WebGL 2 is required for the 3D scene. If unavailable, the viewer shows an explicit graphics error and the table view remains usable. The fixture/policy process does not depend on WebGL.
 
 Run `uv run python scripts/avatar_check.py` with the server active to verify all six fly gestures and the opponent's real check/call gestures, card/event correspondence, the opponent information boundary, positive card-face orientation toward both holder and default camera, two-hand all-in movement, pause for both rigs, full silhouette bounds, camera reset, desktop/mobile overflow and browser errors. Evidence is in `docs/review/avatar/`; `fly-action-demo.webm` records the actual browser.
+
+## Card and chip readability
+
+A dedicated strip below the 3D scene shows the fly's two cards, all five public community slots and exact balances. Community slots remain empty until the event deals them. The 3D cards are larger and use a larger central rank, while the inset remains readable on a narrow phone screen. Both players have three chip piles positioned inside the rail; their visible count follows the public balance and becomes zero when the stack is empty. The inset contains the exact chip amounts; mesh counts are illustrative.
+
+Browser checks compare the community strip with the canonical events on preflop, flop, turn and river, and verify chip visibility for zero/positive balances for both seats.
