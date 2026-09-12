@@ -31,3 +31,7 @@ The expected MaleCNS source.lock.json is reproduced from DOOMFLY's pinned proven
 Three.js 0.186.0 (MIT), https://github.com/mrdoob/three.js, installed separately with npm from the committed lockfile; license retained at licenses/Threejs-MIT.txt. Current official WebGLRenderer/OrbitControls APIs were checked at https://threejs.org/docs/. No remote renderer assets are loaded.
 
 `ui/src/fly-avatar.js` adapts the ellipsoid/rod and veined-wing construction ideas from DOOMFLY `doom-ui/lib/fly-model.ts` at the pinned revision. Its source header and licenses/DOOMFLY-MIT.txt preserve attribution. The upright poker pose, articulated hands, card textures, chips, table and event-driven gestures are original FlyHoldem code. This is an anatomy-inspired illustration; no third-party character mesh, neural-body model or game art is copied.
+
+## Numerical runtime
+
+`src/flyholdem/neural/kernel/doomfly_lif.cpp` retains the all-edge lazy LIF algorithm from DOOMFLY `doom/kernel.cpp` at the pinned revision, with an added provenance header and the MIT notice at licenses/DOOMFLY-MIT.txt. The Python reference, validated ctypes wrapper, checkpoint manager and build record are original FlyHoldem code. The Brian2 oracle test adapts the independent-oracle test design from DOOMFLY. Brian2 2.10.1 uses CeCILL 2.1; it is installed separately in the locked oracle environment, not vendored.

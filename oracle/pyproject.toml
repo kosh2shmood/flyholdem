@@ -1,0 +1,5 @@
+[project]
+name = "flyholdem-numerical-oracle"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = ["brian2==2.10.1", "numpy==2.4.6", "pytest==9.1.1"]

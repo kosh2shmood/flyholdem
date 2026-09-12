@@ -1,0 +1,18 @@
+{
+  "status": "pass",
+  "scope": "small-graph numerical/software validation only",
+  "application_python": "3.11.16",
+  "oracle_python": "3.12.14",
+  "brian2": "2.10.1",
+  "native_python_tests": 4,
+  "checkpoint_tests": 3,
+  "brian_oracle_tests": 2,
+  "spike_counts": "exact",
+  "voltage_conductance_atol": 0.002,
+  "tested_boundary_ms": [
+    0.1,
+    10.0
+  ],
+  "full_connectome_tested": false,
+  "learning_evidence": false
+}

@@ -17,3 +17,7 @@ browser-check:
 	uv run --frozen python scripts/browser_check.py
 fetch-malecns:
 	uv run --frozen python -m flyholdem.connectome.registry
+build-kernel:
+	uv run --frozen python -m flyholdem.neural.kernel.build
+test-oracle:
+	PYTHONPATH=src uv run --frozen --project oracle pytest tests/numerical/test_brian_oracle.py -q
