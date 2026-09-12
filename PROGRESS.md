@@ -1,9 +1,9 @@
 # FlyHoldem progress
 
 ## Current phase
-M3 fixed native population interface and controllability runner are implemented; three data-free tests pass for balanced mapping/leakage, disjoint connectivity selection and neural-only masked decoding. Save this protocol/code checkpoint, then run the circuit controllability experiment. No Gate 1 outcome exists yet.
+M4 local plasticity and the registered conditioning runner are implemented; 52 tests pass and two isolated-oracle tests skip in the app environment. Full and circuit Gate 1 passed, with all full retained edges at the frozen quarter-strength configuration. No conditioning result exists yet. First execute the committed smoke/recovery check, then the ordered development learning-rate candidates, then independent confirmation only after development qualifies. Exact protocol: docs/CONDITIONING.md and configs/conditioning.yaml.
 
-M2 connectome runtime is complete: exact source hashes, reproducible full/circuit graph counts and all prepared-file hashes, independent numerical verification, atomic native-state checkpoints and measured sequential resource runs. Evidence checkpoint ab9a658 is published. The public/live poker scene is still the labeled synthetic fixture. No conditioning, trained teacher, transfer or learned poker result exists yet.
+M2 runtime and M3 controllability evidence are complete and published through a895d0e. The public live scene remains the honestly labeled synthetic fixture. The original build, teacher/corpus/transfer, poker optimization and human play interface remain required; the goal is active.
 
 ## Latest user steering — implemented
 - Three.js fly at the side of the table, fully visible, with curved cards oriented toward itself and the spectator.
@@ -15,7 +15,8 @@ M2 connectome runtime is complete: exact source hashes, reproducible full/circui
 - V0 visual gate: passed, committed/pushed/tagged visual-demo-v0.
 - Gate 0 rules/software: passed. 2,512-hand fixed software check, independent mean -0.151 BB/hand, SE 0.256678, exact paired-seat residual zero. This is not a learning result.
 - M2 engineering: passed (no scientific learning gate implied).
-- Gates 1, 2, 2A, 3, 4, 5, 6: pending. Do not skip dependent scientific gates. Publish negative results if they fail and continue valid independent engineering.
+- Gate 1: passed for circuit v1 and full quarter-strength v2; full baseline and half-strength failures preserved.
+- Gates 2, 2A, 3, 4, 5, 6: pending. Do not skip dependent scientific gates. Publish negative results if they fail and continue valid independent engineering.
 
 ## Latest verification
 - 41 tests passed with optional data tools installed; two Brian2 tests intentionally skipped in that environment and both pass separately via make test-oracle.
@@ -89,3 +90,7 @@ The expanded goal also includes a play-chip heads-up interface for the user to p
 ## M3 complete — current valid full configuration
 Full Gate 1 passed at registered global scale 0.25: all five actions 20/20 confirmation; shuffled input 20% overall and black input silent. Input gain 12, controlled-cell count 64. Every retained neuron/edge and transmitter sign remains; base contact gain 0.275 is uniformly scaled to 0.06875. Half-scale failed one action at 17/20 and remains published; the registered sequence stopped before tenth-scale. V1 failure baselines were separately supplied with unchanged historical-manifest links.
 Frozen full artifact: runs/controllability-full-quarter-v2/preregistration.json, SHA-256 e3e2b48df9e946d800cec63b5ef88164190c3ffa1cf451b4284a99df5cc26f23. Use load_controller() to validate the base graph and reconstruct the exact scaled initial weights. Circuit v1 remains its separately labeled base-gain configuration. Both passing mappings are frozen; no poker results were used. Next: M4 local eligibility/plasticity, two-cue conditioning and matched controls, plus the independent self-play teacher/corpus pipeline. No conditioning or learned poker claim exists yet.
+
+## Registered M4 execution checkpoint
+Local eligibility selects all existing annotated KC-to-MBON edges only; bounded ratios preserve topology/signs. PAM/PPL1 stimulation is explicitly an engineering proxy. Conditioning uses two shared-path cue groups with frozen readouts, matched frozen and shuffled-earned-reward controls, held-out seeds, retention and restoration checks. Hash-chained journals and complete state checkpoints support exact tail re-execution; invalid partial operations cannot overwrite the preceding valid checkpoint. Seven new data-free tests pass; complete suite 52 passed / 2 skipped. PyTorch 2.14.0 is now a locked optional teacher dependency and CPU import was verified; no teacher implementation or learning result is implied.
+Before the first long experiment, commit this exact code/config. Smoke: `.venv/bin/python -m flyholdem.experiments.conditioning --profile smoke --learning-rate 0.03 --output runs/conditioning-full-smoke-v1`. Development: `.venv/bin/python -m flyholdem.experiments.conditioning --profile development --learning-rate 0.03 --output runs/conditioning-full-lr003-v1`. Add --resume for the same output after interruption. Registered candidate order 0.03, 0.1, 0.3; independent confirmation is blocked until a candidate meets development criteria. No concurrent full workers.

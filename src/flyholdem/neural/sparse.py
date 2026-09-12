@@ -52,6 +52,14 @@ class SparseBrain:
         if not np.isfinite(self.v).all() or not np.isfinite(self.g).all():raise FloatingPointError('Nonfinite neural state')
         return self.counts.copy()
 
+    def reset_dynamics(self):
+        """Fresh neural trial, preserving every current synaptic weight."""
+        self.v.fill(-52)
+        self.last.fill(-1)
+        for name in self.state_names:
+            if name not in ('weights', 'v', 'last'):
+                getattr(self, name).fill(0)
+
     def state(self):return {name:getattr(self,name).copy() for name in self.state_names}
 
     def restore_state(self,state):

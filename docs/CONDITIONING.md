@@ -1,0 +1,34 @@
+# Elementary conditioning protocol v1
+
+Status: implementation verified; no conditioning outcome yet. Gate 1's full model uses all 166,700 neurons and all 25,582,938 retained edges at the previously frozen global synaptic scale 0.25. No poker result is involved in this protocol.
+
+## Registered experiment
+
+`configs/conditioning.yaml` fixes the candidate order, development and confirmation seeds, trial counts, controls and success criterion before execution. Two disjoint groups of 64 KCs are selected from cells with existing paths to both frozen action-0 and action-1 ensembles. Rank by the smaller original connection strength to either ensemble, select the top 128, and partition with seed 64001. Cue identity determines target 0 or 1. Both cues receive the same fixed gain and independent ±15% per-cell amplitude noise. This is an engineered non-poker conditioning input, distinct from the fixed 237-channel poker population code.
+
+Only existing annotated KC-to-MBON connections can change. Ratios remain between 0.1 and 2.0 of their original signed strengths. The native LIF solver uses 0.1 ms integration; local eligibility aggregates spikes in registered 5 ms bins. Presynaptic traces decay over 20 ms and eligibility over 5 s; the coincidence coefficient is 0.001. The ordered learning rates are 0.03, 0.1 and 0.3. Five-millisecond observation boundaries can change lazy-state floating rounding slightly relative to one uninterrupted call; the fixed bin schedule is part of run identity. Numerical tests verify equal small-graph spike counts and a 1e-4 voltage/conductance tolerance against the uninterrupted call.
+
+Each trial resets membrane, conductance, refractory state, delayed queue and eligibility, preserving weights. Stimulation follows the frozen 50/300/100 ms baseline/stimulus/readout timing. Masked neural argmax over actions 0 and 1 is the entire policy. Correct/incorrect decisions earn +1/−1, with a past-only running reward mean across both cues subtracted. Reward times local eligibility changes weights. A separate 200 ms native stimulation pulse targets annotated PAM or PPL1 cells. These labels are engineering valence proxies; the scalar gate is not a claim that measured dopamine receptor physiology was simulated. Pulses do not introduce a target-specific neural drive.
+
+The plastic arm, frozen arm and shuffled-reward arm share initial weights, cue schedule and stimulus seeds. The shuffled arm receives an independently permuted copy of the plastic arm's actual earned reward sequence, preserving its reward multiset. Evaluation disables updates, uses independent stimulus seeds, and has balanced cue counts. The same evaluation stimuli are replayed before training, after training, after a 5 s no-training interval, and after restoring initial weights. Erased and frozen decisions must exactly equal initial decisions.
+
+Development uses three seeds, 400 training trials per arm and 32 held-out trials per cue. Stop at the first candidate reaching mean accuracy 0.8, every seed at least 0.7, mean improvement at least 0.15 over both controls and erased weights, and retention loss at most 0.05. Confirmation requires that saved development result and uses five new seeds with 64 held-out trials per cue. It additionally requires one-sided paired-seed sign-flip p ≤ 0.05 against each comparator. Report each seed, paired bootstrap intervals and every failed candidate. These comparisons establish only this conditioning task, never poker skill.
+
+## Recovery and provenance
+
+Each run locks protocol, source, environment, binary, graph, cue, readout and plastic-edge identities. A hash-chained append journal is flushed/fsynced after each complete trial or state transition. Atomic checkpoints contain all native state, weights, eligibility and past-reward baselines at least every 5 min and on graceful shutdown. Stimulus RNG is independently derived from recorded seed/phase/trial; cue schedules and shuffled rewards are reconstructed deterministically. Keep latest three plus best held-out conditioning checkpoint; this best snapshot does not select seeds for poker.
+
+Resume verifies checkpoint/journal alignment, skips the saved prefix and exactly re-executes any logged tail. Divergence is an error. An unexpected failure during an incomplete operation preserves the preceding valid checkpoint. Truncated/corrupt journals are detected rather than silently edited.
+
+## Commands
+
+Run from the repository, using the locked app environment with data tools and the verified native kernel:
+
+```sh
+.venv/bin/python -m flyholdem.experiments.conditioning --profile smoke --learning-rate 0.03 --output runs/conditioning-full-smoke-v1
+.venv/bin/python -m flyholdem.experiments.conditioning --profile development --learning-rate 0.03 --output runs/conditioning-full-lr003-v1
+```
+
+Subsequent registered candidates use `0.1` / `0.3` and distinct output paths, only if the previous development candidate fails. Confirmation adds `--profile confirmatory --development-reference runs/conditioning-full-lr003-v1/result.json` with the selected learning rate and a new output path. Resume adds `--resume` to the original command without changing source/config/environment. `--stop-after N` is available for deterministic recovery verification; remove it when resuming.
+
+No `conditioning-v0` tag until a valid confirmation passes.
