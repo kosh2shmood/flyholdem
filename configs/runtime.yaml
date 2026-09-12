@@ -1,0 +1,18 @@
+schema: malecns-runtime-v1
+dataset: MaleCNS-v1.0
+mode: full
+weight_gain: 0.275
+ambiguous_sign: 1
+circuit_classes: [Kenyon_Cell, MBON, DAN]
+circuit_types: [APL, DPM]
+reference_counts:
+  nodes: 166700
+  edges: 25582938
+  synaptic_contacts: 124177617
+benchmark:
+  seed: 1729
+  input_class: Kenyon_Cell
+  input_cells: 64
+  stimulus: 12.0
+  baseline_ms: 50.0
+  stimulus_ms: 100.0

@@ -21,3 +21,12 @@ build-kernel:
 	uv run --frozen python -m flyholdem.neural.kernel.build
 test-oracle:
 	PYTHONPATH=src uv run --frozen --project oracle pytest tests/numerical/test_brian_oracle.py -q
+prepare-malecns:
+	uv run --frozen --extra data python -m flyholdem.connectome.import_malecns
+	uv run --frozen --extra data python -m flyholdem.connectome.prepare --mode full
+	uv run --frozen --extra data python -m flyholdem.connectome.prepare --mode circuit
+test-data:
+	uv run --frozen --extra data pytest tests/unit/test_import_prepare.py -q
+audit-malecns:
+	uv run --frozen --extra data python -m flyholdem.connectome.audit --mode full --benchmark
+	uv run --frozen --extra data python -m flyholdem.connectome.audit --mode circuit --benchmark

@@ -41,3 +41,7 @@ See [PROGRESS.md](PROGRESS.md), [visual gate report](docs/VISUAL_GATE.md), [prot
 That wording describes the intended full-data system, not this synthetic fixture. Do not call this a living fly, consciousness, faithful whole-brain emulation, or proven learner. The remaining implementation follows `flyholdem_build_spec.md`; scientific gates cannot be replaced by a visually compelling demonstration.
 
 Original code is MIT licensed. Data and dependencies retain their own terms; see [THIRD_PARTY.md](THIRD_PARTY.md). No real-money service, account, or execution integration is included.
+
+## Official data preparation
+
+After the fixture demo, `make fetch-malecns` explicitly downloads and verifies the three pinned source files. `make prepare-malecns` installs the locked data extra, accounts for all retained/excluded objects and contacts, then compiles full and circuit CSR arrays. `make audit-malecns` verifies all hashes/counts and runs the registered sequential resource smoke checks. Data and generated reports remain ignored under `connectome_data/` and `runs/data-audit/`. `make test-data` exercises import/preparation with tiny synthetic data; it never downloads MaleCNS.

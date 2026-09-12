@@ -35,3 +35,5 @@ Three.js 0.186.0 (MIT), https://github.com/mrdoob/three.js, installed separately
 ## Numerical runtime
 
 `src/flyholdem/neural/kernel/doomfly_lif.cpp` retains the all-edge lazy LIF algorithm from DOOMFLY `doom/kernel.cpp` at the pinned revision, with an added provenance header and the MIT notice at licenses/DOOMFLY-MIT.txt. The Python reference, validated ctypes wrapper, checkpoint manager and build record are original FlyHoldem code. The Brian2 oracle test adapts the independent-oracle test design from DOOMFLY. Brian2 2.10.1 uses CeCILL 2.1; it is installed separately in the locked oracle environment, not vendored.
+
+MaleCNS exact-ID and edge-retention helpers in `connectome/import_malecns.py` are adapted from the pinned DOOMFLY `doom/connectome.py`. The transmitter proxy follows the declared logic in `doom/transmitters.py`; FlyHoldem adds whitespace normalization. Attribution and the complete MIT notice are retained. Streaming CSR preparation, audit and resource benchmark orchestration are original. No retinal or motor policy is imported.
