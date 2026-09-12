@@ -1,7 +1,7 @@
 # FlyHoldem progress
 
 ## Current phase
-Animated fly visual follow-up complete and verified; save/push its checkpoint, then continue M1 software Gate 0. V0 and M0 are already pushed. V0 commit 2bd2d3c and visual-demo-v0 are pushed. Official source registry/provenance checks, import policy, repository contract and data-free CI are implemented. No MaleCNS source download or teacher/poker training started.
+M1 software Gate 0 passed locally; committing/pushing the coherent rules and CI correction checkpoint. Animated fly checkpoint 6aa7895 is already pushed. Next is M2. V0 commit 2bd2d3c and visual-demo-v0 are pushed. Official source registry/provenance checks, import policy, repository contract and data-free CI are implemented. No MaleCNS source download or teacher/poker training started.
 
 ## Completed acceptance checks
 - Read execution brief/specification/setup context and applicable ancestor AGENTS.md paths (none existed).
@@ -18,6 +18,8 @@ Animated fly visual follow-up complete and verified; save/push its checkpoint, t
 
 - Animated fly: 18 core tests still pass; WebGL 2 / Three.js 186 browser checks cover all six real gestures, live/replay card correspondence, replay-state reset, pause and camera/table controls. No browser errors.
 
+- M1: 29 tests passed, including showdown/ties/side pots/short all-in reopening/private checkpoint continuation. Fixed 2,512-hand software symmetry check passed: independent mean -0.151 BB/hand, SE 0.256678, declared interval [-0.921035, 0.619035], exact paired-seat residual zero.
+
 ## Exact working commands
 ```
 cd /Users/bohdankoshevoi/flyholdem/flyholdem
@@ -27,6 +29,7 @@ make replay
 uv run python -m playwright install chromium
 make browser-check
 make record
+uv run python -m flyholdem.experiments.software_gate
 uv run python scripts/avatar_check.py
 ```
 Demo URL: http://127.0.0.1:8766. Default seed 20260912, graph/mapping seed 1729. One command serves backend/UI. Browser check expects running server.
@@ -42,16 +45,16 @@ The user requested a visible animated fly like the Doom/döner examples, with it
 
 ## Known failures and limitations
 - Resolved publication restriction: user explicitly approved publishing checked milestones on astra/visual-first and tags to public kosh2shmood/flyholdem. V0 branch and tag pushed successfully. Earlier automatic-review rejections are historical; do not ask again.
-- CI M0 tests and browser checks passed, but setup-uv cleanup failed because the background `uv run` server retained a cache lock. Fix: start the installed executable directly and always terminate it with a shell trap. Verify next pushed CI run.
+- CI M0 tests and browser checks passed, but setup-uv cleanup failed because the background `uv run` server retained a cache lock. Fix: start the installed executable directly and always terminate it with a shell trap. Fixed in the animated-fly commit; CI cleanup now succeeds. The next CI run exposed last-bit floating differences between ARM/macOS and x86/Linux in re-simulated event hashes. Resolution preserves exact within-runtime regeneration, exact recorded playback/hash integrity, and exact categorical/spike behavior with 1e-12 cross-platform diagnostic tolerance. Verify next pushed run.
 - Two upstream Starlette test-client deprecation warnings; tests pass.
-- Gate 0 only partially covered until M1; Gates 1–6/2A pending. No MaleCNS/full runtime, conditioned model, trained teacher, transfer checkpoint, or poker training result yet.
+- Gate 0 passed locally at M1; Gates 1–6/2A pending. No MaleCNS/full runtime, conditioned model, trained teacher, transfer checkpoint, or poker training result yet.
 - Full mutable-state checkpoints/resume and registered manifests remain runtime milestones; V0 live logs are append-only, fsynced after completed hands, and ignored.
 
 ## Last stable commit
-V0: 2bd2d3c2fc6158248c4f633690b5d170add14b32 (visual-demo-v0), pushed. M0: fa873a6, pushed. Animated fly is the following `feat: animate fly hands from recorded poker actions` checkpoint; see Git log for its exact hash.
+V0: 2bd2d3c2fc6158248c4f633690b5d170add14b32 (visual-demo-v0), pushed. M0: fa873a6, pushed. Animated fly: 6aa7895, pushed. M1 is the following `feat: complete deterministic poker rules gate` checkpoint; see Git log for its exact hash.
 
 ## Resumable experiment command
 No long training experiment started. Reproduce visual run with `make demo`; replay with `make replay`. Current local live worker logs into a timestamped ignored runs/live-* directory.
 
 ## Next step
-Verify corrected CI after pushing the animated-fly checkpoint. Then finish M1 software Gate 0: full golden hands (ties, short raises, uneven/side pots), deterministic paired seat-symmetry evidence, state replay serialization and opponent policies. Then M2 reference/native numerical runtime and checksum-verified full MaleCNS import/audit, measuring memory before any concurrent full jobs. Do not skip failed scientific gates.
+Verify corrected CI for this rules checkpoint. M2: implement and compare pure-Python and native sparse LIF references with DOOMFLY-comparable .1 ms timing/refractory semantics, complete hash-locked atomic state checkpoints, then explicitly fetch/verify MaleCNS, stream-import all retained nodes/edges and measure memory/throughput. No full-graph training before controllability/conditioning gates. Keep the working avatar/dashboard functional.

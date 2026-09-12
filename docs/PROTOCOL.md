@@ -33,3 +33,13 @@ Eligibility and membrane state persist across hands. Reports distinguish eligibi
 Canonical sorted JSON events form a SHA-256 chain. The same stream drives live WebSocket and recorded playback. A decision stores its pre-action visible information and post-action table; the viewer labels the decision as pre-action information. The opponent is a conventional calling-station control and never supplies fly scores. Its hidden observation is not logged. Fly cards are preserved for display even when PokerKit mucks a losing hand. Opponent cards appear only if revealed at showdown.
 
 The neural activity view reports the latest measurement window; reinforcement replaces it with the actual dopamine-period spike counts. Controls and conditioning labels remain pending. Display pause does not pause the simulation. Live files are exclusively created in unique run directories, append-only and fsynced after each terminal reinforcement; mutable full-state checkpoints are subsequent runtime work.
+
+## Reproducibility across runtime architectures
+
+Recorded event playback preserves original bytes and hash chains on every platform. Re-simulation is required to be byte-identical on the same locked runtime; the test regenerates two complete streams and compares bytes. ARM/macOS and x86/Linux NumPy transcendental implementations can differ in the last floating-point bit, which also changes encoded-input and event hashes. The checked-in fixture is therefore additionally compared across platforms with exact cards/actions/spike counts/masks and absolute 1e-12 tolerance for floating diagnostics, with each chain independently verified. No tolerance applies to hidden-information mutation tests within a runtime. Training checkpoint resume must reject different recorded runtime/binary identities rather than claiming cross-architecture bit identity.
+
+## M1 rules completion
+
+The underlying hand adapter is aware of 2–10 players for settlement testing, while the registered neural observation explicitly rejects non-heads-up use. Golden cases now cover showdown, royal-board ties, three-way main/side pots, uncalled excess and short all-ins that do not reopen betting. Private hand serialization includes the initial deck and action sequence and verifies the reconstructed public-state hash. This payload is checkpoint-only and forbidden in observations, viewer events and teacher corpus rows.
+
+Fixed software-validation seed/config: `configs/software_gate.yaml`. Run `uv run python -m flyholdem.experiments.software_gate`. The endpoint is independent random-play return within a predeclared three-standard-error bound plus exact paired physical-seat symmetry. This checks the rules adapter; it is not a learned-policy evaluation.

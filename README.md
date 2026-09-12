@@ -28,11 +28,11 @@ Locked dependencies live in `uv.lock`. The UI uses plain browser APIs plus pinne
 ## Status and evidence
 
 - V0: a working live/replay fixture vertical slice, with automated browser evidence.
-- Software Gate 0: partial coverage at V0; complete side-pot, tie, short-raise and seat-symmetry suites belong to M1.
+- Software Gate 0: passed locally at M1; 29 tests and the 2,512-hand registered symmetry check. Machine-readable evidence is in `docs/review/software-gate0.json`.
 - Gates 1–6 and teacher Gate 2A: pending. No conditioning, teacher transfer, or poker learning claim.
 - No MaleCNS data has been downloaded for V0. The full-graph runtime and both experiment modes are subsequent milestones.
 
-See [PROGRESS.md](PROGRESS.md), [visual gate report](docs/VISUAL_GATE.md), [protocol](docs/PROTOCOL.md), [model card](docs/MODEL_CARD.md), and [browser evidence](docs/review/browser-check.json). Live logs are written to ignored, timestamped `runs/live-*/events.jsonl` directories, flushed at every completed hand. Hash chains detect modifications; seeds replay the loop exactly on the locked environment. V0 does not yet resume a running neural state from a checkpoint.
+See [PROGRESS.md](PROGRESS.md), [visual gate report](docs/VISUAL_GATE.md), [protocol](docs/PROTOCOL.md), [model card](docs/MODEL_CARD.md), and [browser evidence](docs/review/browser-check.json). Live logs are written to ignored, timestamped `runs/live-*/events.jsonl` directories, flushed at every completed hand. Hash chains detect modifications; seeds regenerate the loop exactly on the same locked runtime. Cross-architecture numerical comparison uses absolute 1e-12 tolerance for floating diagnostics with exact cards/actions/spike counts; recorded playback is byte-exact everywhere. V0 does not yet resume a running neural state from a checkpoint.
 
 ## Scope of the intended full experiment
 

@@ -1,0 +1,75 @@
+{
+  "schema": "software-gate0-v1",
+  "scope": "software rules and seat symmetry only; no learning endpoint",
+  "config": {
+    "schema": "software-gate-v1",
+    "seed_start": 590000,
+    "independent_hands": 2000,
+    "paired_deals": 256,
+    "stacks": [
+      40,
+      40
+    ],
+    "blinds": [
+      1,
+      2
+    ],
+    "opponents": [
+      "random",
+      "random"
+    ],
+    "symmetry_threshold_standard_errors": 3,
+    "claim": "software rules and seat symmetry only; no learning endpoint"
+  },
+  "config_hash": "43ca314bb183127b97dc63d968be41931402a6fc9fb1f373e5bfb97e5fa8699b",
+  "source_hash": "67c9774a9ee4a93ebdd54aba24f11d84af75dbe59b85cc0eef496eab820181d0",
+  "environment": {
+    "python": "3.11.16 (main, Sep  1 2026, 14:08:22) [Clang 22.1.3 ]",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "packages": {
+      "PyYAML": "6.0.3",
+      "Pygments": "2.21.0",
+      "annotated-doc": "0.0.5",
+      "annotated-types": "0.8.0",
+      "anyio": "4.15.1",
+      "certifi": "2026.7.22",
+      "click": "8.5.0",
+      "fastapi": "0.141.1",
+      "flyholdem": "0.1.0",
+      "greenlet": "3.5.5",
+      "h11": "0.16.0",
+      "httpcore": "1.0.9",
+      "httpx": "0.28.1",
+      "idna": "3.19",
+      "iniconfig": "2.3.0",
+      "numpy": "2.4.6",
+      "packaging": "26.3",
+      "playwright": "1.62.0",
+      "pluggy": "1.6.0",
+      "pokerkit": "0.7.5",
+      "pydantic": "2.13.5",
+      "pydantic_core": "2.46.5",
+      "pyee": "13.0.1",
+      "pytest": "9.1.1",
+      "starlette": "1.6.0",
+      "typing-inspection": "0.4.4",
+      "typing_extensions": "4.16.0",
+      "uvicorn": "0.52.4",
+      "websockets": "16.1.1"
+    },
+    "node": "v24.12.0",
+    "compiler": "Apple clang version 16.0.0 (clang-1600.0.26.6)"
+  },
+  "mean_bb_per_hand": -0.151,
+  "standard_error": 0.25667838123943715,
+  "sampling_interval_bb": [
+    -0.9210351437183115,
+    0.6190351437183115
+  ],
+  "within_registered_sampling_error": true,
+  "max_seat_swapped_pair_residual_bb": 0.0,
+  "seat_swap_exact": true,
+  "hands": 2512,
+  "seconds": 1.6907307499786839,
+  "status": "pass"
+}

@@ -1,0 +1,9 @@
+schema: software-gate-v1
+seed_start: 590000
+independent_hands: 2000
+paired_deals: 256
+stacks: [40, 40]
+blinds: [1, 2]
+opponents: [random, random]
+symmetry_threshold_standard_errors: 3
+claim: software rules and seat symmetry only; no learning endpoint
