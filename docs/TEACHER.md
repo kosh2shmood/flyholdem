@@ -108,3 +108,22 @@ Add --resume after interruption. Export/evaluation must use the same PYTHONPATH.
 ## Double DQN v4 result — development failed
 
 The controlled v4 candidate completed 250,000 hands in 1,620.01 s and failed the complete original development suite: +1.064453125 / −0.216796875 / −0.263671875 / −1.80859375 BB per hand against random/station/TAG/equity. No suite-adjusted lower bound was positive. Hidden-information mutation checks passed all 32 decisions. The frozen average policy SHA-256 is 372e5ee1a74b83750ad945dbe62c2fc6dcd316ca00cada307aa2c3138402cf9a; evaluation manifest bf99368c38b7d64937e05ba2f85932a8383a41825b2832b05bdef79057401395. All generated records remain local. No confirmation or corpus is allowed. Double DQN alone did not solve teacher robustness; the next candidate will require a separately registered training-population change, preserving all original evaluation opponents and reserved deals.
+
+
+## Registered v5 fixed-policy-prior NFSP candidate
+
+V5 changes the conventional training population after v1–v4 failed robustness validation. Every eight-hand cycle contains four NFSP self-play hands followed by one hand against each original fixed opponent: random, calling station, TAG and equity-bucket. The fixed opponent alternates seats on successive cycles, so each learned agent sees both positions. Only the active learned agent receives transitions, supervised best-response samples and optimizer updates on fixed-opponent hands. No opponent identity or internals enter the canonical neural-network input. The same NFSP episode mixture and uniform average-policy reservoir remain; the exported policy is still the equal average-probability mixture of the two learned agents.
+
+This is explicitly **NFSP with a fixed policy prior**, not vanilla NFSP or a complete PSRO implementation. It takes the policy-mixture robustness motivation from [Lanctot et al. (2017)](https://arxiv.org/abs/1711.00832), while keeping a declared fixed prior rather than solving an empirical meta-game. No equilibrium claim is made. The entire original opponent suite remains in held-out evaluation; only training deals overlap earlier development training. Reserved confirmation deals remain unused. No biological mapping or plasticity parameter changes.
+
+Config configs/teacher_nfsp_population_v5.yaml registers 500,000 hands, the original 71001 initialization/deal seed sequence, v4 Double DQN, 357 visible features, the same networks/optimizers/exploration and 20 BB stacks. Half the hands are self-play; half are equally split among all four original opponents, with no performance-based weighting or opponent selection.
+
+To keep the equity-bucket training opponent practical, a teacher-only helper preserves its exact visible-state hash, ordered unknown cards, Python RNG draws, thresholds and action priority, replacing only repeated PokerKit rank comparisons with the already-tested batched C++ rank utility. It matched exact equity on 120 CI states and complete action trajectories for all four opponents; a separate 200-state benchmark matched every value and took 0.03758 s versus 3.28761 s (87.5× on this machine). The independent evaluation opponent retains its original PokerKit implementation. No shared native LIF or equity binary is rebuilt.
+
+Complete population-run stop/resume journals and frozen export identity passed; fixed-opponent transitions cannot enter learned-agent memories. Commit source/config before execution, then freeze src/lock/config and a separate copied equity binary in runs/teacher-runtime-v5:
+
+```sh
+PYTHONPATH="$PWD/runs/teacher-runtime-v5/src" .venv/bin/python -m flyholdem.teacher.training --config runs/teacher-runtime-v5/configs/teacher_nfsp_population_v5.yaml --output runs/teacher-nfsp-population-v5
+```
+
+Add --resume after interruption. Export and validation use the same PYTHONPATH. This candidate remains unvalidated until the unchanged development and reserved confirmation suites pass. Generated data/checkpoints/logs remain local. Preserve every prior failure.

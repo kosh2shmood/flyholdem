@@ -16,8 +16,14 @@ from flyholdem.experiments.journal import Journal
 from .nfsp import NFSPAgent
 
 
-def self_play_hand(agents, seed, button, stack_bb, epsilon, training=True):
+def self_play_hand(agents, seed, button, stack_bb, epsilon, training=True, fixed_opponent=None):
     hand = Hand(seed, button=button, stacks=(2 * stack_bb,) * 2)
+    fixed_seat=None
+    if fixed_opponent is not None:
+        from .fast_opponents import TrainingOpponent
+        fixed_seat,kind=fixed_opponent
+        if fixed_seat not in (0,1):raise ValueError('Fixed opponent requires one heads-up seat')
+        fixed=TrainingOpponent(seed+2000000,kind)
     pending = [None, None]
     transitions = [0, 0]
     decisions = []
@@ -26,6 +32,11 @@ def self_play_hand(agents, seed, button, stack_bb, epsilon, training=True):
     while not hand.done:
         seat = hand.actor
         observation = hand.observation()
+        if seat==fixed_seat:
+            action=fixed.act(observation)
+            decisions.append({'seat':seat,'information_id':canonical_information_id(observation),
+                              'action':action,'best_response_episode':False,'fixed_opponent':kind})
+            hand.act(action);continue
         agent = agents[seat]
         # Bootstrap only at this SAME player's next decision, never on the other
         # player's private information set. Intermediate chip movement is no reward.
@@ -45,19 +56,30 @@ def self_play_hand(agents, seed, button, stack_bb, epsilon, training=True):
             if pending[seat] is not None:
                 agent.transition(pending[seat], payoffs[seat] / (2 * stack_bb))
                 transitions[seat] += 1
-    return {'deal_seed': seed, 'button': button, 'net_bb': [value / 2 for value in payoffs],
+    result={'deal_seed': seed, 'button': button, 'net_bb': [value / 2 for value in payoffs],
             'decisions': decisions, 'transitions': transitions, 'epsilon': epsilon}
+    if fixed_opponent is not None:result.update(fixed_opponent=kind,fixed_seat=fixed_seat,learning_seats=[1-fixed_seat])
+    return result
 
 
 def train(config, output, resume=False, stop_after=None):
     if config['stack_bb'] not in (10, 20):
         raise ValueError('Independent teacher prototype is registered at 10 or 20 BB only')
+    population=config.get('population')
+    if population is not None:
+        from flyholdem.poker.opponents import VERSIONS
+        expected=['self-play']*4+list(VERSIONS)
+        if (not isinstance(population,dict) or config.get('algorithm')!='NFSP-fixed-policy-prior-v1' or population.get('cycle')!=expected
+                or population.get('fixed_hand_update')!='active-agent-only'
+                or population.get('fixed_opponent_backend')!='exact-v1-batched-ranks'):
+            raise ValueError('Use the complete registered fixed-policy-prior cycle and update contract')
+    elif config.get('algorithm','NFSP')!='NFSP':raise ValueError('Unknown conventional self-play algorithm')
     torch.set_num_threads(config['torch_threads'])
     torch.use_deterministic_algorithms(True)
     torch.manual_seed(config['seed'])
     agents = [NFSPAgent(config['agent'], config['seed'] + 100 * seat) for seat in range(2)]
     runtime = manifest(config, 'conventional-teacher-no-connectome', identity(feature_names(config['agent'].get('feature_version', V1))),
-                       identity({'algorithm': 'NFSP-average-policy', 'actions': 5}),
+                       identity({'algorithm': config.get('algorithm','NFSP')+'-average-policy', 'actions': 5}),
                        identity({'pytorch':'cpu','features':feature_runtime_identity(config['agent'].get('feature_version',V1))}))
     output = Path(output); output.mkdir(parents=True, exist_ok=resume)
     if resume:
@@ -107,11 +129,15 @@ def train(config, output, resume=False, stop_after=None):
             in_hand = True
             progress = min(1, hand_index / config['epsilon_decay_hands'])
             epsilon = config['epsilon_start'] + progress * (config['epsilon_end'] - config['epsilon_start'])
+            fixed_opponent=None
+            if population is not None:
+                kind=population['cycle'][hand_index%len(population['cycle'])]
+                if kind!='self-play':fixed_opponent=((hand_index//len(population['cycle']))%2,kind)
             row = self_play_hand(agents, config['deal_seed_start'] + hand_index, hand_index % 2,
-                                 config['stack_bb'], epsilon)
+                                 config['stack_bb'], epsilon,fixed_opponent=fixed_opponent)
             row['optimization'] = []
-            for agent in agents:
-                updates = [agent.train_step() for _ in range(config['updates_per_hand'])]
+            for seat,agent in enumerate(agents):
+                updates = [agent.train_step() for _ in range(config['updates_per_hand'])] if fixed_opponent is None or seat!=fixed_opponent[0] else []
                 row['optimization'].append(updates)
             journal.record(hand_index, ['self-play-hand', hand_index], row)
             completed = hand_index + 1
@@ -123,7 +149,7 @@ def train(config, output, resume=False, stop_after=None):
                     'reservoir': [a.reservoir.size for a in agents], 'last_losses': row['optimization']}), flush=True)
             if stopped or stop_after is not None and completed >= stop_after:
                 break
-        result = {'schema': 'nfsp-training-v1', 'algorithm': 'NFSP', 'mode': 'conventional-teacher-control',
+        result = {'schema': 'nfsp-training-v1', 'algorithm': config.get('algorithm','NFSP'), 'mode': 'conventional-teacher-control',
                   'hands_completed': completed, 'planned_hands': config['hands'],
                   'status': 'trained-unvalidated' if completed == config['hands'] else 'interrupted',
                   'allowed_as_teacher': False, 'learning_claim_about_fly': False,

@@ -17,7 +17,7 @@ def export_training(run_path, output, which='latest'):
     config = saved['config']
     torch.set_num_threads(config['torch_threads']); torch.use_deterministic_algorithms(True)
     runtime = manifest(config, 'conventional-teacher-no-connectome', identity(feature_names(config['agent'].get('feature_version', V1))),
-                       identity({'algorithm': 'NFSP-average-policy', 'actions': 5}),
+                       identity({'algorithm': config.get('algorithm','NFSP')+'-average-policy', 'actions': 5}),
                        identity({'pytorch':'cpu','features':feature_runtime_identity(config['agent'].get('feature_version',V1))}))
     arrays, extra, metadata = Checkpoints(root / 'checkpoints').load(runtime, which)
     agents = [NFSPAgent(config['agent'], config['seed'] + 100 * seat) for seat in range(2)]
@@ -27,7 +27,7 @@ def export_training(run_path, output, which='latest'):
         'training_manifest_sha256': digest(root / 'manifest.json'), 'checkpoint_step': metadata['step'],
         'checkpoint_pointer_sha256': digest(root / 'checkpoints' / (which + '.json')),
         'training_source_hash': saved['source_hash'], 'training_commit': saved['commit'],
-        'algorithm': 'NFSP', 'hands_completed': extra['completed_hands'], 'seed': config['seed']})
+        'algorithm': config.get('algorithm','NFSP'), 'hands_completed': extra['completed_hands'], 'seed': config['seed']})
     return {'policy_sha256': policy_hash, 'status': 'frozen-conventional-policy-unvalidated', 'allowed_as_teacher': False}
 
 
