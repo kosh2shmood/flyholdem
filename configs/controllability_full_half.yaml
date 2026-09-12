@@ -1,0 +1,32 @@
+amplitude_jitter: 0.1
+calibration:
+  control_cell_counts:
+  - 32
+  - 64
+  - 128
+  gains:
+  - 12.0
+  - 20.0
+  - 32.0
+  seed: 43100
+  trials_per_action: 5
+confirmatory:
+  minimum_success: 0.95
+  seed: 43200
+  trials_per_action: 20
+decision_ms:
+  baseline: 50
+  inter_decision: 50
+  readout: 100
+  stimulus: 300
+encoder: engineered-kc-v1
+ensemble_size: 3
+fanout: 32
+input_class: Kenyon_Cell
+mapping_seed: 1729
+minimum_presynaptic_inputs: 8
+readout_class: MBON
+schema: neural-controllability-gain-v2
+score_scale_hz: 100.0
+selection: diverse-direct-KC-connectivity-v1
+global_weight_scale: 0.5

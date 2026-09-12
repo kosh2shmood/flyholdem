@@ -67,3 +67,24 @@ class NeuralController:
             'observation':observation,'virtual_time_ms':self.brain.time_ms,'counts':counts}
 
     def commit_interval(self):self.brain.advance(self.blank,self.registration['config']['decision_ms']['inter_decision'])
+
+
+def scaled_weights(weights,scale):
+    """Uniform declared dynamics sensitivity; topology and transmitter signs stay fixed."""
+    weights=np.asarray(weights,dtype=np.float32)
+    if not np.isfinite(scale) or scale<=0:raise ValueError('Positive finite synaptic scale required')
+    result=weights*np.float32(scale)
+    if not np.isfinite(result).all() or np.any((weights!=0)&(result==0)):raise ValueError('Invalid scaled synapses')
+    return result
+
+
+def load_controller(graph_path,preregistration_path,seed=0):
+    import json
+    from pathlib import Path
+    from flyholdem.connectome.prepare import load_graph
+    from flyholdem.neural.sparse import SparseBrain
+    graph,prepared=load_graph(graph_path)
+    registration=json.loads(Path(preregistration_path).read_text())
+    if prepared['graph_hash']!=registration.get('base_graph_hash',registration['graph_hash']):raise ValueError('Preregistration base graph mismatch')
+    brain=SparseBrain(graph['ptr'],graph['post'],scaled_weights(graph['weight'],registration['config'].get('global_weight_scale',1)))
+    return NeuralController(brain,registration,seed)

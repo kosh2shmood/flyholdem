@@ -34,3 +34,14 @@ def test_decoder_is_neural_only_masked_and_silent_without_strategy_fallback():
     assert select_action(np.zeros(5),[False,False,True,True,True],rng)==2
     with pytest.raises(ValueError):select_action([np.nan]*5,[True]*5,rng)
     with pytest.raises(ValueError):neural_scores(np.ones(5),[np.array([0])]*5,100)
+
+
+def test_global_gain_sensitivity_preserves_every_edge_and_sign():
+    from flyholdem.interface.population import scaled_weights
+    initial=np.array([.275,-.55,9.625,0],dtype=np.float32)
+    before=initial.tobytes();result=scaled_weights(initial,.5)
+    assert initial.tobytes()==before
+    assert np.array_equal(result,np.array([.1375,-.275,4.8125,0],dtype=np.float32))
+    assert np.array_equal(np.sign(result),np.sign(initial))
+    for scale in [0,-1,np.nan,np.inf]:
+        with pytest.raises(ValueError):scaled_weights(initial,scale)

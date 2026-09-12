@@ -9,7 +9,7 @@ import time
 import numpy as np
 import yaml
 from .encoder import CHANNELS
-from .population import balanced_projection,neural_scores,select_action
+from .population import balanced_projection,neural_scores,select_action,scaled_weights
 from flyholdem.connectome.registry import ROOT,digest
 from flyholdem.connectome.prepare import load_graph
 from flyholdem.provenance import identity,manifest,assert_compatible
@@ -85,12 +85,17 @@ def candidates(graph_path,config):
     return graph,artifact,matrix,groups
 
 
-def run_gate(graph_path,config,output,resume=False):
+def run_gate(graph_path,config,output,resume=False,failure_reference=None):
     from flyholdem.neural.sparse import SparseBrain
     graph,artifact,matrix,groups=candidates(graph_path,config);output=Path(output)
     output.mkdir(parents=True,exist_ok=resume)
-    brain=SparseBrain(graph['ptr'],graph['post'],graph['weight']);inputs=np.array(artifact['input_indices']);ensembles=[np.array(e['indices']) for e in artifact['ensembles']]
+    brain=SparseBrain(graph['ptr'],graph['post'],scaled_weights(graph['weight'],config.get('global_weight_scale',1)));artifact['base_graph_hash']=artifact['graph_hash'];artifact['graph_hash']=brain.graph_hash;inputs=np.array(artifact['input_indices']);ensembles=[np.array(e['indices']) for e in artifact['ensembles']]
     runtime=manifest(config,brain.graph_hash,identity(artifact['projection_indices']),identity(artifact['ensembles']),brain.build['binary_sha256'])
+    if failure_reference is not None:
+        reference=Path(failure_reference);old=json.loads((reference/'manifest.json').read_text());old_result=json.loads((reference/'result.json').read_text());old_candidate=json.loads((reference/'candidate.json').read_text())
+        if old_result['status']!='fail' or old['config_hash']!=runtime['config_hash'] or old['graph_hash']!=runtime['graph_hash']:raise ValueError('Invalid failed-run reference')
+        if old_candidate['projection_indices']!=artifact['projection_indices'] or old_candidate['ensembles']!=artifact['ensembles']:raise ValueError('Failure-reference mapping changed')
+        runtime['failure_reference']={'manifest_sha256':digest(reference/'manifest.json'),'result_sha256':digest(reference/'result.json'),'original_commit':old['commit'],'scope':'Supplementary failure baselines, not a new confirmatory gate'}
     if resume:
         assert_compatible(json.loads((output/'manifest.json').read_text()),runtime)
         if json.loads((output/'candidate.json').read_text())!=artifact:raise ValueError('Candidate mismatch on resume')
@@ -141,13 +146,23 @@ def run_gate(graph_path,config,output,resume=False):
         print(json.dumps(result),flush=True);return result
     try:
         selected=None;selected_patterns=None
-        for gain,count in itertools.product(config['calibration']['gains'],config['calibration']['control_cell_counts']):
+        grid=[] if failure_reference else itertools.product(config['calibration']['gains'],config['calibration']['control_cell_counts'])
+        for gain,count in grid:
             patterns=[inputs[p] for p in control_patterns(matrix,groups,count)]
             result=block(patterns,gain,'development',config['calibration']['trials_per_action'],config['calibration']['seed']);calibrations.append(result)
             if min(result['success'])>=config['confirmatory']['minimum_success']:
                 selected=result;selected_patterns=patterns;break
         if selected is None:
-            result={'schema':'controllability-result-v1','status':'fail','mode':artifact['mode'],'gate':1,'reason':'No registered calibration candidate reached the criterion','calibration':calibrations,'elapsed_seconds':time.perf_counter()-started}
+            gain=config['calibration']['gains'][0];count=config['calibration']['control_cell_counts'][0]
+            patterns=[inputs[p] for p in control_patterns(matrix,groups,count)]
+            shuffled=np.random.default_rng(config['mapping_seed']+1).permutation(inputs);lookup=dict(zip(inputs,shuffled))
+            shuffled_patterns=[np.array([lookup[i] for i in p]) for p in patterns]
+            shuffle=block(shuffled_patterns,gain,'failure-reference-shuffled-input',config['calibration']['trials_per_action'],config['calibration']['seed'])
+            black=trial([],gain,config['calibration']['seed'])
+            result={'schema':'controllability-result-v1','status':'fail','mode':artifact['mode'],'gate':1,
+                'reason':'Supplementary failure baselines' if failure_reference else 'No registered calibration candidate reached the criterion',
+                'calibration':calibrations,'shuffled_input':shuffle,'black_input':black,'learning_claim':False,'elapsed_seconds':time.perf_counter()-started}
+            if failure_reference:result['failure_reference']=runtime['failure_reference']
         else:
             artifact['stage']='frozen';artifact['selected_gain']=selected['gain'];artifact['control_cell_count']=selected['control_cells'];artifact['control_indices']=[p.tolist() for p in selected_patterns]
             (output/'preregistration.json').write_text(json.dumps(artifact,sort_keys=True,indent=2)+'\n')
@@ -166,6 +181,6 @@ def run_gate(graph_path,config,output,resume=False):
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--config',default='configs/controllability.yaml');p.add_argument('--mode',choices=['circuit','full'],default='circuit');p.add_argument('--output',required=True);p.add_argument('--resume',action='store_true');args=p.parse_args()
-    result=run_gate(ROOT/'connectome_data/malecns_v1'/('prepared-'+args.mode),yaml.safe_load(Path(args.config).read_text()),args.output,args.resume)
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--config',default='configs/controllability.yaml');p.add_argument('--mode',choices=['circuit','full'],default='circuit');p.add_argument('--output',required=True);p.add_argument('--resume',action='store_true');p.add_argument('--failure-reference');args=p.parse_args()
+    result=run_gate(ROOT/'connectome_data/malecns_v1'/('prepared-'+args.mode),yaml.safe_load(Path(args.config).read_text()),args.output,args.resume,args.failure_reference)
     print(json.dumps(result,indent=2))
