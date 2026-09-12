@@ -1,0 +1,21 @@
+schema: full-teacher-transfer-gate2a-v1
+scope: Full 20 BB conventional teacher, canonical corpus and confirmed native cue transfer
+conditioning:
+  run: runs/conditioning-full-confirm-v1
+  protocol: configs/conditioning.yaml
+  result_sha256: 8fec88ae335b4940f97c09a3c8e5f6e026b1059dd8444b29f5ce63102409cca5
+  manifest_sha256: d38469805e1c0e1617b249f91e24eb4a28fd3cba5acd908802bad55d64292cc0
+transfer:
+  run: runs/exact-surrogate-circuit-confirm-v1
+  protocol: configs/exact_transfer_surrogate.yaml
+  result_sha256: 3a9a11fe172c6aa1fa659d3c0b7e154b9ed94dcbdd44b1e7f6b30d80e0175f4e
+  manifest_sha256: f33ef9ae87f3646256fac72693144cb0b76c63f6d1760cc2cb7a18a3573ee1e7
+  model: runs/exact-surrogate-circuit-confirm-v1-model
+  model_sha256: c3876173e83c739738706ee4bd2e0a28c7854b934e63fc67ffbaba90b9e6defb
+  graph: connectome_data/malecns_v1/prepared-circuit
+failed_local:
+  run: runs/exact-transfer-circuit-confirm-v1
+  protocol: configs/exact_transfer.yaml
+  result_sha256: 5110abe179cbb6dcecb13fc2d6a9527ed287b27808366607faa4c7528b37a0ab
+  manifest_sha256: 973b95cbc5943cca6366dabb78652978bb4472dff5f1d9f5a971ff29055482b5
+teacher_evaluation_yaml_sha256: 5fb344fad4c27a5a5556764db0d0c43b1f64177ccadafc68b3d81453f52ca9c1

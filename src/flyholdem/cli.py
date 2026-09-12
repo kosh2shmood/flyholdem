@@ -60,6 +60,17 @@ def parser():
     _learning_options(train)
     distill=sub.add_parser('distill',help='Run registered exact-cue local or bounded-edge surrogate transfer')
     _learning_options(distill)
+    gates=sub.add_parser('gate',help='Reverify prerequisite evidence before biological poker training')
+    gs=gates.add_subparsers(dest='gate_command',required=True)
+    certify=gs.add_parser('certify-transfer',help='Require the full 20 BB teacher, reproduced corpus and actual cue transfer/removal')
+    certify.add_argument('--policy',required=True);certify.add_argument('--confirmation',required=True)
+    certify.add_argument('--corpus',required=True);certify.add_argument('--output',required=True)
+    verify=gs.add_parser('verify-transfer',help='Repeat every dependency in an existing Gate 2A certificate')
+    verify.add_argument('--certificate',required=True)
+    cues=gs.add_parser('verify-cues',help='Recompute complete registered conditioning or exact-transfer confirmation evidence')
+    cues.add_argument('--run',required=True);cues.add_argument('--config',required=True);cues.add_argument('--allow-failed',action='store_true')
+    removal=gs.add_parser('verify-removal',help='Execute the actual cue model before and after deleting copied teaching files')
+    removal.add_argument('--model',required=True);removal.add_argument('--graph',required=True);removal.add_argument('--transfer-run',required=True)
     teacher=sub.add_parser('teacher',help='Independent conventional teacher workflow; never fly inference')
     ts=teacher.add_subparsers(dest='teacher_command',required=True)
     small=ts.add_parser('train-shove-fold',help='Train the separate small tabular 10 BB reference')
@@ -95,6 +106,18 @@ def parser():
 
 
 def dispatch(args):
+    if args.command=='gate':
+        if args.gate_command=='certify-transfer':
+            from flyholdem.experiments.gates import certify_gate2a
+            return certify_gate2a(args.policy,args.confirmation,args.corpus,args.output)
+        if args.gate_command=='verify-transfer':
+            from flyholdem.experiments.gates import verify_gate2a
+            return verify_gate2a(args.certificate)
+        if args.gate_command=='verify-cues':
+            from flyholdem.experiments.cue_validation import verify_cue_evidence
+            return verify_cue_evidence(args.run,configuration(args.config),require_pass=not args.allow_failed)
+        from flyholdem.experiments.teacher_removal import verify_cue_teacher_removal
+        return verify_cue_teacher_removal(args.model,args.graph,args.transfer_run)
     if args.command=='serve':
         import uvicorn
         from flyholdem.server.app import create_app

@@ -41,3 +41,6 @@ A separately registered best-response extraction uses `flyholdem teacher export-
 
 
 To qualify a completed full-hand corpus from its measured teacher, use `.venv/bin/flyholdem teacher verify-qualified-corpus --corpus CORPUS --policy POLICY --validation-run CONFIRMATION_RUN`. This repeats the registered collection and compares actual targets and split bytes. It rejects an unqualified teacher before collection replay; structural `verify-corpus` alone does not authorize training.
+
+
+Gate prerequisite commands are documented in GATES.md. `gate certify-transfer` requires complete confirmed full-teacher/corpus evidence and actual native cue transfer/removal; `gate verify-transfer` repeats every check. `gate verify-cues --run RUN --config PROTOCOL` rederives registered confirmation statistics; add `--allow-failed` only for read-only negative audits. These commands do not claim that the pending poker learning gates passed.
