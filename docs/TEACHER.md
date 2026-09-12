@@ -221,3 +221,8 @@ PYTHONPATH="$PWD/runs/teacher-runtime-v9/src" .venv/bin/python -m flyholdem.cli 
 ```
 
 Resume evaluation replaces `--output` with `--resume` naming that run. The original full opponent suite and untouched confirmation deals remain required before teaching. The fly's frozen inference files and action-score source are unchanged.
+
+
+### V9 negative result
+
+The fixed boundary policy a15dacb25161be56227eb9ec8f581c932ccc1ba616ec8c492fd7b7ea0c6f65f0 also failed. Its complete 512 paired-deal records were byte-identical to V8 (journal SHA ff099e4483eb34c0f421aa6ebca80d5e19b3892eb6abfb369c3440b0119f4921), with the same returns, action counts and intervals. The post-training exact fold-value correction therefore did not improve this evaluated candidate. All 32 private-information probes passed and independent statistics recomputed exactly. Result SHA 0fd06b781bfc89d5be2e26d310c0839934c95882d025df246a9d01d5e29c3931; evaluation manifest 0014d9020d29b762687570accd53681202e579732a57b468ca0234e5e3d2fbe9. Full confirmation remains unused. Neither a full-hand corpus nor biological poker training is authorized.
