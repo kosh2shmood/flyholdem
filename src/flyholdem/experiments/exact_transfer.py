@@ -36,6 +36,16 @@ def run(config, output, profile, learning_rate, resume=False, development_refere
     evidence = json.loads(prerequisite.read_text())
     if evidence.get('gate') != 2 or evidence.get('status') != 'pass' or evidence.get('profile') != 'confirmatory':
         raise ValueError('Passing registered conditioning confirmation required before transfer')
+    optimization = config.get('optimization', 'teacher-advantage-local-eligibility')
+    if optimization not in ('teacher-advantage-local-eligibility', 'direct-readout-rate-surrogate-v1'):
+        raise ValueError('Unknown registered exact-transfer optimizer')
+    use_surrogate = optimization == 'direct-readout-rate-surrogate-v1'
+    if use_surrogate:
+        failed_path = ROOT / config['failed_local_reference']
+        failed = json.loads(failed_path.read_text())
+        if (digest(failed_path) != config['failed_local_reference_sha256'] or failed.get('status') != 'fail'
+                or failed.get('profile') != 'confirmatory' or failed.get('gate_component') != '2A-small-exact-transfer'):
+            raise ValueError('Preserved failed local transfer confirmation is required')
     base = ROOT / config['preregistration']
     if digest(base) != config['preregistration_sha256']:
         raise ValueError('Frozen controllability artifact changed')
@@ -46,8 +56,14 @@ def run(config, output, profile, learning_rate, resume=False, development_refere
     plastic_config = {**config['plasticity'], 'learning_rate': learning_rate}
     eligible = Eligibility(brain, np.flatnonzero(nodes['class'].eq('Kenyon_Cell').to_numpy()),
                            np.flatnonzero(nodes['class'].eq('MBON').to_numpy()), plastic_config)
+    surrogate = None
+    if use_surrogate:
+        from flyholdem.learning.surrogate import ReadoutSurrogate
+        surrogate = ReadoutSurrogate(eligible, controller.ensembles, {**config['surrogate'], 'learning_rate': learning_rate})
     dopamine_populations = annotated_populations(nodes)
     cues = cue_registration(brain, registration, config['cue'])
+    if use_surrogate and (failed['cue_hash'] != identity(cues) or failed['mode'] != config['mode']):
+        raise ValueError('Surrogate must retain the failed local cue/mode registration')
     teacher = ExactCueTeacher(config['cue']['actions'])
     sensory = {'schema': 'native-cue-input-v1', 'cells': cues['indices'], 'actions': config['cue']['actions'],
                'amplitude_jitter': config['cue']['amplitude_jitter'], 'bin_ms': config['plasticity']['bin_ms']}
@@ -57,6 +73,8 @@ def run(config, output, profile, learning_rate, resume=False, development_refere
                       'cue_hash': identity(cues), 'plasticity_registration': eligible.registration,
                       'dopamine_indices': [p.tolist() for p in dopamine_populations],
                       'teacher_registration': teacher.registration, 'sensory_protocol': sensory}
+    if surrogate:
+        runtime_config['surrogate_registration'] = surrogate.registration
     if profile == 'confirmatory':
         if not development_reference:
             raise ValueError('Confirmation requires a passing development result')
@@ -151,6 +169,14 @@ def run(config, output, profile, learning_rate, resume=False, development_refere
             advantage = teacher.advantage(cue, row['selected'])
             row['teacher_probabilities'] = teacher.probabilities(cue).tolist()
             row['teacher_advantage'] = advantage
+            if surrogate:
+                teaching_cue = cue if override_reward is None else int(override_reward)
+                target = teacher.probabilities(teaching_cue)
+                row['supervision'] = {'target': target.tolist(), 'teacher_cue': teaching_cue,
+                                      'shuffled': override_reward is not None}
+                row['plasticity'] = surrogate.step(row['scores'], [a in cues['targets'] for a in range(5)], target, learning)
+                row['dopamine_pulse'] = {'delivered': False, 'reason': 'nonbiological surrogate optimization'}
+                return row
             delivered = advantage if override_reward is None else float(override_reward)
             reward = baseline.event(delivered, 'exact-cue-teacher-advantage', transform='identity')
             update = eligible.reinforce(reward['dopamine'], learning)
@@ -160,16 +186,17 @@ def run(config, output, profile, learning_rate, resume=False, development_refere
                         'reward_shuffled': override_reward is not None})
         return row
 
+    shuffled_name = 'shuffled-teacher' if surrogate else 'shuffled-reward'
     summaries = []
     try:
         for seed in selected['seeds']:
             schedule = np.random.default_rng(seed).permutation(np.arange(selected['training_trials']) % 2)
             earned_rewards = []; measures = {}
-            for control in ('plastic', 'frozen', 'shuffled-reward'):
+            for control in ('plastic', 'frozen', shuffled_name):
                 execute([seed, control, 'initialize'], initialize)
                 phases = ['pre', 'train', 'post', 'retention', 'erased'] if control == 'plastic' else ['train', 'post']
-                shuffled = (np.random.default_rng(seed + 30000).permutation(earned_rewards)
-                            if control == 'shuffled-reward' else None)
+                shuffled = (np.random.default_rng(seed + 30000).permutation(schedule if surrogate else earned_rewards)
+                            if control == shuffled_name else None)
                 for phase in phases:
                     if phase == 'retention':
                         def retain():
@@ -213,7 +240,7 @@ def run(config, output, profile, learning_rate, resume=False, development_refere
             raise ValueError('Journal has unexpected trailing operations')
         evidence = {}
         criteria = config['criterion']
-        for control in ('frozen/post', 'shuffled-reward/post', 'plastic/erased'):
+        for control in ('frozen/post', shuffled_name + '/post', 'plastic/erased'):
             differences = [s['plastic/post'] - s[control] for s in summaries]
             evidence[control] = paired_evidence(differences, criteria['bootstrap_seed'], criteria['bootstrap_repeats'])
         accuracy = [s['plastic/post'] for s in summaries]
@@ -231,7 +258,8 @@ def run(config, output, profile, learning_rate, resume=False, development_refere
                   'elapsed_seconds_this_invocation': time.perf_counter() - started,
                   'peak_rss_bytes': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * (1 if __import__('sys').platform == 'darwin' else 1024),
                   'scope': 'Exact-table two-cue transfer in circuit; no poker claim or complete Gate 2A pass',
-                  'optimization': 'teacher-advantage dopamine with bounded local eligibility',
+                  'optimization': optimization,
+                  'surrogate_registration': surrogate.registration if surrogate else None,
                   'teacher_registration': teacher.registration, 'teacher_connected_at_evaluation': False,
                   'manifest_sha256': digest(output / 'manifest.json')}
         atomic_json(output / 'result.json', result)

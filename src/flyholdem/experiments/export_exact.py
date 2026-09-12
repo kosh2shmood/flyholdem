@@ -41,7 +41,7 @@ def export(run, output):
     reference = {'manifest_sha256': digest(run / 'manifest.json'),
                  'best_checkpoint': json.loads((run / 'checkpoints/best.json').read_text()),
                  'best_validation': extra['best_validation'],
-                 'optimization': 'teacher-advantage-local-eligibility',
+                 'optimization': config.get('optimization', 'teacher-advantage-local-eligibility'),
                  'teacher_table_sha256': config['teacher_registration']['table_sha256'],
                  'cue_player': {'implementation_sha256': digest(Path(cue_player.__file__)),
                                 'sensory_protocol': config['sensory_protocol']}}
