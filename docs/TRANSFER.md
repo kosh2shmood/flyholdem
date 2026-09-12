@@ -56,3 +56,15 @@ Config configs/exact_transfer_surrogate.yaml pins the failed local confirmation,
 ```
 
 Add --resume after interruption. If development fails, run the next already registered rate in a separate output directory, stopping at the first qualifying rate before independent confirmation. The optimizer is stateless projected SGD; complete neural state, local activity observer, schedule and journal position retain the existing atomic recovery contract. Actual model export and teacher-removal checks remain required. No surrogate experiment result exists at registration.
+
+## Surrogate development qualified at the first registered rate
+
+Rate 0.1 completed in 148.20 s. Held-out learned accuracy was 0.859375, 0.9375 and 0.96875 across the three development seeds (mean 0.921875), versus 0.53125 frozen/restored and 0.546875 shuffled-teacher. Retention and exact erasure passed. The first candidate qualifies; rates 1.0 and 10.0 are not run. Preserve the original local-rule confirmation failure. This is still an exact-cue circuit result, not poker skill.
+
+Freeze 0.1 and run the five reserved confirmation seeds using the unchanged surrogate-runtime-v1 snapshot:
+
+```sh
+PYTHONPATH="$PWD/runs/surrogate-runtime-v1/src" .venv/bin/python -m flyholdem.experiments.exact_transfer --config runs/surrogate-runtime-v1/configs/exact_transfer_surrogate.yaml --profile confirmatory --learning-rate 0.1 --development-reference runs/exact-surrogate-circuit-lr01-v1/result.json --output runs/exact-surrogate-circuit-confirm-v1
+```
+
+Add --resume after interruption. Export and actual teacher-removal checks use the same snapshot. Confirmation has not yet run at this checkpoint; Gate 2A remains pending independent teacher/corpus qualification as well.

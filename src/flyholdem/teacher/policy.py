@@ -7,10 +7,10 @@ from flyholdem.connectome.registry import digest
 from flyholdem.provenance import identity
 from flyholdem.neural.checkpoint import atomic_json
 from .nfsp import network
-from .features import features, feature_names, V1
+from .features import features, feature_names, feature_runtime_identity, V1, V3
 
 
-def policy_implementation_identity():
+def policy_implementation_identity(feature_version=V1):
     import importlib
     import platform
     import sys
@@ -18,9 +18,14 @@ def policy_implementation_identity():
              'flyholdem.teacher.serialization', 'flyholdem.poker.infoset',
              'flyholdem.poker.observation', 'flyholdem.interface.encoder')
     files = {name: digest(importlib.import_module(name).__file__) for name in names}
+    if feature_version == V3:
+        module=importlib.import_module('flyholdem.teacher.equity')
+        files['flyholdem.teacher.equity']=digest(module.__file__)
+        files['flyholdem.teacher.equity.cpp']=digest(Path(module.__file__).with_suffix('.cpp'))
     return {'source_files': files, 'source_hash': identity(files), 'python': sys.version,
             'platform': platform.platform(), 'numpy': np.__version__, 'torch': torch.__version__,
-            'pokerkit': __import__('importlib.metadata', fromlist=['version']).version('pokerkit')}
+            'pokerkit': __import__('importlib.metadata', fromlist=['version']).version('pokerkit'),
+            'feature_runtime':feature_runtime_identity(feature_version)}
 
 
 class TeacherPolicy:
@@ -56,7 +61,7 @@ def export_policy(agents, output, provenance):
               'hidden': agents[0].config['hidden'], 'agents': len(agents),
               'aggregation': 'equal-probability-mixture', 'files': entries,
               'feature_version': agents[0].feature_version,
-              'provenance': provenance, 'implementation': policy_implementation_identity(), 'allowed_as_teacher': False}
+              'provenance': provenance, 'implementation': policy_implementation_identity(agents[0].feature_version), 'allowed_as_teacher': False}
     atomic_json(output / 'manifest.json', record)
     return digest(output / 'manifest.json')
 
@@ -67,7 +72,7 @@ def load_policy(output):
     if (record['schema'] != 'teacher-average-policy-v1' or record['aggregation'] != 'equal-probability-mixture'
             or record['agents'] != 2):
         raise ValueError('Unsupported conventional teacher policy')
-    if record['implementation'] != policy_implementation_identity():
+    if record['implementation'] != policy_implementation_identity(record['feature_version']):
         raise ValueError('Teacher inference source/runtime mismatch')
     dimension = len(feature_names(record['feature_version']))
     models = [network(record['hidden'], dimension) for _ in range(record['agents'])]

@@ -65,3 +65,19 @@ PYTHONPATH="$PWD/runs/teacher-runtime-v2/src" .venv/bin/python -m flyholdem.teac
 ## Visible-card teacher v2 — validation failed
 
 The registered 250,000-hand v2 run completed in 1,410.12 s. Policy SHA-256: 9ec0bc011ec48ad84191ee25c0084bfece4a3d56414dc3913914bc736a06bf77. Held-out development return was +0.977 / +0.348 / −0.523 / −1.619 BB per hand against random/station/TAG/equity. None had a positive suite-adjusted lower confidence bound. The 32 actual private-data invariance checks passed, but strength validation failed. Confirmation seeds remain unused and no corpus exists. Exact evidence is local in runs/teacher-nfsp-cards-v2-development. Additional visible-card features alone did not qualify this teacher; a stronger training procedure is required. The next candidate should address its opponent distribution and value learning under a separately committed protocol, rather than treating longer training or visible activity as success.
+
+## Registered visible-equity teacher v3
+
+The next teacher representation adds a deterministic 256-sample estimate against uniformly sampled unknown opponent cards/runouts, its square, and its difference from the visible call price. The estimator accepts only the teacher's two own cards and current public board. Samples are hypothetical; the actual opponent cards, deck, game object and hand counters are unavailable. A visible-card hash seeds each calculation, so repeated canonical states have identical features. The 357 inputs retain the exact original 237 channels as their prefix. None of these added features enter the fly's observation or corpus observation fields.
+
+The conventional utility uses a separate original C++ hand evaluator for speed. PokerKit remains the only dealing, betting and settlement engine. The utility's rank ordering/ties matched PokerKit on 4,500 independent five/six/seven-card hands plus targeted straight/flush/quads/full-house/two-pair cases; another 1,800 sampled hands are covered in CI. On this machine, 1,000 calls of 256 samples took 0.0281 s in the isolated prototype. This benchmark establishes utility throughput, not poker policy strength. Source, compiler flags and actual binary hash are pinned in v3 training and frozen-policy identities; existing native LIF binaries and the fly's inference runtime are unchanged. Old teacher versions use their preserved source snapshots.
+
+Config configs/teacher_nfsp_equity_v3.yaml retains the v2 250,000-hand horizon, source/deal seeds, 128-unit network hidden widths, anticipatory mixture, replay/reservoir sizes and optimizer settings. Only representation and its explicitly pinned optional evaluator change. The original held-out development suite remains fixed; confirmation seeds are still unused. Full suite: 83 passed / 2 isolated-oracle skips, including exact complete training recovery, native-evaluator agreement, private-data invariance and byte-identical frozen exports for v3.
+
+Commit this configuration before training. Snapshot src, uv.lock and config into ignored runs/teacher-runtime-v3 and preserve the separate equity binary under its runs/build reference. Execute:
+
+```sh
+PYTHONPATH="$PWD/runs/teacher-runtime-v3/src" .venv/bin/python -m flyholdem.teacher.training --config runs/teacher-runtime-v3/configs/teacher_nfsp_equity_v3.yaml --output runs/teacher-nfsp-equity-v3
+```
+
+Resume adds --resume; export/evaluation also use this PYTHONPATH. Do not rebuild the equity utility or change the installed environment while the experiment is active. No result or teacher qualification is assumed at registration.

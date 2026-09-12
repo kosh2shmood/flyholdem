@@ -1,0 +1,26 @@
+schema: conventional-nfsp-visible-equity-v3
+algorithm: NFSP
+status: development
+stack_bb: 20
+torch_threads: 1
+seed: 71001
+hands: 250000
+deal_seed_start: 1000000
+epsilon_start: 1.0
+epsilon_end: 0.1
+epsilon_decay_hands: 20000
+updates_per_hand: 1
+progress_hands: 10000
+agent:
+  hidden: 128
+  q_lr: 0.0003
+  average_lr: 0.001
+  replay_capacity: 50000
+  reservoir_capacity: 200000
+  anticipatory: 0.1
+  batch_size: 128
+  warmup_transitions: 1000
+  discount: 1.0
+  gradient_clip: 5.0
+  target_update_steps: 200
+  feature_version: canonical-visible-uniform-equity-v3

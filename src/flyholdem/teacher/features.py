@@ -2,7 +2,8 @@
 
 The fly continues to receive its frozen 237-channel code. These additional
 features never enter corpus observation fields or the native neural interface.
-PokerKit supplies visible made-hand ranks; there is no future-card sampling.
+PokerKit supplies visible made-hand ranks. V3 additionally samples hypothetical
+unknown cards inside the conventional teacher; it never receives the actual deck.
 """
 from functools import lru_cache
 import numpy as np
@@ -12,6 +13,7 @@ from flyholdem.poker.infoset import canonical_state
 
 V1 = 'canonical-visible-237-with-public-first-action-v1'
 V2 = 'canonical-visible-card-structure-v2'
+V3 = 'canonical-visible-uniform-equity-v3'
 RANKS = '23456789TJQKA'
 SUITS = 'cdhs'
 LABELS = list(Label)
@@ -29,8 +31,9 @@ PUBLIC_NAMES = ['call_price', 'own_stack_fraction', 'effective_spr', 'facing_bet
 def feature_names(version=V1):
     if version == V1:
         return list(CHANNELS)
-    if version == V2:
-        return list(CHANNELS) + CARD_NAMES + PUBLIC_NAMES
+    if version in (V2,V3):
+        names = list(CHANNELS) + CARD_NAMES + PUBLIC_NAMES
+        return names + ['teacher_visible_uniform_equity','teacher_visible_equity_squared','teacher_visible_equity_minus_price'] if version == V3 else names
     raise ValueError('Unknown registered conventional-teacher representation')
 
 
@@ -71,11 +74,25 @@ def features(observation, version=V1):
     base = encode_player_state(state).astype(np.float32)
     if version == V1:
         return base
-    if version != V2:
+    if version not in (V2,V3):
         raise ValueError('Unknown conventional-teacher feature version')
     cards = card_structure(tuple(state['hole']), tuple(state['board']))
     public = np.array([state['to_call'] / max(1, state['pot'] + state['to_call']),
         state['own_stack'] / max(1, state['own_stack'] + state['pot']),
         min(20, min(state['own_stack'], state['opponent_stack']) / max(1, state['pot'] + state['to_call'])) / 20,
         float(state['to_call'] > 0)], dtype=np.float32)
-    return np.concatenate((base, cards, public))
+    value=np.concatenate((base, cards, public))
+    if version == V3:
+        from .equity import visible_equity
+        equity=visible_equity(tuple(state['hole']),tuple(state['board']),256)
+        value=np.concatenate((value,np.array([equity,equity*equity,equity-public[0]],dtype=np.float32)))
+    return value
+
+
+def feature_runtime_identity(version=V1):
+    feature_names(version)  # reject unknown representation before constructing a manifest
+    result={'feature_version':version}
+    if version==V3:
+        from .equity import backend_identity
+        result['visible_equity_native']=backend_identity()
+    return result

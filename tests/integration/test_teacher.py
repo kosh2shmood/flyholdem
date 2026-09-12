@@ -16,7 +16,7 @@ CONFIG = dict(stack_bb=20, torch_threads=1, seed=71100, hands=30, deal_seed_star
                          gradient_clip=5, target_update_steps=10))
 
 
-@pytest.mark.parametrize('feature_version', [None, 'canonical-visible-card-structure-v2'])
+@pytest.mark.parametrize('feature_version', [None, 'canonical-visible-card-structure-v2', 'canonical-visible-uniform-equity-v3'])
 def test_teacher_complete_checkpoint_matches_uninterrupted_optimizer_and_replay(tmp_path, feature_version):
     full, resumed = tmp_path / 'full', tmp_path / 'resumed'
     config = copy.deepcopy(CONFIG)
@@ -113,3 +113,21 @@ def test_visible_card_structure_stays_inside_teacher_and_has_no_hidden_inputs(tm
     export_policy(agents, tmp_path/'v2-policy', {'stack_bb':20,'status':'engineering-fixture'})
     restored,_ = load_policy(tmp_path/'v2-policy')
     assert np.array_equal(policy.probabilities(obs), restored.probabilities(obs))
+
+
+def test_teacher_equity_representation_is_private_invariant_and_export_pins_binary(tmp_path):
+    from flyholdem.teacher.features import V3, features, feature_names
+    from flyholdem.teacher.equity import backend_identity
+    from flyholdem.interface.encoder import encode_player_state
+    config=dict(CONFIG['agent'],feature_version=V3)
+    agents=[NFSPAgent(config,301+seat) for seat in range(2)]
+    policy=TeacherPolicy([a.average for a in agents],V3)
+    obs=Hand(1967).observation();x=features(obs,V3)
+    assert x.shape==(357,) and np.array_equal(x[:237],encode_player_state(obs).astype(np.float32))
+    assert 0<=x[feature_names(V3).index('teacher_visible_uniform_equity')]<=1
+    from flyholdem.teacher.evaluation import verify_information_boundary
+    assert verify_information_boundary(policy,seeds=(713,714))['hidden_hole_future_deck_and_teacher_label_invariance']
+    export_policy(agents,tmp_path/'v3',{'stack_bb':20,'status':'engineering-fixture'})
+    restored,record=load_policy(tmp_path/'v3')
+    assert np.array_equal(policy.probabilities(obs),restored.probabilities(obs))
+    assert record['implementation']['feature_runtime']['visible_equity_native']['binary_sha256']==backend_identity()['binary_sha256']
