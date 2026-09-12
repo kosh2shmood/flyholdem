@@ -84,7 +84,7 @@ def evaluate(policy_path, config, output, profile='development', resume=False):
     from flyholdem.neural.checkpoint import atomic_json
     from flyholdem.experiments.journal import Journal
     from flyholdem.provenance import manifest, identity, assert_compatible
-    from .policy import load_policy
+    from .loaders import load_policy, sampling
     if profile not in config['profiles'] or set(config['opponents']) != set(VERSIONS):
         raise ValueError('Use the complete registered opponent suite and profile')
     torch.set_num_threads(1); torch.use_deterministic_algorithms(True)
@@ -134,7 +134,7 @@ def evaluate(policy_path, config, output, profile='development', resume=False):
         if index != len(journal.rows):
             raise ValueError('Unexpected trailing evaluation rows')
         summary = evaluation_summary(rows_by_opponent, config)
-        result = {'schema': 'teacher-evaluation-v1', **summary, 'profile': profile,
+        result = {'schema': 'teacher-evaluation-v1', **summary, 'sampling': sampling(policy_record), 'profile': profile,
                   'policy_sha256': policy_hash, 'stack_bb': config['stack_bb'],
                   'information_boundary_verified': True, 'information_boundary': boundary,
                   'allowed_as_teacher': bool(profile == 'confirmatory' and summary['passes_fixed_suite']),

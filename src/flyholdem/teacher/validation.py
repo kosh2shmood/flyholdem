@@ -11,6 +11,7 @@ from flyholdem.experiments.reports import _json, audit_journal
 from flyholdem.poker.opponents import VERSIONS
 from flyholdem.provenance import identity
 from .evaluation import evaluation_summary
+from .loaders import sampling
 
 
 def registered_suite():
@@ -40,7 +41,7 @@ def verify_evaluation(run, policy_path, registered_config=None, require_confirma
     if (result.get('manifest_sha256')!=digest(run/'manifest.json')
             or result.get('policy_sha256')!=policy_hash
             or result.get('stack_bb')!=config['stack_bb']
-            or policy.get('schema')!='teacher-average-policy-v1'
+            or policy.get('schema') not in ('teacher-average-policy-v1','teacher-best-response-policy-v1')
             or policy.get('provenance',{}).get('stack_bb')!=config['stack_bb']):
         raise ValueError('Teacher evaluation policy, stack or manifest mismatch')
     # Tensor identities are checked offline as well as by load_policy later.
@@ -73,6 +74,7 @@ def verify_evaluation(run, policy_path, registered_config=None, require_confirma
                 raise ValueError('Invalid teacher paired-deal schedule, returns or action counts')
             grouped[kind].append(row)
     recalculated=evaluation_summary(grouped,config)
+    recalculated["sampling"]=sampling(policy)
     for key,value in recalculated.items():
         if result.get(key)!=value:raise ValueError('Teacher evaluation summary differs from its paired-deal evidence: '+key)
     allowed=profile=='confirmatory' and recalculated['passes_fixed_suite']

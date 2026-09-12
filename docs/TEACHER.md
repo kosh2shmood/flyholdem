@@ -147,3 +147,16 @@ V5 population training completed all 500,000 hands in 2,901.88463 seconds, using
 V5 failed the unchanged full development suite: random +0.568359, station +0.404297, TAG −0.283203 and equity −1.480469 BB/hand, with no positive adjusted lower bound. Its 32-state private-information invariance passed. Recomputed all 512 paired-deal summaries independently; result SHA ddfe482d3163c0f53b562fea532c4375c33f3deea0dbb70c1810ad0b15f63743, evaluation manifest 22d60152a3b2303cf91089e4fa496648487c19794873cb6158ad415ffdd6aee4. Full confirmation deals remain unused and no full-hand corpus is permitted.
 
 Next controlled conventional candidate: separately export the two final learned Double-DQN best-response components as an equal mixture of their legal greedy policies. This tests a different existing component, without retraining or selecting a biological parameter. It must be explicitly labeled as a population-trained best-response mixture, not NFSP's time-average policy or an equilibrium claim, and independently pass the same full suite before any teaching. The candidate implementation/configuration must be committed before evaluation.
+
+## V6: final best-response components, without retraining
+
+V6 extracts the two final Double-DQN Q heads from the completed V5 checkpoint. Each component chooses its own legal greedy action; the candidate distribution is their equal mixture (one action with probability 1, or two with 0.5 each). This is a population-trained best-response mixture, not the historical NFSP average or an equilibrium claim. The distinction follows NFSP's separate best-response and average-policy components; the existing Double DQN value update is unchanged.
+
+The new extraction protocol pins V5's training manifest, frozen source and completed 500,000-hand boundary. It checks the full original source hash, exact original feature/network/codec files, environment, feature binary identity, checkpoint hashes and complete training journal before exporting numeric Q tensors. A separate policy module and explicit loader preserve every previous frozen average-policy source. Its original private-information, paired-game, complete-suite and corpus-qualification checks apply unchanged, with an accurate sampling label. There is no change to fly inference, biological parameters or held-out full-hand confirmation seeds.
+
+```sh
+.venv/bin/flyholdem teacher export-best-response --config configs/teacher_best_response_v6.yaml --output runs/teacher-best-response-v6-policy
+.venv/bin/flyholdem teacher evaluate --policy runs/teacher-best-response-v6-policy --config configs/teacher_evaluation.yaml --profile development --output runs/teacher-best-response-v6-development
+```
+
+Commit and freeze the candidate source/config with a copied verified teacher-equity binary before these operations; execute through that snapshot's PYTHONPATH. Extraction is not resumable and writes a new policy directory; evaluation resumes with `--resume RUN`. No candidate is qualified until the unchanged full development and confirmation suites pass. Three new checks verify exact saved-Q tensor bytes, distinct Q/average components, legal greedy mixtures, invalid values, private invariance, corrupted tensors and rederived full-suite results/sampling identity.

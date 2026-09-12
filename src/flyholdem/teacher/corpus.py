@@ -9,7 +9,7 @@ from flyholdem.poker.infoset import canonical_state, canonical_information_id
 from flyholdem.poker.observation import canonical_bytes
 from flyholdem.poker.opponents import Opponent, visible_strength
 from flyholdem.provenance import identity
-from .policy import load_policy
+from .loaders import load_policy
 
 
 def split_for_id(information_id):
