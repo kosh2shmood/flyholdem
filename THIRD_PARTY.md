@@ -19,3 +19,9 @@ PokerKit 0.7.5 (MIT): https://github.com/uoftcprg/pokerkit; canonical game rules
 NumPy (BSD-3-Clause), FastAPI (MIT), Starlette (BSD-3-Clause), Uvicorn (BSD-3-Clause), websockets (BSD-3-Clause), PyYAML (MIT) and their transitive dependencies are installed separately under their own licenses from `uv.lock`. Pytest, HTTPX and Playwright are development tools, not vendored source. The UI uses system fonts and original HTML/CSS/canvas; no remote assets.
 
 PettingZoo's official no-limit documentation was inspected for the five-action reference abstraction; it is not the canonical rules engine or a V0 dependency. No code copied from that implementation.
+
+## Additional inspected references
+
+FlyVis: https://github.com/TuragaLab/flyvis, MIT, official connectome-constrained visual-system PyTorch model. Used as a scope/modeling reference only; no code copied or dependency installed. DOOMFLY live protocol and its independent Brian2 numerical-oracle tests were reviewed at the pinned revision. The linked Prismix/Pong discussion is a secondary failure-analysis reference; biological and numerical claims rely on primary implementation/data sources.
+
+The expected MaleCNS source.lock.json is reproduced from DOOMFLY's pinned provenance record. Its MIT notice is retained at `licenses/DOOMFLY-MIT.txt`. Hash expectations are independently verified on fetch; data is still downloaded from the official release.

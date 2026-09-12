@@ -13,3 +13,5 @@ record:
 	uv run --frozen flyholdem record --hands 6
 browser-check:
 	uv run --frozen python scripts/browser_check.py
+fetch-malecns:
+	uv run --frozen python -m flyholdem.connectome.registry

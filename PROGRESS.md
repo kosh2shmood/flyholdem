@@ -1,7 +1,7 @@
 # FlyHoldem progress
 
 ## Current phase
-V0 complete locally: real fixture visual-first vertical slice verified. Save milestone commit and `visual-demo-v0` tag, then proceed to M0/M1 and later dependency-ordered milestones. No full MaleCNS data or poker teacher/training started.
+M0 complete; proceed to M1 software Gate 0. V0 commit 2bd2d3c and visual-demo-v0 are pushed. Official source registry/provenance checks, import policy, repository contract and data-free CI are implemented. No MaleCNS source download or teacher/poker training started.
 
 ## Completed acceptance checks
 - Read execution brief/specification/setup context and applicable ancestor AGENTS.md paths (none existed).
@@ -12,6 +12,9 @@ V0 complete locally: real fixture visual-first vertical slice verified. Save mil
 - 15 pytest tests passed: rule/raise mechanics, duplicate masks, chip conservation/replay over 100 random hands, byte-level hidden-card/deck leakage, neural-only scores, bounds/frozen updates, refractory edge case and actual WebSocket/replay.
 - Chromium desktop 1440×1080 and mobile 390×844 checks passed, screenshots inspected; no browser errors or overflow.
 - Short fixture benchmark and visual gate report saved in docs/review/ and docs/VISUAL_GATE.md.
+
+- M0: source-lock validation and mismatch rejection tests pass; exact expected data bytes total 1,109,008,094. Explicit resumable fetch retains the pre-existing trusted hashes.
+- M0: config/source/graph/encoder/decoder/binary/runtime identity comparison rejects mismatched checkpoints. CI uses locked Python packages and uv 0.12.13.
 
 ## Exact working commands
 ```
@@ -32,16 +35,16 @@ Demo URL: http://127.0.0.1:8766. Default seed 20260912, graph/mapping seed 1729.
 - Keep original checkout, development branch astra/visual-first. No agents delegated.
 
 ## Known failures and limitations
-- Automatic approval review twice rejected push: first destination verification, then public publication. Authenticated user kosh2shmood has ADMIN on the exact existing public origin https://github.com/kosh2shmood/flyholdem. No push has executed; request explicit public-publication approval only after a concrete verified commit exists. Continue local checkpoints meanwhile.
+- Resolved publication restriction: user explicitly approved publishing checked milestones on astra/visual-first and tags to public kosh2shmood/flyholdem. V0 branch and tag pushed successfully. Earlier automatic-review rejections are historical; do not ask again.
 - Two upstream Starlette test-client deprecation warnings; tests pass.
 - Gate 0 only partially covered until M1; Gates 1–6/2A pending. No MaleCNS/full runtime, conditioned model, trained teacher, transfer checkpoint, or poker training result yet.
 - Full mutable-state checkpoints/resume and registered manifests remain runtime milestones; V0 live logs are append-only, fsynced after completed hands, and ignored.
 
 ## Last stable commit
-The commit tagged `visual-demo-v0` contains this verified V0 milestone. Its parent is 1f66f396472801cad0ee21a56da47a70ec17c1d4.
+V0: 2bd2d3c2fc6158248c4f633690b5d170add14b32 (visual-demo-v0), pushed. M0 is the following `chore: lock provenance and add fixture CI` checkpoint; see Git log for its exact hash.
 
 ## Resumable experiment command
 No long training experiment started. Reproduce visual run with `make demo`; replay with `make replay`. Current local live worker logs into a timestamped ignored runs/live-* directory.
 
 ## Next step
-M0: AGENTS.md, CI, validated config/provenance registry/locks; then finish M1 software Gate 0. Keep V0 frozen at its tag. After that implement M2 reference/native runtime, explicit checksum-verified MaleCNS setup, resource measurements and audit. Do not skip failed scientific gates.
+Finish M1 software Gate 0: full golden hands (ties, short raises, uneven/side pots), deterministic paired seat-symmetry evidence, state replay serialization and opponent policies. Then M2 reference/native numerical runtime and checksum-verified full MaleCNS import/audit, measuring memory before any concurrent full jobs. Do not skip failed scientific gates.
