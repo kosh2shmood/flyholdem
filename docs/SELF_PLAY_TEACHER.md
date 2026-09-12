@@ -71,3 +71,6 @@ Implementation milestone 107fe26ea26a527648f2ac9cec84a6bf6e9f5db2 passed CI [347
 
 
 The separate exact V13 downstream runtime has now passed its bounded engineering preflight. See [DOWNSTREAM_RUNTIME.md](DOWNSTREAM_RUNTIME.md) for identities, real target/replay checks, preserved qualification refusals and conditional commands. Actual V13 training and fixed-final qualification remain on the original teacher runtime.
+
+
+The exact fixed-final export, development, independent verification, actual-play replay, conditional confirmation and downstream command sequence is collected in [V13_QUALIFICATION_COMMANDS.md](V13_QUALIFICATION_COMMANDS.md). A successful consistency check of failed development is not a qualification pass. All future commands remain dependent on completion and the preceding actual result.
