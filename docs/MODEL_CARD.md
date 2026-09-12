@@ -10,7 +10,7 @@ The full retained MaleCNS graph and the declared 4,505-cell circuit now import, 
 
 ## What does not yet exist
 
-A native population controller and bounded local rule now exist; the live poker backend remains the fixture. Conditioning development reached 84.4% versus 45.8% frozen and 43.8% shuffled controls; independent confirmation is pending. No validated poker teacher, actual distilled-connectome checkpoint or confirmatory poker evaluation exists. No confirmatory learning claim is supported. The synthetic DAN/KC/MBON labels describe engineering roles, not anatomically reconstructed cells. V0's Euler solver and schematic coordinates are development assumptions.
+A native population controller and bounded local rule now exist; the live poker backend remains the fixture. Full-graph conditioning passed five independent seeds: mean 82.3% versus 47.2% frozen and 50.0% shuffled, with retention and exact weight-erasure checks. Its mechanism is learned suppression of a competing readout under the fixed binary legal decoder; see docs/CONDITIONING.md. No validated poker teacher, actual distilled-connectome checkpoint or confirmatory poker evaluation exists. The confirmatory learning claim is limited to these two engineered cues. Poker learning is unproven. The synthetic DAN/KC/MBON labels describe engineering roles, not anatomically reconstructed cells. V0's Euler solver and schematic coordinates are development assumptions.
 
 ## Intended use
 

@@ -1,6 +1,6 @@
 # Elementary conditioning protocol v1
 
-Status: full-graph smoke and exact recovery verified on 3093ac0; development and confirmation are pending. Gate 1's full model uses all 166,700 neurons and all 25,582,938 retained edges at the previously frozen global synaptic scale 0.25. No poker result is involved in this protocol.
+Status: full retained graph passed Gate 2 on five independent confirmation seeds. The learned mechanism is engineered cue discrimination by readout suppression; poker learning is untested. Gate 1's full model uses all 166,700 neurons and all 25,582,938 retained edges at the previously frozen global synaptic scale 0.25. No poker result is involved in this protocol.
 
 ## Registered experiment
 
@@ -50,3 +50,24 @@ The 0.1 candidate failed: plastic accuracies 0.578125/0.71875/0.59375 (mean 0.63
 Freeze learning rate 0.3 for five independent confirmation seeds 65201–65205, 400 training trials per arm and 64 held-out trials per cue. The development result SHA is verified through --development-reference. No Gate 2 pass or conditioning-v0 tag exists until confirmation completes. New teacher, canonical-state and frozen-inference engineering does not alter the conditioning trial mathematics or stimuli.
 
 Confirmation command: `.venv/bin/python -m flyholdem.experiments.conditioning --profile confirmatory --learning-rate 0.3 --development-reference runs/conditioning-full-lr03-v1/result.json --output runs/conditioning-full-confirm-v1` (add --resume after interruption on the same source/config/environment).
+
+## Gate 2 confirmation passed
+
+The registered confirmation on source checkpoint 3f3069a completed 9,865 operations in 1,004.48 s with peak RSS 717,553,664 bytes. All 166,700 neurons and 25,582,938 retained edges remained; 61,210 existing KC-to-MBON edges could change within their fixed 0.1–2.0 bounds.
+
+| Seed | Plastic accuracy | Frozen / erased | Shuffled reward | Retained |
+|---|---:|---:|---:|---:|
+| 65201 | 0.8203125 | 0.4687500 | 0.5468750 | 0.8203125 |
+| 65202 | 0.8046875 | 0.4609375 | 0.4843750 | 0.8046875 |
+| 65203 | 0.8359375 | 0.5000000 | 0.4453125 | 0.8359375 |
+| 65204 | 0.8281250 | 0.4687500 | 0.5703125 | 0.8281250 |
+| 65205 | 0.8281250 | 0.4609375 | 0.4531250 | 0.8281250 |
+| Mean | **0.8234375** | **0.4718750** | **0.5000000** | **0.8234375** |
+
+Each seed used 400 training trials per arm and 128 balanced held-out trials. Paired improvement over frozen/erased was 0.3515625 (seed-bootstrap 95% interval 0.3421875–0.3609375); over shuffled rewards 0.3234375 (0.2765625–0.3703125). Each one-sided paired-seed sign-flip test gave p=0.03125. All registered accuracy, effect, retention and confirmation criteria passed. Every individual retained decision matched post-training, and every erased/frozen decision matched the initial network.
+
+An independent journal audit verified all hash links, neural-only legal argmax, target/correctness fields, the exact shuffled earned-reward multisets and past-only RPE baselines. Journal SHA-256: 3e84f9408246e65e1256d7b151cbafbb1a2e4f74cbfd5d4f5f025223a24bae72. Run manifest SHA-256: d38469805e1c0e1617b249f91e24eb4a28fd3cba5acd908802bad55d64292cc0. Exact generated result/audit/checkpoint files remain local under ignored runs/conditioning-full-confirm-v1.
+
+### Scope of the learned mechanism
+
+Action-0 readout cells had zero firing in these held-out cue trials. Correct action-0 responses arose when plasticity suppressed the competing action-1 readout sufficiently for the fixed lowest-legal-index tie rule to select 0. There were 39–43 such silent-readout decisions per seed; the input/network itself was stimulated. This is learned cue-dependent suppression in an engineered binary decoder. Independently active learned output patterns and poker skill remain untested. The unchanged decoder contains no strategic fallback or teacher. The qualifying conditioning parameters are now frozen for subsequent experiments; no poker returns selected them.

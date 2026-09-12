@@ -2,11 +2,6 @@ import numpy as np
 import pytest
 from flyholdem.neural.reference import ReferenceBrain
 from flyholdem.neural.sparse import SparseBrain
-from flyholdem.neural.kernel.build import build, LIBRARY
-
-
-@pytest.fixture(scope='module',autouse=True)
-def compile_kernel():build()
 
 
 def graph():return np.array([0,3,5,6,7]),np.array([0,1,2,2,3,1,0]),np.array([100,35,-20,45,-15,20,-10],dtype=np.float32)
