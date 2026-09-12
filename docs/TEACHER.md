@@ -140,7 +140,7 @@ Audit a development candidate without authorizing it:
 
 Omit `--allow-development` to require passing confirmation. The real v4 development evidence recomputed exactly (512 paired deals), and remains failed/unapproved. Seven new numerical-artifact checks cover altered intervals/flags, schedule substitutions, tensor changes, missing opponents and truncation. These synthetic test artifacts are not poker results.
 
-A separate small tabular CFR teacher has now passed development and confirmation for the restricted 10 BB shove/fold subgame. It does not replace the full 20 BB NFSP qualification. See SHOVE_FOLD_TEACHER.md for its registered algorithm, independent paired returns and explicit scope. Full-hand v5 population training remains in progress.
+A separate small tabular CFR teacher has now passed development and confirmation for the restricted 10 BB shove/fold subgame. It does not replace the full 20 BB NFSP qualification. See SHOVE_FOLD_TEACHER.md for its registered algorithm, independent paired returns and explicit scope. Full-hand V5 and the subsequently extracted V6 Q-component candidate failed the separate full suite.
 
 V5 population training completed all 500,000 hands in 2,901.88463 seconds, using the unchanged frozen source fcbf967. Final policy manifest c7f922e82890e7722ad43d9a73740f7e95ac62b775a4200aba54c52e478bca7b remains unvalidated. Training manifest d3324b5fd51335d9f743d71d6698e2ed7084dc7296441c26379eabbdcf198697 and journal head ab0c4b211e457210ff766a43b06039283384e87ae12124464dfba9bb1858cc0f identify the completed run. Next evaluate the original development suite; confirmation remains untouched.
 
@@ -160,3 +160,26 @@ The new extraction protocol pins V5's training manifest, frozen source and compl
 ```
 
 Commit and freeze the candidate source/config with a copied verified teacher-equity binary before these operations; execute through that snapshot's PYTHONPATH. Extraction is not resumable and writes a new policy directory; evaluation resumes with `--resume RUN`. No candidate is qualified until the unchanged full development and confirmation suites pass. Three new checks verify exact saved-Q tensor bytes, distinct Q/average components, legal greedy mixtures, invalid values, private invariance, corrupted tensors and rederived full-suite results/sampling identity.
+
+
+### V6 negative result
+
+The fixed extracted policy ec1c05e64a5c08fafab75bf98a8f13e551fd64d87173c40ef957797c235c1fc0 failed the complete original development suite (128 paired deals per opponent). Random: +1.531250 BB/hand, adjusted CI [0.094702, 2.945837]; station: +0.566406 [-0.322314, 1.499048]; TAG: -0.738281 [-1.677734, 0.159680]; equity: -1.376953 [-2.726611, 0.035730]. Only the random-opponent lower bound was positive. All 32 private-information probes passed. The complete journal and all statistics recomputed exactly. Result SHA 113493b21f23957cc91d3d657e9b70308274df1b3697c78238cf4f215e99e9ee; evaluation manifest 724b9ae88b917fac9cf1a01411092876bb2edc9ca75efb682288cf0d6164d7c2; journal head ddd8d3444fa7855334b0758212d7557e136375b5ad784af5161df2353e746498. No confirmation or full-hand corpus is authorized.
+
+## V7: public-stack potential, conventional teacher only
+
+Config configs/teacher_nfsp_potential_v7.yaml changes one aspect of V5: reward parameterization. It retains the 500,000-hand schedule, 357 visible features, network sizes, Double DQN, fixed-policy population, seeds, optimizer parameters and undiscounted objective. No fly mapping, decoder, edge, learning parameter or scoring path changes.
+
+Let S be the initial chip stack and s the acting player's current remaining stack. At each same-player decision, Phi(s)=(s-S)/S; terminal Phi is zero. The conventional replay reward is r'=r+Phi(next)-Phi(current). Raw intermediate reward remains zero and raw terminal reward remains net chips/S. The shaped trajectory sum is the original return minus Phi at that player's first decision, a constant independent of its subsequent actions. This is the finite, undiscounted potential construction of [Ng, Harada and Russell (1999)](https://ai.stanford.edu/~ang/papers/shaping-icml99.pdf). The implementation rejects other discounts and verifies the telescoping identity on every hand. This identity does not promise convergence or improved approximation by a finite neural learner.
+
+At nonterminal transitions the new reward is the negative incremental chips paid divided by S. At termination it is (final stack minus the previous decision's remaining stack)/S; a legal fold therefore has exactly zero shaped reward. These are public stack counts and the already permitted terminal reward. No fold override, analytical strategy or new teacher feature is introduced. Historical candidates keep their original parameterization and frozen source snapshots.
+
+Three tests cover exact telescoping, real same-player PokerKit transitions with byte-identical actions before optimizer updates, and exact optimizer/memory/RNG/journal recovery. V7 must pass the unchanged full development and confirmation suites before teaching. The separate confirmed small-game CFR reference does not replace that requirement.
+
+Commit the exact source/config and record their hashes before execution. Freeze src, uv.lock, this config and the original evaluation YAML, with a separately verified copy of the existing teacher equity binary, in runs/teacher-runtime-v7. Run:
+
+```sh
+PYTHONPATH="$PWD/runs/teacher-runtime-v7/src" .venv/bin/python -m flyholdem.teacher.training --config runs/teacher-runtime-v7/configs/teacher_nfsp_potential_v7.yaml --output runs/teacher-nfsp-potential-v7
+```
+
+Add `--resume` after interruption. Existing environments and shared native binaries remain unchanged. Checkpoints and complete reward journals remain local and ignored.

@@ -16,7 +16,12 @@ from flyholdem.experiments.journal import Journal
 from .nfsp import NFSPAgent
 
 
-def self_play_hand(agents, seed, button, stack_bb, epsilon, training=True, fixed_opponent=None):
+def self_play_hand(agents, seed, button, stack_bb, epsilon, training=True, fixed_opponent=None, reward_parameterization=None):
+    if reward_parameterization not in (None,'own-stack-potential-v1'):
+        raise ValueError('Unknown conventional reward parameterization')
+    if reward_parameterization and any(agent.config['discount']!=1 for agent in agents):
+        raise ValueError('The registered stack potential requires undiscounted finite hands')
+    reward_events=[]
     hand = Hand(seed, button=button, stacks=(2 * stack_bb,) * 2)
     fixed_seat=None
     if fixed_opponent is not None:
@@ -27,6 +32,14 @@ def self_play_hand(agents, seed, button, stack_bb, epsilon, training=True, fixed
     pending = [None, None]
     transitions = [0, 0]
     decisions = []
+    def transition(seat,raw_reward,next_observation=None):
+        reward=raw_reward
+        if reward_parameterization:
+            from .potential import transition_reward
+            event=transition_reward(raw_reward,pending[seat][2],None if next_observation is None else next_observation['own_stack'],2*stack_bb)
+            reward=event['shaped_reward'];reward_events.append({'seat':seat,**event})
+        agents[seat].transition(pending[seat][:2],reward,next_observation)
+
     for agent in agents:
         agent.begin_hand()
     while not hand.done:
@@ -39,14 +52,14 @@ def self_play_hand(agents, seed, button, stack_bb, epsilon, training=True, fixed
             hand.act(action);continue
         agent = agents[seat]
         # Bootstrap only at this SAME player's next decision, never on the other
-        # player's private information set. Intermediate chip movement is no reward.
+        # player's private information set. Raw intermediate reward remains zero.
         if training and pending[seat] is not None:
-            agent.transition(pending[seat], 0, observation)
+            transition(seat,0,observation)
             transitions[seat] += 1
         action, x = agent.act(observation, epsilon, record=training)
         decisions.append({'seat': seat, 'information_id': canonical_information_id(observation),
                           'action': action, 'best_response_episode': agent.episode_br})
-        pending[seat] = (x, action)
+        pending[seat] = (x, action, observation['own_stack']) if reward_parameterization else (x, action)
         hand.act(action)
     payoffs = hand.view()['payoffs']
     if sum(payoffs) != 0:
@@ -54,10 +67,17 @@ def self_play_hand(agents, seed, button, stack_bb, epsilon, training=True, fixed
     if training:
         for seat, agent in enumerate(agents):
             if pending[seat] is not None:
-                agent.transition(pending[seat], payoffs[seat] / (2 * stack_bb))
+                transition(seat,payoffs[seat] / (2 * stack_bb))
                 transitions[seat] += 1
     result={'deal_seed': seed, 'button': button, 'net_bb': [value / 2 for value in payoffs],
             'decisions': decisions, 'transitions': transitions, 'epsilon': epsilon}
+    if reward_parameterization:
+        result.update(reward_parameterization=reward_parameterization,reward_events=reward_events)
+        for seat in (0,1):
+            events=[value for value in reward_events if value['seat']==seat]
+            if events and not np.isclose(sum(value['shaped_reward'] for value in events),
+                    payoffs[seat]/(2*stack_bb)-events[0]['previous_potential'],rtol=0,atol=1e-12):
+                raise AssertionError('Stack-potential rewards failed their telescoping identity')
     if fixed_opponent is not None:result.update(fixed_opponent=kind,fixed_seat=fixed_seat,learning_seats=[1-fixed_seat])
     return result
 
@@ -65,6 +85,9 @@ def self_play_hand(agents, seed, button, stack_bb, epsilon, training=True, fixed
 def train(config, output, resume=False, stop_after=None):
     if config['stack_bb'] not in (10, 20):
         raise ValueError('Independent teacher prototype is registered at 10 or 20 BB only')
+    reward_parameterization=config.get('reward_parameterization')
+    if reward_parameterization not in (None,'own-stack-potential-v1') or reward_parameterization and config['agent']['discount']!=1:
+        raise ValueError('Use the registered undiscounted stack potential or unchanged terminal reward')
     population=config.get('population')
     if population is not None:
         from flyholdem.poker.opponents import VERSIONS
@@ -134,7 +157,7 @@ def train(config, output, resume=False, stop_after=None):
                 kind=population['cycle'][hand_index%len(population['cycle'])]
                 if kind!='self-play':fixed_opponent=((hand_index//len(population['cycle']))%2,kind)
             row = self_play_hand(agents, config['deal_seed_start'] + hand_index, hand_index % 2,
-                                 config['stack_bb'], epsilon,fixed_opponent=fixed_opponent)
+                                 config['stack_bb'], epsilon,fixed_opponent=fixed_opponent,reward_parameterization=reward_parameterization)
             row['optimization'] = []
             for seat,agent in enumerate(agents):
                 updates = [agent.train_step() for _ in range(config['updates_per_hand'])] if fixed_opponent is None or seat!=fixed_opponent[0] else []

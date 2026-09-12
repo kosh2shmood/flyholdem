@@ -58,7 +58,10 @@ def test_live_websocket_has_actual_fly_decision_and_reinforcement(tmp_path):
             for _ in range(30):
                 e=ws.receive_json()
                 events.append(e)
-                if e['kind']=='reinforcement':
+                # A live subscriber can join near a hand's end. Wait for a
+                # decision followed by reinforcement instead of assuming the
+                # first observed reinforcement belongs to a complete hand.
+                if e['kind']=='reinforcement' and any(row['kind']=='decision' for row in events):
                     break
         assert any(e['kind']=='decision' for e in events)
         assert events[-1]['kind']=='reinforcement'
