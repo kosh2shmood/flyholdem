@@ -96,3 +96,5 @@ Each named run contains its `manifest.json` and `result.json`; modern experiment
 Native training and its replay now keep detailed hand records on disk, with streamed audits and bounded retained windows. In a synthetic 64 MiB journal benchmark, indexed write/resume used 322,314 peak traced Python bytes versus 68,535,459 with resident records, with byte-identical files. These storage figures exclude the neural graph/state; see [training replay resources](TRAINING_REPLAY.md).
 
 A future conventional teacher runtime can use [exact PokerKit traversal reuse](POKER_TREE_PERFORMANCE.md). A small prototype workload ran about twice as fast with identical recorded and numeric results; the final helper reproduced all first 128 original training records. V11 continues its original frozen source.
+
+Twenty focused corpus/regret/qualification checks and a fresh process with no Torch module loaded also passed after correcting tabular corpus backend provenance. These integration fixtures do not constitute a qualified teacher or scientific corpus.

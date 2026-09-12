@@ -82,7 +82,7 @@ def export_corpus(policy_path, validation_path, config, output, resume=False):
     from flyholdem.provenance import manifest, assert_compatible
     output = Path(output); output.mkdir(parents=True, exist_ok=resume)
     runtime = manifest({**config, 'teacher_sha256': policy_hash, 'validation_sha256': digest(validation_path)},
-                       'conventional-teacher-corpus', identity('canonical-visible-infoset-v1'), policy_hash, 'pytorch-cpu')
+                       'conventional-teacher-corpus', identity('canonical-visible-infoset-v1'), policy_hash, policy_record.get('inference_backend','pytorch-cpu'))
     if resume:
         assert_compatible(json.loads((output / 'run-manifest.json').read_text()), runtime)
         if (output / 'manifest.json').exists():
