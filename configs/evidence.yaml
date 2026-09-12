@@ -17,3 +17,46 @@ gates:
     status: pending
     detail: Shove/fold, river, 20 BB and 100 BB learning gates remain pending.
 report: https://github.com/kosh2shmood/flyholdem/blob/astra/visual-first/docs/CONDITIONING.md
+
+# Written summaries of the already published confirmation findings in
+# docs/CONDITIONING.md and docs/TRANSFER.md. No per-trial data or model artifacts.
+experiments:
+  - title: Two-cue conditioning
+    mode: FULL GRAPH · BIO-PLASTIC
+    method: Local dopamine-gated learning · Confirmatory
+    seeds: 5
+    status: passed
+    arms:
+      - {label: Learned, accuracy: 0.8234375}
+      - {label: Frozen, accuracy: 0.471875}
+      - {label: Shuffled reward, accuracy: 0.5}
+    improvement: {mean: 0.3515625, interval: [0.3421875, 0.3609375]}
+    limit: Learned selection between two engineered cues. This does not establish poker skill.
+    detail: Retained decisions matched post-training exactly. Restoring initial weights reproduced the initial decisions. All registered conditioning criteria passed. The observed mechanism includes competing-readout suppression and silent legal ties. Five independent seeds; one-sided paired sign-flip p = 0.03125.
+    report: https://github.com/kosh2shmood/flyholdem/blob/astra/visual-first/docs/CONDITIONING.md
+  - title: Local teacher transfer
+    mode: CIRCUIT · DISTILLED-CONNECTOME
+    method: Teacher-advantage dopamine · Confirmatory
+    seeds: 5
+    status: failed
+    arms:
+      - {label: Learned, accuracy: 0.778125}
+      - {label: Frozen, accuracy: 0.5421875}
+      - {label: Shuffled reward, accuracy: 0.5546875}
+    improvement: {mean: 0.2359375, interval: [0.2078125, 0.2625]}
+    limit: Improved over controls, but 77.8% accuracy missed the registered 80% transfer threshold.
+    detail: The original local-rule failure is preserved. Retention and erasure checks passed, but an improvement alone cannot pass the complete transfer gate. This was exact two-cue teaching in the mushroom-body circuit, with no poker-strength claim. Five independent seeds; one-sided paired sign-flip p = 0.03125.
+    report: https://github.com/kosh2shmood/flyholdem/blob/astra/visual-first/docs/TRANSFER.md
+  - title: Surrogate teacher transfer
+    mode: CIRCUIT · DISTILLED-CONNECTOME
+    method: Bounded existing-edge surrogate · Confirmatory
+    seeds: 5
+    status: passed
+    arms:
+      - {label: Learned, accuracy: 0.9453125}
+      - {label: Frozen, accuracy: 0.5515625}
+      - {label: Shuffled teacher, accuracy: 0.521875}
+    improvement: {mean: 0.39375, interval: [0.3859375, 0.4046875]}
+    limit: Small exact-cue transfer passed. Full poker teacher and corpus qualification remain pending.
+    detail: This optimizer is explicitly nonbiological. It changes bounded parameters on existing registered edges and uses actual native forward scores. Retention and erasure were exact. All 128 frozen-model decisions remained identical after copied teacher/corpus files were deleted. Five independent seeds; one-sided paired sign-flip p = 0.03125.
+    report: https://github.com/kosh2shmood/flyholdem/blob/astra/visual-first/docs/TRANSFER.md

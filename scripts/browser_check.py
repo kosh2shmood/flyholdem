@@ -22,6 +22,12 @@ with sync_playwright() as p:
     assert 'FIXTURE / VISUAL PROTOTYPE / NOT A FULL-CONNECTOME RESULT' in page.locator('.notice').inner_text()
     assert page.locator('#chosen').inner_text()!='Awaiting spikes'
     assert page.locator('.score').count()==5
+    page.wait_for_function("document.querySelectorAll('.comparison-card').length === 3")
+    assert page.locator('.comparison-status').all_text_contents()==['Passed','Failed','Passed']
+    assert page.locator('.comparison-value').all_text_contents()==['82.3%','47.2%','50.0%','77.8%','54.2%','55.5%','94.5%','55.2%','52.2%']
+    assert 'not poker learning results' in page.locator('.control-evidence').inner_text()
+    page.locator('.comparison-details summary').nth(2).click()
+    assert '128 frozen-model decisions' in page.locator('.comparison-details').nth(2).inner_text()
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     page.screenshot(path=str(out/'fixture-live.png'),full_page=True)
     live=page.evaluate('window.flyholdem.latest')
@@ -42,7 +48,7 @@ with sync_playwright() as p:
     assert not page.evaluate('window.flyholdem.errors')
     report={'viewport':[1440,1080],'mobile_viewport':[390,844],
       'live_websocket':True,'replay':True,'visible_weight_changes':True,'exact_input_inspection':True,
-      'overflow':False,'browser_errors':errors,'live_event_hash':live['hash'],
+      'published_control_comparisons':True,'preserves_failed_transfer':True,'overflow':False,'browser_errors':errors,'live_event_hash':live['hash'],
       'replay_event_hash':replay['hash'],'browser':browser.version,
       'scope':'FIXTURE / VISUAL PROTOTYPE / NOT A FULL-CONNECTOME RESULT'}
     (out/'browser-check.json').write_text(json.dumps(report,indent=2)+'\n')

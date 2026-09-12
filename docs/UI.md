@@ -51,3 +51,10 @@ The human session token is kept in browser session storage, not in the page URL.
 ```
 
 Verified in Chromium 151.0.7922.34 on fixture and actual full native graph: legal action buttons, both players' motions, own/fly card privacy, community correspondence, reload recovery, leave/resume spectator, desktop/mobile overflow and no console/page errors. Native state-isolation and no-fallback tests run without full data. Generated screenshots/reports stay local.
+
+
+## Published matched-control comparisons
+
+The evidence section displays the already published five-seed confirmation findings for full conditioning, failed local exact-cue transfer and subsequent circuit surrogate transfer. All accuracy bars share a 0–100% scale. Paired improvement intervals are explicitly intervals for the difference from frozen weights, not error bars for an individual arm. Each experiment preserves its graph, learning method, confirmation status, exact-cue scope, retention/erasure explanation and source report link. The failed 77.8% local transfer stays failed despite positive improvement. These are written historical summaries from CONDITIONING.md / TRANSFER.md, not live chips, raw per-trial data or a new gate calculation. The frontend checks finite values, legal ranges, paired arithmetic and source-link destinations before rendering.
+
+The current browser check includes all nine accuracy values and passed/failed labels, disclosure behavior and mobile overflow. Local desktop (1440×1080) and phone (390×844) inspection verified the three-column and stacked layouts, clear values and source links. Versioned entry assets refresh previously cached open tabs; no runtime neural parameters or private play payloads change.

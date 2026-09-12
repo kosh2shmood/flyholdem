@@ -1,3 +1,4 @@
+import {renderEvidenceComparisons} from '/assets/evidence-comparisons.js';
 const $ = id => document.getElementById(id);
 const names = ['Fold', 'Check / call', 'Raise ½ pot', 'Raise pot', 'All-in'];
 const suits = {c:'♣', d:'♦', h:'♥', s:'♠'};
@@ -210,6 +211,7 @@ $('brain-filter').onchange=()=>brainCloud?.setFilter($('brain-filter').value);
 async function loadEvidence(){
  try{const response=await fetch('/api/evidence');if(!response.ok)throw Error('Evidence unavailable');const data=await response.json();$('evidence-scope').textContent=data.scope;$('gate-list').replaceChildren();
   for(const gate of data.gates){const item=document.createElement('span'),dot=document.createElement('i'),name=document.createElement('span'),status=document.createElement('b');dot.className=gate.status==='passed'?'passed':'pending';name.textContent=gate.name;status.textContent=gate.status;item.append(dot,name,status);item.title=gate.detail;$('gate-list').append(item)}
+  renderEvidenceComparisons($('evidence-comparisons'),data.experiments);
   const link=document.createElement('a');link.href=data.report;link.textContent='Read the registered evidence ↗';link.target='_blank';link.rel='noopener';$('gate-list').append(link);
  }catch(error){$('evidence-scope').textContent='Registered evidence unavailable: '+error.message;errors.push(error.message)}
 }

@@ -9,7 +9,7 @@ Gate 2A is implemented as an evidence check, not a manually set pass flag. `conf
 
 Certification first requires the entire confirmed full teacher suite and reproduces the qualified canonical corpus's complete PokerKit collection. It then rederives the registered cue operation schedules, native-score argmax choices, correctness labels, independent-seed summaries, bootstrap intervals, sign-flip tests, retention and erasure. It checks the failed-local-before-surrogate sequence and runs actual frozen inference before and after deleting copied teaching artifacts. Verification of an existing certificate repeats these dependencies; a stored flag or changed checksum cannot replace them. This is reproducible local artifact consistency, not a cryptographic signature or a rerun of historical native training.
 
-The separate confirmed 10 BB tabular teacher cannot substitute for the full 20 BB teacher. A Gate 2A certificate would authorize subsequent registered experiments, not assert that a fly learned poker. Gates 3–6 still require their own curriculum, matched-control and held-out evidence. The general poker experiment orchestrator remains subsequent implementation work.
+The separate confirmed 10 BB tabular teacher cannot substitute for the full 20 BB teacher. A Gate 2A certificate would authorize subsequent registered experiments, not assert that a fly learned poker. Gates 3–6 still require their own curriculum, matched-control and held-out evidence. The gated multi-seed poker orchestrator is implemented; its public entry point reverifies this certificate and preceding-stage evidence before native poker training. See POKER_TRAINING.md.
 
 ## Actual checks
 
