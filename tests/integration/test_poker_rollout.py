@@ -176,3 +176,28 @@ def test_frozen_native_opponent_plays_actual_scores_with_only_one_learning_seat(
     opponent.brain.weights[0]*=1.1
     with pytest.raises(ValueError,match='weights changed'):
         poker_hand(player,'hu-20bb-v1',opponent,1705,0,learning=True)
+
+
+
+def test_online_distillation_never_queries_targets_for_validation_or_test_information_ids():
+    from flyholdem.teacher.corpus import split_for_id
+    from flyholdem.poker.infoset import canonical_information_id
+    queries=[]
+    class TrainOnly(VisibleTeacher):
+        def probabilities(self,observation):
+            info=canonical_information_id(observation);assert split_for_id(info)=='train';queries.append(info)
+            return super().probabilities(observation)
+    _,player=make('distilled-connectome','direct-readout-rate-surrogate-v1')
+    skipped=[];delivered=0
+    for seed in range(17600,17620):
+        row=poker_hand(player,'hu-20bb-v1','random',seed,seed%2,learning=True,teacher=TrainOnly(),teacher_split='train')
+        delivered+=row['teacher_targets_delivered']
+        for decision in row['neural_decisions']:
+            info=decision['teacher_input_id']
+            if split_for_id(info)!='train':
+                assert decision['teacher_target_held_out'] and decision['teaching_after_commit'] is None
+                assert decision['original_teacher_target'] is None;skipped.append(info)
+            else:assert not decision['teacher_target_held_out'] and decision['teaching_after_commit'] is not None
+    assert skipped and queries and delivered==len(queries) and not set(skipped)&set(queries)
+    with pytest.raises(ValueError,match='Only teaching arms'):
+        poker_hand(player,'hu-20bb-v1','random',17699,0,teacher_split='train')

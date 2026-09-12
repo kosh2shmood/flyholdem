@@ -83,7 +83,8 @@ def _train_arm(player,config,output,*,teacher=None,teacher_sha256=None,shuffled_
             target_seed=int(identity([config['seed'],'shuffled-teacher',index])[:16],16) if arm=='shuffled-teacher' else None
             row=poker_hand(player,config['curriculum'],snapshots[kind] if kind in snapshots else kind,deal,seat,
                 learning=learning,temperature=temp,teacher=teacher,phase='training',
-                terminal_reward_override=None if rewards is None else float(rewards[index]),target_permutation_seed=target_seed)
+                terminal_reward_override=None if rewards is None else float(rewards[index]),target_permutation_seed=target_seed,
+                teacher_split=config.get('teacher_split') if learning and player.requires_teacher else None)
             journal.record(index,[kind,deal,seat],row);completed=index+1;in_hand=False
             if time.monotonic()-last_checkpoint>=300:checkpoint()
             if completed%config.get('progress_hands',32)==0:print(json.dumps({'arm':arm,'hands':completed,'planned':hands}),flush=True)

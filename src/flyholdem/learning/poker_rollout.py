@@ -13,7 +13,7 @@ from .curriculum import CurriculumHand
 
 def poker_hand(player, curriculum, opponent, deal_seed, seat, *, learning=False,
                temperature=0, teacher=None, terminal_reward_override=None,
-               target_permutation_seed=None, phase=None):
+               target_permutation_seed=None, phase=None, teacher_split=None):
     if type(seat) is not int or seat not in (0,1):raise ValueError('One heads-up learning seat is required')
     phase=phase or ('training' if learning else 'evaluation')
     if phase not in ('training','evaluation') or phase=='evaluation' and learning:
@@ -23,6 +23,8 @@ def poker_hand(player, curriculum, opponent, deal_seed, seat, *, learning=False,
     if not learning and (teacher is not None or terminal_reward_override is not None or target_permutation_seed is not None):
         raise ValueError('Frozen weights accept no teacher or control reward inputs')
     distilled=player.requires_teacher
+    if teacher_split is not None and (teacher_split!='train' or not learning or not distilled):
+        raise ValueError('Only teaching arms may restrict supervision to the canonical train split')
     if learning and distilled and teacher is None:raise ValueError('Distillation requires an independently qualified teacher')
     if not distilled and (teacher is not None or target_permutation_seed is not None):
         raise ValueError('Terminal learning accepts chip reward only')
@@ -61,22 +63,25 @@ def poker_hand(player, curriculum, opponent, deal_seed, seat, *, learning=False,
         if learning and distilled:
             visible=canonical_state(observation);before=canonical_bytes(visible)
             target_id=canonical_information_id(visible)
-            target=np.asarray(teacher.probabilities(visible),dtype=float).copy()
-            if before!=canonical_bytes(visible):raise ValueError('Teacher modified its canonical input')
-            if (target.shape!=(5,) or not np.isfinite(target).all() or np.any(target<0)
-                    or np.any(target[~legal]) or not np.isclose(target.sum(),1,rtol=0,atol=1e-12)):
-                raise ValueError('Teacher supplied an invalid legal distribution')
-            original_target=target.tolist()
-            if target_rng is not None:
-                # Preserve this target's mass and entropy; break its action label
-                # association only within the currently legal action set.
-                target[legal]=target_rng.permutation(target[legal])
-        event=player.commit_action(learning,teacher_target=target)
+            from flyholdem.teacher.corpus import split_for_id
+            if teacher_split is None or split_for_id(target_id)==teacher_split:
+                target=np.asarray(teacher.probabilities(visible),dtype=float).copy()
+                if before!=canonical_bytes(visible):raise ValueError('Teacher modified its canonical input')
+                if (target.shape!=(5,) or not np.isfinite(target).all() or np.any(target<0)
+                        or np.any(target[~legal]) or not np.isclose(target.sum(),1,rtol=0,atol=1e-12)):
+                    raise ValueError('Teacher supplied an invalid legal distribution')
+                original_target=target.tolist()
+                if target_rng is not None:
+                    # Preserve this target's mass and entropy; break its action label
+                    # association only within the currently legal action set.
+                    target[legal]=target_rng.permutation(target[legal])
+        event=player.commit_action(learning and (not distilled or target is not None),teacher_target=target)
         record={key:value for key,value in decision.items() if key not in ('counts','encoded')}
         record.update(counts_sha256=hashlib.sha256(decision['counts'].tobytes()).hexdigest(),
             committed_action=committed,teaching_after_commit=event,
             teacher_input_id=target_id,original_teacher_target=original_target,
-            legal_target_permutation=target_rng is not None)
+            legal_target_permutation=target_rng is not None and target is not None,
+            teacher_target_held_out=target_id is not None and target is None)
         decisions.append(record)
     table=game.view()
     if sum(table['payoffs'])!=0:raise AssertionError('PokerKit chip conservation failure')
@@ -91,4 +96,5 @@ def poker_hand(player, curriculum, opponent, deal_seed, seat, *, learning=False,
         'learning':learning,'phase':phase,'learning_mode':player.mode,'optimization':player.optimization,'teacher_connected':learning and distilled,
         'terminal_reinforcement':reinforcement,'frozen_opponent':other.finish_hand() if snapshot else None,
         'weights_before_sha256':weights_before,
-        'weights_after_sha256':weights_after,'target_permutation_seed':target_permutation_seed}
+        'weights_after_sha256':weights_after,'target_permutation_seed':target_permutation_seed,'teacher_split':teacher_split,
+        'teacher_targets_delivered':sum(row['teaching_after_commit'] is not None for row in decisions)}

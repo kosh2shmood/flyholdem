@@ -1,0 +1,9 @@
+schema: teacher-best-response-extraction-v1
+algorithm: population-Double-DQN-best-response-mixture-v1
+aggregation: equal-legal-greedy-best-response-mixture
+status: development
+training_run: runs/teacher-nfsp-potential-v7
+training_manifest_sha256: da1cce8ecd5aacc5d99fe93e6f59ee20128266e8983544913dc8cfffb5a6b1fe
+training_source: runs/teacher-runtime-v7
+training_source_sha256: 6743ce3404940f7f63d2312afb9d4fd172ab3a6cb21421e3ef986220a4b8e44e
+completed_hands: 500000
