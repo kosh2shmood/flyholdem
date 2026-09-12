@@ -51,3 +51,15 @@ def stimulus(x, mapping, n=126):
 
 def encoded_hash(x):
     return hashlib.sha256(x.tobytes()).hexdigest()
+
+
+def encode_player_state(observation):
+    """Native player code: first own action is derivable from public history.
+
+    Keep the legacy fixture encode() bytes frozen at visual-demo-v0. The native
+    begin-hand pulse means this player's first decision, including the BB after
+    the opponent has already acted; no external hidden episode flag is needed.
+    """
+    x = encode(observation)
+    x[-1] = not any(item['actor'] == 1 for item in observation['history'])
+    return x

@@ -42,3 +42,11 @@ A second run stopped after operation 30, resumed, and produced the same 173-oper
 ## Development candidate 0.03 — did not qualify
 
 Commit 067d35d executed 4,767 operations in 508.79 s at peak RSS 725,778,432 bytes. Held-out plastic accuracy across seeds 65101/65102/65103 was 0.5000/0.53125/0.546875 (mean 0.52604); frozen 0.484375/0.453125/0.4375 (mean 0.45833); shuffled reward 0.46875/0.421875/0.515625 (mean 0.46875). These improvements are below the registered accuracy and effect-size criteria. Retention preserved post-training decisions and restoring weights exactly restored initial decisions. No confirmation or learning claim follows. Continue the predeclared 0.1, then 0.3 sequence if needed, without changing cues, biological mapping or reward rule.
+
+## Development sequence completed — rate 0.3 selected
+
+The 0.1 candidate failed: plastic accuracies 0.578125/0.71875/0.59375 (mean 0.63021), shuffled 0.4375/0.515625/0.453125, with the same frozen control as before. Runtime 506.28 s. The 0.3 candidate qualified: 0.796875/0.890625/0.84375 (mean 0.84375), versus frozen mean 0.45833 and shuffled mean 0.4375. Runtime 497.28 s, peak RSS 726,220,800 bytes. Retention preserved outcomes and restoring weights exactly restored the initial decisions for all seeds. Both candidates used unchanged neural conditioning code on commit 64a3471. All negative candidates remain recorded.
+
+Freeze learning rate 0.3 for five independent confirmation seeds 65201–65205, 400 training trials per arm and 64 held-out trials per cue. The development result SHA is verified through --development-reference. No Gate 2 pass or conditioning-v0 tag exists until confirmation completes. New teacher, canonical-state and frozen-inference engineering does not alter the conditioning trial mathematics or stimuli.
+
+Confirmation command: `.venv/bin/python -m flyholdem.experiments.conditioning --profile confirmatory --learning-rate 0.3 --development-reference runs/conditioning-full-lr03-v1/result.json --output runs/conditioning-full-confirm-v1` (add --resume after interruption on the same source/config/environment).

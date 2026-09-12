@@ -1,6 +1,6 @@
 """Fixed population code and native neural-only action interface."""
 import numpy as np
-from .encoder import CHANNELS,encode,encoded_hash
+from .encoder import CHANNELS,encode_player_state,encoded_hash
 
 
 def balanced_projection(inputs,fanout,seed):
@@ -52,9 +52,11 @@ class NeuralController:
         self.ensembles=[np.array(e['indices'],dtype=np.int32) for e in preregistration['ensembles']]
         self.blank=np.zeros(brain.n,dtype=np.float32)
 
-    def decide(self,observation,temperature=0,first_in_hand=False):
+    def decide(self,observation,temperature=0,first_in_hand=None):
         p=self.registration;t=p['config']['decision_ms']
-        x=encode(observation);x[-1]=bool(first_in_hand)
+        x=encode_player_state(observation)
+        if first_in_hand is not None and (type(first_in_hand) is not bool or first_in_hand != bool(x[-1])):
+            raise ValueError('First-action flag disagrees with visible action history')
         drive=population_drive(x,self.mapping,self.brain.n,p['selected_gain'])
         self.brain.advance(self.blank,t['baseline']);self.brain.advance(drive,t['stimulus'])
         counts=self.brain.advance(drive,t['readout'])

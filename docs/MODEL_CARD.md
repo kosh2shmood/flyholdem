@@ -1,6 +1,6 @@
 # FlyHoldem model card
 
-**Version:** M3 controllability checkpoint; live poker remains the fixture prototype. **Status:** development. **Money:** play chips only.
+**Version:** M4 conditioning/teacher engineering checkpoint; live poker remains the fixture prototype. **Status:** development. **Money:** play chips only.
 
 ## What exists
 
@@ -10,7 +10,7 @@ The full retained MaleCNS graph and the declared 4,505-cell circuit now import, 
 
 ## What does not yet exist
 
-No full MaleCNS poker controller, validated teacher, distilled-connectome checkpoint, conditioning result, or confirmatory poker evaluation. No learning claim is supported. The synthetic DAN/KC/MBON labels describe engineering roles, not anatomically reconstructed cells. V0's Euler solver and schematic coordinates are development assumptions.
+A native population controller and bounded local rule now exist; the live poker backend remains the fixture. Conditioning development reached 84.4% versus 45.8% frozen and 43.8% shuffled controls; independent confirmation is pending. No validated poker teacher, actual distilled-connectome checkpoint or confirmatory poker evaluation exists. No confirmatory learning claim is supported. The synthetic DAN/KC/MBON labels describe engineering roles, not anatomically reconstructed cells. V0's Euler solver and schematic coordinates are development assumptions.
 
 ## Intended use
 
@@ -18,7 +18,7 @@ Inspect the neural/game information boundary and mechanism during software devel
 
 ## Reproducibility
 
-Python 3.11, dependency pins in uv.lock, fixed graph/mapping seed 1729, default demo seed 20260912. Recorded truth: examples/fixture-demo.jsonl. Review: docs/review/browser-check.json and screenshots. The separate 0.1 ms full/circuit solver has passed scalar Python and Brian2 parity checks. Native-state atomic checkpoints are verified; integrated long-running experiment/plasticity/game recovery remains a subsequent runner requirement.
+Python 3.11, dependency pins in uv.lock, fixed graph/mapping seed 1729, default demo seed 20260912. Recorded truth: examples/fixture-demo.jsonl. Review: docs/review/browser-check.json and screenshots. The separate 0.1 ms full/circuit solver has passed scalar Python and Brian2 parity checks. Native conditioning checkpoints include weights, eligibility and reward baselines; interrupted and logged-tail continuation reproduced the entire journal exactly. Teacher optimizer/replay recovery and teacher-disconnected native fixture inference tests pass. Integrated native poker learning/recovery remains subsequent work.
 
 ## Claims
 

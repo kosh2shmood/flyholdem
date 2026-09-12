@@ -1,0 +1,9 @@
+schema: canonical-teacher-corpus-v1
+stack_bb: 20
+seed_start: 4000000
+maximum_hands: 10000
+minimum_rows: 5000
+minimum_per_street: 100
+maximum_per_stratum: 16
+calling_station_collection_probability: 0.35
+random_collection_probability: 0.35
