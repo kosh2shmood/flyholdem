@@ -64,6 +64,9 @@ def create_app(seed=20260912, replay=None, interval=.9, log_path=None):
 
     app = FastAPI(title='FlyHoldem fixture visual prototype', lifespan=lifespan)
     app.mount('/assets', StaticFiles(directory=ROOT/'ui/src'), name='assets')
+    vendor = ROOT/'ui/node_modules/three'
+    if vendor.is_dir():
+        app.mount('/vendor/three', StaticFiles(directory=vendor), name='three')
 
     @app.get('/')
     def index():

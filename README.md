@@ -10,7 +10,7 @@ Prerequisites: [uv](https://docs.astral.sh/uv/getting-started/installation/), No
 make demo
 ```
 
-Open **http://127.0.0.1:8766**. A real two-player PokerKit game autoplays continuously. The fly's scores come from a synthetic LIF circuit. The opponent is a labeled calling station. Watch cards, pot, stacks, action trail, exact encoded inputs, legal masks, neural activity, and terminal reinforcement. Pause freezes the display; the live process continues. The replay control uses the checked-in compact log. The speed control applies to recorded replay.
+Open **http://127.0.0.1:8766**. A real two-player PokerKit game autoplays continuously. The default 3D fly camera shows an articulated fly holding its actual cards face up, tapping to check, pushing chips for calls/raises and sweeping both hands forward for all-in. Use Table view for the overhead layout. The fly's scores come from a synthetic LIF circuit. The opponent is a labeled calling station. Watch cards, pot, stacks, action trail, exact encoded inputs, legal masks, neural activity, and terminal reinforcement. Pause freezes the display; the live process continues. The replay control uses the checked-in compact log. The speed control applies to recorded replay.
 
 **FIXTURE / VISUAL PROTOTYPE / NOT A FULL-CONNECTOME RESULT.** The fixture contains 126 synthetic cells and 1,920 existing synthetic edges. Its layout is schematic. Weight changes and wins are not evidence of learning.
 
@@ -20,9 +20,10 @@ make replay                # backend streams the checked-in recorded truth
 make record                # regenerate six deterministic fixture hands
 uv run python -m playwright install chromium
 make browser-check         # while make demo is running; docs/review/ screenshots
+uv run python scripts/avatar_check.py  # six actual action gestures + WebGL screenshots/video
 ```
 
-Locked dependencies live in `uv.lock`. The UI uses plain browser APIs and has no downloaded runtime dependencies or remote assets. `ui/package-lock.json` records this empty dependency set. No separate frontend build is needed; one backend serves UI and WebSocket.
+Locked dependencies live in `uv.lock`. The UI uses plain browser APIs plus pinned Three.js 0.186.0 (MIT) from `ui/package-lock.json`. `make demo` installs it with `npm ci` and serves it locally; the dashboard makes no third-party asset requests. No separate frontend build is needed; one backend serves UI and WebSocket.
 
 ## Status and evidence
 

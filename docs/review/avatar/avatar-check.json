@@ -1,0 +1,103 @@
+{
+  "status": "pass",
+  "scope": "illustrative action-driven avatar, not a body simulation",
+  "live_event_card_match": true,
+  "replay_event_card_match": true,
+  "six_gestures": {
+    "call": {
+      "event_hash": "c7edbe112fca89b221ad354a71cf61a35a1283003c7876c3fc687dfe19eeb757",
+      "sequence": 1,
+      "hand": 1,
+      "left_displacement": 0.0,
+      "right_displacement": 0.7847128644102692,
+      "cards": [
+        "3h",
+        "4c"
+      ],
+      "action_frames": 7,
+      "elapsed": 0.20870000000000027
+    },
+    "all-in": {
+      "event_hash": "3e9e69242d40fde167027ff5e549552d00c87045194e85c4855416a2e14259a7",
+      "sequence": 4,
+      "hand": 1,
+      "left_displacement": 0.7544197628558635,
+      "right_displacement": 0.7544197628558635,
+      "cards": [
+        "3h",
+        "4c"
+      ],
+      "action_frames": 6,
+      "elapsed": 0.175
+    },
+    "pot": {
+      "event_hash": "0ca5a0f298d40ab2a6ee4b0cc432fc2c258a269f59f6a6f87c6366b44fdc51dd",
+      "sequence": 9,
+      "hand": 2,
+      "left_displacement": 0.28793444707261895,
+      "right_displacement": 0.9404068069081671,
+      "cards": [
+        "8s",
+        "9d"
+      ],
+      "action_frames": 7,
+      "elapsed": 0.1985
+    },
+    "fold": {
+      "event_hash": "7355beb7deeb65ae76b3b17249ddb14485f3955e66be09dcc46b44263b1807d5",
+      "sequence": 15,
+      "hand": 3,
+      "left_displacement": 0.2168058009074565,
+      "right_displacement": 0.2786493372134828,
+      "cards": [
+        "Qs",
+        "Ac"
+      ],
+      "action_frames": 5,
+      "elapsed": 0.15829999999999927
+    },
+    "check": {
+      "event_hash": "3da48677a37b5d6881f4980ca640a37310f007ca20031a15b927723490fd0cdb",
+      "sequence": 19,
+      "hand": 4,
+      "left_displacement": 0.0,
+      "right_displacement": 0.4078214918519089,
+      "cards": [
+        "Ad",
+        "8c"
+      ],
+      "action_frames": 7,
+      "elapsed": 0.21660000000000218
+    },
+    "half-pot": {
+      "event_hash": "005c2126b97f78803e6dee1065c247c37cf40a7bf19561a9efffd0cafadb3f1b",
+      "sequence": 24,
+      "hand": 4,
+      "left_displacement": 0.23849290819818714,
+      "right_displacement": 0.6456483529321341,
+      "cards": [
+        "Ad",
+        "8c"
+      ],
+      "action_frames": 5,
+      "elapsed": 0.15859999999999855
+    }
+  },
+  "pause_freezes_pose": true,
+  "camera_reset": true,
+  "table_toggle": true,
+  "desktop": [
+    1440,
+    1080
+  ],
+  "mobile": [
+    390,
+    844
+  ],
+  "browser": "151.0.7922.34",
+  "webgl": "three-webgl2",
+  "three_revision": "186",
+  "triangles": 21536,
+  "draw_calls": 599,
+  "errors": []
+}

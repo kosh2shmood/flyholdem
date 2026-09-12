@@ -1,7 +1,7 @@
 # FlyHoldem progress
 
 ## Current phase
-M0 complete; proceed to M1 software Gate 0. V0 commit 2bd2d3c and visual-demo-v0 are pushed. Official source registry/provenance checks, import policy, repository contract and data-free CI are implemented. No MaleCNS source download or teacher/poker training started.
+Animated fly visual follow-up complete and verified; save/push its checkpoint, then continue M1 software Gate 0. V0 and M0 are already pushed. V0 commit 2bd2d3c and visual-demo-v0 are pushed. Official source registry/provenance checks, import policy, repository contract and data-free CI are implemented. No MaleCNS source download or teacher/poker training started.
 
 ## Completed acceptance checks
 - Read execution brief/specification/setup context and applicable ancestor AGENTS.md paths (none existed).
@@ -16,6 +16,8 @@ M0 complete; proceed to M1 software Gate 0. V0 commit 2bd2d3c and visual-demo-v0
 - M0: source-lock validation and mismatch rejection tests pass; exact expected data bytes total 1,109,008,094. Explicit resumable fetch retains the pre-existing trusted hashes.
 - M0: config/source/graph/encoder/decoder/binary/runtime identity comparison rejects mismatched checkpoints. CI uses locked Python packages and uv 0.12.13.
 
+- Animated fly: 18 core tests still pass; WebGL 2 / Three.js 186 browser checks cover all six real gestures, live/replay card correspondence, replay-state reset, pause and camera/table controls. No browser errors.
+
 ## Exact working commands
 ```
 cd /Users/bohdankoshevoi/flyholdem/flyholdem
@@ -25,8 +27,12 @@ make replay
 uv run python -m playwright install chromium
 make browser-check
 make record
+uv run python scripts/avatar_check.py
 ```
 Demo URL: http://127.0.0.1:8766. Default seed 20260912, graph/mapping seed 1729. One command serves backend/UI. Browser check expects running server.
+
+## User steering
+The user requested a visible animated fly like the Doom/döner examples, with its cards face up to the viewer and hands moving for each action. Implemented an original Three.js poker scene with a DOOMFLY-informed avatar; all six check/call/fold/half-pot/pot/all-in gestures passed Chromium checks against actual live/replay events. Cards and event hashes match; both hands move for all-in; pause freezes pose; table toggle/camera reset/mobile layout pass. Screenshot inspection passed. `docs/review/avatar/avatar-check.json` records evidence; compact screenshots are tracked and the full capture/video remains ignored and reproducible. This is an illustrative event-driven character, not a biological motor simulation.
 
 ## Important decisions
 - Explicit no-strategic-fallback request supersedes the spec's check/call silence clause: silent finite scores choose logged deterministic legal argmax. Invalid scores stop.
@@ -36,15 +42,16 @@ Demo URL: http://127.0.0.1:8766. Default seed 20260912, graph/mapping seed 1729.
 
 ## Known failures and limitations
 - Resolved publication restriction: user explicitly approved publishing checked milestones on astra/visual-first and tags to public kosh2shmood/flyholdem. V0 branch and tag pushed successfully. Earlier automatic-review rejections are historical; do not ask again.
+- CI M0 tests and browser checks passed, but setup-uv cleanup failed because the background `uv run` server retained a cache lock. Fix: start the installed executable directly and always terminate it with a shell trap. Verify next pushed CI run.
 - Two upstream Starlette test-client deprecation warnings; tests pass.
 - Gate 0 only partially covered until M1; Gates 1–6/2A pending. No MaleCNS/full runtime, conditioned model, trained teacher, transfer checkpoint, or poker training result yet.
 - Full mutable-state checkpoints/resume and registered manifests remain runtime milestones; V0 live logs are append-only, fsynced after completed hands, and ignored.
 
 ## Last stable commit
-V0: 2bd2d3c2fc6158248c4f633690b5d170add14b32 (visual-demo-v0), pushed. M0 is the following `chore: lock provenance and add fixture CI` checkpoint; see Git log for its exact hash.
+V0: 2bd2d3c2fc6158248c4f633690b5d170add14b32 (visual-demo-v0), pushed. M0: fa873a6, pushed. Animated fly is the following `feat: animate fly hands from recorded poker actions` checkpoint; see Git log for its exact hash.
 
 ## Resumable experiment command
 No long training experiment started. Reproduce visual run with `make demo`; replay with `make replay`. Current local live worker logs into a timestamped ignored runs/live-* directory.
 
 ## Next step
-Finish M1 software Gate 0: full golden hands (ties, short raises, uneven/side pots), deterministic paired seat-symmetry evidence, state replay serialization and opponent policies. Then M2 reference/native numerical runtime and checksum-verified full MaleCNS import/audit, measuring memory before any concurrent full jobs. Do not skip failed scientific gates.
+Verify corrected CI after pushing the animated-fly checkpoint. Then finish M1 software Gate 0: full golden hands (ties, short raises, uneven/side pots), deterministic paired seat-symmetry evidence, state replay serialization and opponent policies. Then M2 reference/native numerical runtime and checksum-verified full MaleCNS import/audit, measuring memory before any concurrent full jobs. Do not skip failed scientific gates.

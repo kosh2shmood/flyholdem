@@ -13,14 +13,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - run: uv sync --frozen
+      - run: make setup
       - run: make test
       - run: uv run python -m playwright install --with-deps chromium
       - name: Live and replay browser verification
         run: |
-          uv run flyholdem serve --port 8766 > /tmp/flyholdem-server.log 2>&1 &
+          .venv/bin/flyholdem serve --port 8766 > /tmp/flyholdem-server.log 2>&1 &
+          FLY_SERVER_PID=$!
+          trap 'kill "$FLY_SERVER_PID" 2>/dev/null || true' EXIT
           uv run python -c "import time, urllib.request; exec('for i in range(60):\n try:\n  urllib.request.urlopen(\"http://127.0.0.1:8766/api/health\"); break\n except OSError: time.sleep(1)\nelse: raise RuntimeError(\"Server unavailable\")')"
           make browser-check
+          uv run python scripts/avatar_check.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

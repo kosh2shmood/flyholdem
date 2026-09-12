@@ -15,3 +15,9 @@ runs/
 *.dylib
 *.egg-info/
 __pypackages__/
+# Keep compact avatar evidence in Git; regenerate full gesture captures/video.
+docs/review/avatar/*.png
+!docs/review/avatar/fly-closeup.png
+!docs/review/avatar/fly-all-in.png
+!docs/review/avatar/fly-mobile.png
+docs/review/avatar/*.webm

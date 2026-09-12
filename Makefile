@@ -1,8 +1,10 @@
 .PHONY: setup test demo replay record check-ui browser-check
 setup:
 	uv sync --frozen
+	npm ci --prefix ui
 check-ui:
 	node --check ui/src/app.js
+	node --check ui/src/fly-avatar.js
 test: check-ui
 	uv run --frozen pytest -q
 demo: setup

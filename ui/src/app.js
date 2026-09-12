@@ -3,10 +3,10 @@ const names = ['Fold', 'Check / call', 'Raise ½ pot', 'Raise pot', 'All-in'];
 const suits = {c:'♣', d:'♦', h:'♥', s:'♠'};
 let socket, mode='live', paused=false, latest=null, timer, replayEvents=[], replayIndex=0, graph=null;
 let activity=Array(126).fill(0), shown=Array(126).fill(0);
-let decisionHand=null;
+let decisionHand=null, avatar=null;
 const errors=[];
 window.addEventListener('error', e => errors.push(e.message));
-window.flyholdem = {get latest(){return latest}, get mode(){return mode}, errors};
+window.flyholdem = {get latest(){return latest}, get mode(){return mode}, get avatar(){return avatar}, errors};
 function card(value){
  const el=document.createElement('span'); el.className='card';
  if(value==='??'){el.classList.add('back');el.textContent='◇';return el}
@@ -27,8 +27,20 @@ function resetDecision(){
  $('channels').replaceChildren();$('observation').textContent='';$('input-hash').textContent='—';$('silent').textContent='—';$('temperature').textContent='—';
  for(let i=0;i<5;i++){const row=$(`score-${i}`);row.className='score';row.querySelector('.mask').textContent='—';row.querySelector('.score-value').textContent='—';row.querySelector('i').style.width='0'}
 }
+function resetPlasticity(){
+ $('dopamine').textContent='—';$('changed').textContent='—';$('weight-delta').textContent='—';$('eligibility').textContent='—';$('ratios').textContent='—';$('pulse').style.width='0';activity=Array(126).fill(0);shown=Array(126).fill(0);
+}
 function render(event){
  latest=event;
+ if(event.sequence===0)resetPlasticity();
+ avatar?.update(event);
+ cards("avatar-cards",event.table.hole,2);
+ $("avatar-stack-fly").textContent=event.table.stacks[0];$("avatar-stack-other").textContent=event.table.stacks[1];$("avatar-pot").textContent=event.table.pot;
+ if(event.kind==="hand_start"){$("avatar-action").textContent="Looking at its cards";$("avatar-motion").textContent="A new hand. Waiting for neural output."}
+ if(event.decision){
+  const d=event.decision;$("avatar-action").textContent=names[d.selected];
+  $("avatar-motion").textContent=d.selected===0?"Slides both cards into the muck":d.selected===1?(d.observation.to_call===0?"Taps the felt to check":"Pushes chips forward to call"):d.selected===4?"Both hands push the stack in":"Reaches forward with a raise";
+ }
  if(event.kind==='hand_start')resetDecision();
  const t=event.table;
  $('hand').textContent=`HAND ${String(event.hand).padStart(4,'0')}`;
@@ -71,7 +83,7 @@ function connect(){
  socket.onerror=()=>{if(mode==='live')$('connection').textContent='Connection error'};
  socket.onclose=()=>{if(mode==='live'){$('connection').textContent='Disconnected';$('lamp').className='';setTimeout(()=>{if(mode==='live')connect()},2000)}};
 }
-function setMode(value){mode=value;$('live').classList.toggle('active',mode==='live');$('replay').classList.toggle('active',mode==='replay');$('source').textContent=mode==='live'?'LIVE STREAM':'CHECKED-IN REPLAY';resetDecision()}
+function setMode(value){resetPlasticity();mode=value;$('live').classList.toggle('active',mode==='live');$('replay').classList.toggle('active',mode==='replay');$('source').textContent=mode==='live'?'LIVE STREAM':'CHECKED-IN REPLAY';resetDecision()}
 $('live').onclick=()=>{clearTimeout(timer);setMode('live');connect()};
 async function validateReplay(events){
  let previous='0'.repeat(64);
@@ -87,8 +99,15 @@ async function replay(){
 }
 function tickReplay(){if(mode!=='replay')return;if(!paused){render(replayEvents[replayIndex]);replayIndex=(replayIndex+1)%replayEvents.length}timer=setTimeout(tickReplay,Number($('speed').value))}
 $('replay').onclick=replay;
-$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'▶':'Ⅱ';$('pause').setAttribute('aria-label',paused?'Resume display':'Pause display');$('connection').textContent=paused?'Display paused':mode==='live'?'Live WebSocket':'Deterministic replay'};
-async function init(){graph=await(await fetch('/api/graph')).json();connect();draw()}
+$('pause').onclick=()=>{paused=!paused;avatar?.setPaused(paused);$('pause').textContent=paused?'▶':'Ⅱ';$('pause').setAttribute('aria-label',paused?'Resume display':'Pause display');$('connection').textContent=paused?'Display paused':mode==='live'?'Live WebSocket':'Deterministic replay'};
+async function init(){
+ graph=await(await fetch('/api/graph')).json();connect();draw();
+ try{const {createFlyViewer}=await import('/assets/fly-avatar.js');avatar=createFlyViewer($('fly-avatar'),message=>{$('avatar-error').hidden=false;$('avatar-error').textContent=message});if(latest)avatar.update(latest)}
+ catch(e){$('avatar-error').hidden=false;$('avatar-error').textContent='3D fly unavailable: '+e.message;errors.push(e.message)}
+}
+$('view-fly').onclick=()=>{$('avatar-stage').hidden=false;$('table-map').hidden=true;$('view-fly').classList.add('active');$('view-table').classList.remove('active')};
+$('view-table').onclick=()=>{$('avatar-stage').hidden=true;$('table-map').hidden=false;$('view-fly').classList.remove('active');$('view-table').classList.add('active')};
+$('reset-camera').onclick=()=>avatar?.resetCamera();
 function draw(){
  const canvas=$('brain'),ctx=canvas.getContext('2d'),r=canvas.getBoundingClientRect(),scale=devicePixelRatio||1;
  if(canvas.width!==Math.round(r.width*scale)||canvas.height!==Math.round(r.height*scale)){canvas.width=Math.round(r.width*scale);canvas.height=Math.round(r.height*scale)}

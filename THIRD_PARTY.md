@@ -25,3 +25,9 @@ PettingZoo's official no-limit documentation was inspected for the five-action r
 FlyVis: https://github.com/TuragaLab/flyvis, MIT, official connectome-constrained visual-system PyTorch model. Used as a scope/modeling reference only; no code copied or dependency installed. DOOMFLY live protocol and its independent Brian2 numerical-oracle tests were reviewed at the pinned revision. The linked Prismix/Pong discussion is a secondary failure-analysis reference; biological and numerical claims rely on primary implementation/data sources.
 
 The expected MaleCNS source.lock.json is reproduced from DOOMFLY's pinned provenance record. Its MIT notice is retained at `licenses/DOOMFLY-MIT.txt`. Hash expectations are independently verified on fetch; data is still downloaded from the official release.
+
+## Three-dimensional fly spectator
+
+Three.js 0.186.0 (MIT), https://github.com/mrdoob/three.js, installed separately with npm from the committed lockfile; license retained at licenses/Threejs-MIT.txt. Current official WebGLRenderer/OrbitControls APIs were checked at https://threejs.org/docs/. No remote renderer assets are loaded.
+
+`ui/src/fly-avatar.js` adapts the ellipsoid/rod and veined-wing construction ideas from DOOMFLY `doom-ui/lib/fly-model.ts` at the pinned revision. Its source header and licenses/DOOMFLY-MIT.txt preserve attribution. The upright poker pose, articulated hands, card textures, chips, table and event-driven gestures are original FlyHoldem code. This is an anatomy-inspired illustration; no third-party character mesh, neural-body model or game art is copied.
