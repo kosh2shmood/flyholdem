@@ -38,12 +38,12 @@ Operational order: finish V11 and record its original average-policy development
 
 The exported numeric policy includes the exact final regret tensor and its original checkpoint checksum. Loading verifies source/runtime identities, every tensor checksum, complete legal information keys and exact recomputation of every probability from those regrets. Rehashing a changed probability file cannot substitute another strategy. Frozen inference needs neither the training run nor PyTorch.
 
-Freeze the checked new source/configs and existing equity binary into a separate `runs/teacher-runtime-v12` before using these commands. Do not modify `runs/teacher-runtime-v11` or the earlier downstream snapshot.
+Freeze the checked new source/configs and existing equity binary into a separate `runs/teacher-runtime-v12-reviewed` before using these commands. Do not modify `runs/teacher-runtime-v11` or the earlier downstream snapshot.
 
 ```sh
-PYTHONPATH="$PWD/runs/teacher-runtime-v12/src" .venv/bin/python -m flyholdem.cli teacher export-final-regret --config runs/teacher-runtime-v12/configs/teacher_final_regret_v12.yaml --output runs/teacher-final-regret-v12-policy
-PYTHONPATH="$PWD/runs/teacher-runtime-v12/src" .venv/bin/python -m flyholdem.cli teacher evaluate --policy runs/teacher-final-regret-v12-policy --config runs/teacher-runtime-v12/configs/teacher_evaluation.yaml --profile development --output runs/teacher-final-regret-v12-development
-PYTHONPATH="$PWD/runs/teacher-runtime-v12/src" .venv/bin/python -m flyholdem.cli teacher verify-evaluation --run runs/teacher-final-regret-v12-development --policy runs/teacher-final-regret-v12-policy --allow-development
+PYTHONPATH="$PWD/runs/teacher-runtime-v12-reviewed/src" .venv/bin/python -m flyholdem.cli teacher export-final-regret --config runs/teacher-runtime-v12-reviewed/configs/teacher_final_regret_v12.yaml --output runs/teacher-final-regret-v12-policy
+PYTHONPATH="$PWD/runs/teacher-runtime-v12-reviewed/src" .venv/bin/python -m flyholdem.cli teacher evaluate --policy runs/teacher-final-regret-v12-policy --config runs/teacher-runtime-v12-reviewed/configs/teacher_evaluation.yaml --profile development --output runs/teacher-final-regret-v12-development
+PYTHONPATH="$PWD/runs/teacher-runtime-v12-reviewed/src" .venv/bin/python -m flyholdem.cli teacher verify-evaluation --run runs/teacher-final-regret-v12-development --policy runs/teacher-final-regret-v12-policy --allow-development
 ```
 
 Publish the final policy identity before development. Resume evaluation replaces `--output` with `--resume` for the same directory. Confirmation retains the existing required `--development-reference`. Generated logs, tensors and model checkpoints remain local and ignored.
@@ -55,3 +55,24 @@ Engineering verification: 26 focused checks passed in 8.66 seconds; the complete
 
 
 V12 conventional runtime is now frozen and preflighted at runs/teacher-runtime-v12. Code commit 0a1a6c7cc9d7a602796db4c789875c8356853687; source SHA 38b9e758a439054a701f22917a2bc5516b0d84f885d517eab8a5a813d7dfea0f; file ledger 13e329b06e516bd64ae63126cafc0484c198e09cda997c868e440d91c7c9b17c. Its complete file ledger and original evaluation YAML 5fb344fad4c27a5a5556764db0d0c43b1f64177ccadafc68b3d81453f52ca9c1 verified. The separate existing equity binary is 80846bbc3357982b6310ef05c3c8f9921621c0caa9db1d0c17a1c54cc43207ea; it was copied, not rebuilt. A fresh process from this exact runtime passed real tiny numeric extraction/evaluation/qualification tests in 2.06 seconds, with Torch absent before and after. It also rejected active V11 before policy output creation. No full model or held-out trial was produced by these preflight checks.
+
+
+## Independent review and actual-play reproduction
+
+Independent review found that the first V12 loader bound its regret values to the final checkpoint but did not separately bind the key mapping and legal masks. Swapping two valid information keys with the same legal mask, then rehashing the exported key file, could reassign the probabilities to different states. Export and loading now preserve and verify the original checkpoint hashes for all four defining arrays: key offsets, key bytes, legal masks and regrets. The original regret checksum remains checked. A regression uses an actual tiny trained table to reject the key swap; missing/partial checkpoint bindings are also rejected.
+
+The earlier `runs/teacher-runtime-v12` snapshot is retained as historical preflight evidence. Do not use it for actual policy exports. Freeze and use the reviewed runtime named in the commands above. The method, fixed final iteration and extraction configuration are unchanged. Neither V11's original runtime nor any existing native model was altered.
+
+`scripts/audit_teacher_play.py` independently reruns every complete recorded pair with the loaded policy, actual PokerKit rules, original opponents and exact evaluation RNGs. It requires every payoff and five-action count to reproduce, then separates check from call and reports actions by street and opponent. The CLI accepts the original registered suite only. This is a read-only replay of already evaluated deals, not an additional trial or qualification gate. Its report includes the audit script hash, full decision-trace hash and original evaluation identities.
+
+```sh
+PYTHONPATH="$PWD/runs/teacher-runtime-v11/src" .venv/bin/python scripts/audit_teacher_play.py --run runs/teacher-external-regret-v11-development --policy runs/teacher-external-regret-v11-policy --output runs/teacher-external-regret-v11-play-audit.json
+```
+
+Run that only after V11's original evaluation finishes. For V12 use its reviewed runtime and corresponding completed evaluation/policy paths. Existing policy/runtime compatibility checks remain enforced.
+
+The audit was exercised on V10's unchanged failed development result: all 512 paired records and 1,948 decisions reproduced. Actual actions were 89 folds, 423 checks, 109 calls, 244 half-pot raises, 820 pot raises and 263 all-ins. The decision trace is `b442acaa3248115e6aec5db3efcbfee9c53a807c565d734d8716472b4fc9bac7`; audit script SHA is `e272b0e67668f7fa1387fdbca4ba2296f45560d50fbe0d4e7850e90514bbcef3`. V10 remains unqualified: action variety does not establish profitable play against every opponent, and these conventional actions do not describe the visible native fly.
+
+Eleven focused extraction tests passed in 4.88 seconds. Seven new audit tests passed in 6.46 seconds. Expected action counts come from instrumenting committed PokerKit payments in the original evaluator, covering both numeric policy kinds, all streets and both seats. Coherently rehashed false payoffs/action counts pass the older offline statistical consistency check but fail actual replay. Artifact/source immutability, no-Torch numeric execution and the public registration boundary are also checked.
+
+Complete integration verification for the checkpoint-binding fix and actual-play audit: 257 tests passed, with two isolated-oracle skips and two existing dependency deprecations, in 99.59 seconds. No browser-facing code, neural policy parameters, active runtime or environment changed.

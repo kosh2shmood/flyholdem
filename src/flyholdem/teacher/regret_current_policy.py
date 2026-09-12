@@ -21,6 +21,7 @@ SCHEMA='teacher-final-regret-policy-v1'
 EXTRACTION='final-positive-regret-extraction-v1'
 AGGREGATION='normalized-positive-final-regrets-uniform-if-nonpositive-v1'
 PRIOR='uniform-over-legal-actions; includes untrained stack domains'
+CHECKPOINT_ARRAYS=('key_offsets','key_bytes','legal','regrets')
 
 
 def implementation():
@@ -95,14 +96,16 @@ def completed_snapshot(config):
         'iterations_completed':count,'stack_bb':parameters['stack_bb'],
         'population':{'opponents':parameters['opponents'],'probabilities':parameters['opponent_probabilities']},
         'training_aggregation':TRAINING_AGGREGATION,'final_checkpoint_sha256':identity(meta),
-        'final_regrets_npy_sha256':meta['arrays']['regrets']['sha256'],'extraction_config':config}
+        'final_regrets_npy_sha256':meta['arrays']['regrets']['sha256'],
+        'final_checkpoint_arrays_sha256':{name+'.npy':meta['arrays'][name]['sha256'] for name in CHECKPOINT_ARRAYS},
+        'extraction_config':config}
 
 
 def export_current(config,output):
     output=Path(output)
     if output.exists():raise FileExistsError('Write a new final-regret policy directory')
     table,provenance=completed_snapshot(config);state=table.state()
-    arrays={key:state[key] for key in ('key_offsets','key_bytes','regrets','legal')}
+    arrays={key:state[key] for key in CHECKPOINT_ARRAYS}
     arrays['probabilities']=probabilities_from_regrets(state['regrets'],state['legal'])
     output.parent.mkdir(parents=True,exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=output.name+'-partial-',dir=output.parent) as temporary:
@@ -112,8 +115,8 @@ def export_current(config,output):
             with path.open('wb') as stream:
                 np.save(stream,value,allow_pickle=False);stream.flush();os.fsync(stream.fileno())
             files[path.name]=digest(path)
-        if files['regrets.npy']!=provenance['final_regrets_npy_sha256']:
-            raise ValueError('Export must preserve exact final checkpoint regret bytes')
+        if any(files[name]!=sha for name,sha in provenance['final_checkpoint_arrays_sha256'].items()):
+            raise ValueError('Export must preserve exact final checkpoint keys, legality and regret bytes')
         runtime=implementation()
         record={'schema':SCHEMA,'mode':'conventional-teacher-control','aggregation':AGGREGATION,
             'feature_version':VERSION,'config':table.config,'information_sets':len(table.keys),
@@ -137,11 +140,16 @@ def load_policy(root):
             or origin['training_manifest_sha256']!=extraction['training_manifest_sha256']
             or origin['training_source_sha256']!=extraction['training_source_sha256']):
         raise ValueError('Final-regret extraction/provenance binding mismatch')
-    names={'key_offsets','key_bytes','regrets','probabilities','legal'}
+    names={*CHECKPOINT_ARRAYS,'probabilities'}
     if (set(record['files'])!={name+'.npy' for name in names}
-            or any(digest(root/name)!=sha for name,sha in record['files'].items())
-            or record['files']['regrets.npy']!=origin['final_regrets_npy_sha256']):
+            or any(digest(root/name)!=sha for name,sha in record['files'].items())):
         raise ValueError('Final-regret numeric files changed')
+    checkpoint_arrays=origin.get('final_checkpoint_arrays_sha256')
+    if (not isinstance(checkpoint_arrays,dict)
+            or set(checkpoint_arrays)!={name+'.npy' for name in CHECKPOINT_ARRAYS}
+            or checkpoint_arrays['regrets.npy']!=origin['final_regrets_npy_sha256']
+            or any(record['files'][name]!=sha for name,sha in checkpoint_arrays.items())):
+        raise ValueError('Final-regret checkpoint numeric binding changed')
     arrays={name:np.load(root/(name+'.npy'),allow_pickle=False) for name in names}
     offsets,data,p,legal,regrets=[arrays[k] for k in ('key_offsets','key_bytes','probabilities','legal','regrets')]
     n=record['information_sets']

@@ -46,6 +46,11 @@ def test_complete_extraction_matches_actual_final_table_and_is_self_contained(tm
     result=export_current(cfg,output);policy,record=load_policy(output)
     assert result['policy_sha256']==digest(output/'manifest.json') and not result['allowed_as_teacher']
     assert record['aggregation']==AGGREGATION and record['provenance']['iterations_completed']==4
+    pointer=json.loads((run/'checkpoints/latest.json').read_text())
+    checkpoint=json.loads((run/'checkpoints'/pointer['generation']/'manifest.json').read_text())
+    expected={name+'.npy':checkpoint['arrays'][name]['sha256'] for name in ('key_offsets','key_bytes','legal','regrets')}
+    assert record['provenance']['final_checkpoint_arrays_sha256']==expected
+    assert all(record['files'][name]==sha for name,sha in expected.items())
     assert np.array_equal(policy.values,np.array([regret_matching(r,l) for r,l in zip(table.regrets[:len(table.keys)],table.legal[:len(table.keys)])]))
     assert any(not np.array_equal(p,a/a.sum()) for p,a in zip(policy.values,table.averages) if a.sum()>0)
     assert {p.name:p.read_bytes() for p in run.glob('*.json*')}==before
@@ -113,6 +118,46 @@ def test_current_loader_rejects_rehashed_strategy_override_and_source_change(tmp
         p[i]=0;p[i,actions[1]]=1
     np.save(path,p,allow_pickle=False);meta['files']['probabilities.npy']=digest(path);atomic_json(meta_path,meta)
     with pytest.raises(ValueError,match='exactly match'):load_policy(output)
+
+
+def test_current_loader_rejects_rehashed_canonical_key_rebinding(tmp_path):
+    _,cfg=setup(tmp_path);output=tmp_path/'policy';export_current(cfg,output)
+    policy,record=load_policy(output);origin=copy.deepcopy(record['provenance'])
+    offsets=np.load(output/'key_offsets.npy');data=np.load(output/'key_bytes.npy')
+    keys=[data[a:b].tobytes() for a,b in zip(offsets[:-1],offsets[1:])]
+    # Keep every row's probabilities/regrets and legal mask unchanged while
+    # assigning two existing canonical information sets each other's strategy.
+    i,j=next((i,j) for i in range(len(keys)) for j in range(i+1,len(keys))
+        if np.array_equal(policy.legal[i],policy.legal[j])
+        and not np.array_equal(policy.values[i],policy.values[j]))
+    before_key=keys[i];before_value=policy.values[i].copy()
+    keys[i],keys[j]=keys[j],keys[i]
+    assert keys[j]==before_key and not np.array_equal(policy.values[j],before_value)
+    replacement={'key_offsets':np.concatenate((np.zeros(1,dtype=np.int64),
+        np.cumsum(np.array([len(key) for key in keys],dtype=np.int64)))),
+        'key_bytes':np.frombuffer(b''.join(keys),dtype=np.uint8).copy()}
+    for name,value in replacement.items():
+        file=output/(name+'.npy');np.save(file,value,allow_pickle=False)
+        record['files'][file.name]=digest(file)
+    atomic_json(output/'manifest.json',record)
+    assert record['provenance']==origin
+    assert all(digest(output/(name+'.npy'))==record['files'][name+'.npy']
+        for name in ('regrets','probabilities','legal'))
+    with pytest.raises(ValueError,match='checkpoint numeric binding'):load_policy(output)
+
+
+def test_current_loader_requires_complete_checkpoint_array_binding(tmp_path):
+    _,cfg=setup(tmp_path);output=tmp_path/'policy';export_current(cfg,output)
+    manifest=output/'manifest.json';original=json.loads(manifest.read_text())
+    for name in ('key_offsets.npy','key_bytes.npy','legal.npy','regrets.npy',None):
+        record=copy.deepcopy(original)
+        if name is None:record['provenance'].pop('final_checkpoint_arrays_sha256')
+        else:record['provenance']['final_checkpoint_arrays_sha256'].pop(name)
+        atomic_json(manifest,record)
+        with pytest.raises(ValueError,match='checkpoint numeric binding'):load_policy(output)
+    record=copy.deepcopy(original);record['provenance']['final_regrets_npy_sha256']='0'*64
+    atomic_json(manifest,record)
+    with pytest.raises(ValueError,match='checkpoint numeric binding'):load_policy(output)
 
 
 def test_current_candidate_uses_original_qualification_and_no_torch(tmp_path,monkeypatch):
