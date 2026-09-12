@@ -11,6 +11,7 @@ import numpy as np
 from flyholdem.poker.infoset import canonical_state
 from flyholdem.provenance import canonical,identity
 from flyholdem.teacher.equity import visible_equity
+from .poker_tree import fork_hand,counterfactual_root
 
 VERSION='visible-equity-recall-public-history-v1'
 
@@ -110,7 +111,7 @@ class RegretTable:
             seen.add(key);i=self.lookup(key,legal)
             strategy=regret_matching(self.regrets[i],legal).copy();values=np.zeros(5,dtype=float)
             for action in np.flatnonzero(legal):
-                child=copy.deepcopy(hand);child.act(int(action))
+                child=fork_hand(hand);child.act(int(action))
                 values[action]=walk(child,copy.deepcopy(other),own_reach*strategy[action])
             value=float(np.dot(strategy,values));delta=np.where(legal,values-value,0)
             # Reacquire array rows after recursion: lookup may have grown them.
@@ -121,7 +122,8 @@ class RegretTable:
                 'action_values_bb':values.tolist(),'own_reach':float(own_reach),'regret_delta':delta.tolist(),
                 'regrets_after':self.regrets[i].tolist(),'average_after':self.averages[i].tolist()})
             return value
-        root=game.serialize();value=walk(copy.deepcopy(game),copy.deepcopy(opponent),1.)
+        root=game.serialize()
+        with counterfactual_root(game) as tree:value=walk(tree,copy.deepcopy(opponent),1.)
         if root!=game.serialize():raise AssertionError('Counterfactual traversal mutated its initial PokerKit hand')
         return {'root_private_checkpoint':root,'learning_seat':seat,'sampled_policy_value_bb':value,
             'nodes':nodes,'terminal_branches':leaves,'information_sets':len(self.keys),

@@ -44,7 +44,7 @@ Full teacher confirmation now requires a verified passing development run for th
 
 ## Validation and resources
 
-The latest complete local suite passed 231 tests, with two isolated-oracle skips, in 166.84 seconds. CI separately runs the scalar/Brian2 oracle, data-free import checks, and fixture live/replay/avatar/private-play browser checks. Native desktop/mobile checks also passed locally. The new published control panel was inspected at 1440×1080 and 390×844 with no horizontal overflow; all nine displayed accuracies match the original result files.
+The latest complete local suite passed 237 tests, with two isolated-oracle skips, in 140.47 seconds. CI separately runs the scalar/Brian2 oracle, data-free import checks, and fixture live/replay/avatar/private-play browser checks. Native desktop/mobile checks also passed locally. The new published control panel was inspected at 1440×1080 and 390×844 with no horizontal overflow; all nine displayed accuracies match the original result files.
 
 | Recorded experiment | Work | Wall time | Peak process RSS |
 | --- | --- | ---: | ---: |
@@ -94,3 +94,5 @@ Actual native poker training remains guarded by full Gate 2A and preceding curri
 Each named run contains its `manifest.json` and `result.json`; modern experiment journals have complete hash chains. Per-run reports preserve failures and scope. Artifact consistency checks do not claim external signatures or historical neural-training reexecution. Source, commands, exact hashes and chronological negative findings remain in the tracked `PROGRESS.md`.
 
 Native training and its replay now keep detailed hand records on disk, with streamed audits and bounded retained windows. In a synthetic 64 MiB journal benchmark, indexed write/resume used 322,314 peak traced Python bytes versus 68,535,459 with resident records, with byte-identical files. These storage figures exclude the neural graph/state; see [training replay resources](TRAINING_REPLAY.md).
+
+A future conventional teacher runtime can use [exact PokerKit traversal reuse](POKER_TREE_PERFORMANCE.md). A small prototype workload ran about twice as fast with identical recorded and numeric results; the final helper reproduced all first 128 original training records. V11 continues its original frozen source.

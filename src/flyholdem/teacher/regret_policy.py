@@ -16,7 +16,7 @@ AGGREGATION='own-reach-weighted-average-stationary-population-v1'
 
 
 def implementation():
-    names=('flyholdem.teacher.regret','flyholdem.teacher.regret_policy','flyholdem.teacher.equity',
+    names=('flyholdem.teacher.regret','flyholdem.teacher.regret_policy','flyholdem.teacher.poker_tree','flyholdem.teacher.equity',
         'flyholdem.poker.infoset','flyholdem.poker.observation','flyholdem.interface.encoder')
     files={name:digest(importlib.import_module(name).__file__) for name in names}
     files['flyholdem.teacher.equity.cpp']=digest(Path(importlib.import_module('flyholdem.teacher.equity').__file__).with_suffix('.cpp'))
