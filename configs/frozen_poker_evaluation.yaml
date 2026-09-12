@@ -1,0 +1,12 @@
+schema: frozen-poker-evaluation-v1
+status: development
+mode: full
+curriculum: hu-20bb-v1
+preregistration: runs/controllability-full-quarter-v2/preregistration.json
+preregistration_sha256: e3e2b48df9e946d800cec63b5ef88164190c3ffa1cf451b4284a99df5cc26f23
+opponents: [random, calling-station, tight-aggressive, equity-bucket]
+paired_deals_per_opponent: 32
+deal_seed_start: 5100000
+bootstrap_seed: 5190000
+bootstrap_repeats: 5000
+progress_hands: 32

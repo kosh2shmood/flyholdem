@@ -47,6 +47,9 @@ def parser():
     record=sub.add_parser('record',help='Generate a deterministic compact fixture demonstration')
     record.add_argument('--hands',type=int,default=6);record.add_argument('--seed',type=int,default=20260912)
     record.add_argument('--output',default='examples/fixture-demo.jsonl')
+    evaluate=sub.add_parser('evaluate',help='Measure a frozen native model on fixed paired deals; no learning or gate claim')
+    evaluate.add_argument('--config',default='configs/frozen_poker_evaluation.yaml');evaluate.add_argument('--model')
+    evaluate.add_argument('--stop-after',type=int);_output_options(evaluate)
     report=sub.add_parser('report',help='Verify recorded artifact chains and generate Markdown/HTML/JSON reports')
     report.add_argument('--run',required=True);report.add_argument('--output')
     preregister=sub.add_parser('preregister',help='Run registered controllability candidates and freeze the first passing mapping')
@@ -99,6 +102,10 @@ def dispatch(args):
         from flyholdem.interface.preregister import run_gate
         out,resume=run_path(args,'controllability-'+args.mode)
         result=run_gate(ROOT/'connectome_data/malecns_v1'/('prepared-'+args.mode),configuration(args.config),out,resume,args.failure_reference)
+    elif args.command=='evaluate':
+        from flyholdem.experiments.evaluate import evaluate
+        out,resume=run_path(args,'native-frozen-evaluation')
+        result=evaluate(configuration(args.config),out,args.model,resume,args.stop_after)
     elif args.command in ('train','distill'):
         config=configuration(args.config);out,resume=run_path(args,args.command+'-'+args.profile)
         if args.command=='train':
