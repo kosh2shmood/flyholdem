@@ -59,3 +59,6 @@ Full teacher confirmation now explicitly requires `teacher evaluate --profile co
 
 
 Completed native curriculum arms can now be viewed with `serve --training-run <experiment>/<seed>/<arm>/training --graph <exact-prepared-graph> --start-hand 0 --hands 16 --port 8768`. The service audits the complete record, replays actual saved activity and preserves card privacy without a neural worker or live player. See [TRAINING_REPLAY.md](TRAINING_REPLAY.md) for source requirements, labels, resource limits and checked fixture examples. This does not change any scientific gate.
+
+
+For a future qualifying V11 teacher, [DOWNSTREAM_RUNTIME.md](DOWNSTREAM_RUNTIME.md) pins the separate corpus/gate/native orchestration snapshot while preserving the original policy implementation. V11 training, final export and its registered evaluation continue through the original teacher-runtime-v11 source. No V11 qualification is implied.
