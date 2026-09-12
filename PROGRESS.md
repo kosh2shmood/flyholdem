@@ -614,3 +614,20 @@ The immutable local downstream snapshot runs/poker-runtime-v12 uses checked a975
 The exact downstream preflight passed in 3.25 seconds: 83 tiny fixture corpus rows from 17 hands, 64/12/7 canonical splits, all four streets, complete target/trajectory reproduction and unchanged completed resume. Original cue outcomes pass/pass/fail and the limited small teacher reverified, with no Torch or native worker. Existing failed V10 development was refused before policy load or certificate. Full frozen inference remains 1b2c99883afc6e6e30b65e8cf9aafef456953177c10caa443a8d62d531da09ca. Prior documentation commit 520eea3f0e08403cba9f001ea216585eb8d32999 passed CI 34715486678.
 
 Original V11 was authoritatively live at PID 56954, 98.1% CPU, at 97,700/100,000 traversals. An immediate local final-export waiter (exec session 58209; projectless work/mccfr/wait-v11-final-export.py, log work/mccfr/v11-final-export.log) now observes that exact PID, refuses observation errors or identity changes, and exports only the original average policy after the process is absent and final result is complete. It does not evaluate. Do not launch another export while that waiter is active. Once export completes, verify and publish the final policy identity before the original development suite, then independently verify and reproduce actual play. The original immutable PYTHONPATH and conditional candidate order remain unchanged.
+
+
+## V11 fixed final average exported before development
+
+Original V11 completed all 100,000 traversals, 13,858,172 counterfactual nodes and 5,275,792 terminal branches, producing 306,943 information sets. Its resumed invocation took 11270.364090 seconds; peak RSS was 545,734,656 bytes. The policy contains 74,592,670 disk bytes. These are training/resource measurements, not held-out poker results. The original immutable runtime's complete final-table export and an independent repeated provenance/checkpoint/array/RNG audit passed; recorded node and terminal totals also matched the complete journal. No Torch loaded.
+
+The frozen original average policy SHA is `52bd9fbf298031415bf03f99072c4a144539d0f4f620452ee03f2aaf65f22df7`. Training result `4852e3905060ea000ec6663b5486c6b6236680ae2008454bc781cec82c2dde6f`; manifest `1276bb4b27357c9b33a9ed08ae3e048e6ac0ec896d3a82f6c110b783a99b88a3`; complete journal `8969685cc3337ed22a62b128ed2975d40f3eae5f4d9959c1267614742a6c47e9`; journal head `fb7911e24214ad47b4eb911d9c4f89526a03d07a6e59c6d26716b36b1f5ecb6e`. Original training source remains `d16984f8442b6fb8fec62f962ff4992d74dc3bedbca69ee7da017249a60ed48a`. Only the registered final iteration was exported, and its identity is recorded before development. No V12 policy has been exported.
+
+After publishing this identity, run the original development suite:
+
+```sh
+PYTHONPATH="$PWD/runs/teacher-runtime-v11/src" .venv/bin/python -m flyholdem.cli teacher evaluate --policy runs/teacher-external-regret-v11-policy --config runs/teacher-runtime-v11/configs/teacher_evaluation.yaml --profile development --output runs/teacher-external-regret-v11-development
+PYTHONPATH="$PWD/runs/teacher-runtime-v11/src" .venv/bin/python -m flyholdem.cli teacher verify-evaluation --run runs/teacher-external-regret-v11-development --policy runs/teacher-external-regret-v11-policy --allow-development
+PYTHONPATH="$PWD/runs/teacher-runtime-v11/src" .venv/bin/python scripts/audit_teacher_play.py --run runs/teacher-external-regret-v11-development --policy runs/teacher-external-regret-v11-policy --output runs/teacher-external-regret-v11-play-audit.json
+```
+
+Evaluation resume replaces `--output` with `--resume` for that same directory. Original confirmation is still unused and requires independently verified passing development. If V11 development fails, preserve its result and proceed with the reviewed V12 fixed-final candidate; otherwise use the existing V11 confirmation/downstream path. No full teacher qualification, full corpus, Gate 2A certificate or native poker model exists yet. Gates 3–6 remain pending, and the full goal stays active.
