@@ -1,6 +1,6 @@
 # FlyHoldem — current measured results
 
-Status: development, 12 September 2026. The application works with fixture, circuit and full-connectome controllers. Full-graph cue conditioning is confirmed; poker learning remains unvalidated. Conventional teacher V10 completed its fixed training protocol and awaits held-out development evaluation. This is an interim evidence index, not a completed scientific release.
+Status: development, 12 September 2026. The application works with fixture, circuit and full-connectome controllers. Full-graph cue conditioning is confirmed; poker learning remains unvalidated. Conventional teacher V10 failed the full development suite; a longer unchanged-method V11 run is registered. This is an interim evidence index, not a completed scientific release.
 
 > A simulated network using the wiring of one reconstructed male fruit-fly central nervous system controls an engineered heads-up no-limit Hold'em interface.
 
@@ -34,11 +34,11 @@ These tasks concern two engineered cues. The observed conditioning mechanism inc
 
 ## Poker teacher results
 
-Full 20 BB candidates V1–V9 failed the unchanged original development suite. Positive returns against an individual opponent do not pass that suite. V9's terminal fold-value correction produced identical recorded paired outcomes to V8. The reserved full confirmation deals remain unused, and no full-hand teacher corpus or poker-trained student exists.
+Full 20 BB candidates V1–V10 failed the unchanged original development suite. Positive returns against an individual opponent do not pass that suite. V9's terminal fold-value correction produced identical recorded paired outcomes to V8. The reserved full confirmation deals remain unused, and no full-hand teacher corpus or poker-trained student exists.
 
 A separate tabular CFR teacher passed its own 10 BB shove/fold confirmation against all four original opponents. It is qualified only for that restricted subgame. It cannot substitute for the full-hand teacher gate. See the [small-game report](SHOVE_FOLD_TEACHER.md).
 
-V10 is a separately registered external-sampling tabular regret response to the stationary uniform original opponent population. Its 30,000-traversal schedule, seeds, abstraction and final-checkpoint rule were fixed before execution. It is a conventional candidate with no self-play equilibrium or fly-learning claim. The first 128 traversals completed in 11.78 seconds at 63.3 MB peak process RSS; the same run then continued. The fixed final run completed 30,000 traversals and 152,391 information sets at 284.5 MB peak RSS. Frozen policy SHA is `762b180986a3983e8a43f4744c6d89cf11299e16b611df6aba2e8b62a4206955`. Strategic performance remains unmeasured until the original development suite runs. See the [teacher history](TEACHER.md) and [V10 protocol](EXTERNAL_REGRET_TEACHER.md).
+V10 is a separately registered external-sampling tabular regret response to the stationary uniform original opponent population. Its 30,000-traversal schedule, seeds, abstraction and final-checkpoint rule were fixed before execution. It is a conventional candidate with no self-play equilibrium or fly-learning claim. The first 128 traversals completed in 11.78 seconds at 63.3 MB peak process RSS; the same run then continued. The fixed final run completed 30,000 traversals and 152,391 information sets at 284.5 MB peak RSS. Frozen policy SHA is `762b180986a3983e8a43f4744c6d89cf11299e16b611df6aba2e8b62a4206955`. Development returned +1.843750 / +2.480469 / +0.328125 / −0.013672 BB/hand against random / station / tight-aggressive / equity-bucket. Only random and station had positive adjusted lower bounds, so V10 failed. All 512 paired records reproduced exactly in a subsequent coverage audit. V11 changes only the fixed horizon to 100,000 traversals and starts from the same initialization; no V11 result exists yet. See the [teacher history](TEACHER.md) and [V10 protocol](EXTERNAL_REGRET_TEACHER.md).
 
 Full teacher confirmation now requires a verified passing development run for the same frozen policy. Confirmation, recovery and downstream corpus/Gate 2A checks bind and reverify its exact artifacts. The real failed V9 result was rejected before policy inference, confirmation deals or output creation.
 
@@ -88,6 +88,7 @@ Actual native poker training remains guarded by full Gate 2A and preceding curri
 | Full conditioning | `runs/conditioning-full-confirm-v1` | `8fec88ae335b4940f97c09a3c8e5f6e026b1059dd8444b29f5ce63102409cca5` |
 | Failed local cue transfer | `runs/exact-transfer-circuit-confirm-v1` | `5110abe179cbb6dcecb13fc2d6a9527ed287b27808366607faa4c7528b37a0ab` |
 | Circuit surrogate transfer | `runs/exact-surrogate-circuit-confirm-v1` | `3a9a11fe172c6aa1fa659d3c0b7e154b9ed94dcbdd44b1e7f6b30d80e0175f4e` |
+| Failed V10 full teacher | `runs/teacher-external-regret-v10-development` | `9aa3b092046284baf4f3801f62af956d57e7f394816855675584b73d4e3ca37f` |
 | Failed V9 full teacher | `runs/teacher-potential-boundary-v9-development` | `0fd06b781bfc89d5be2e26d310c0839934c95882d025df246a9d01d5e29c3931` |
 
 Each named run contains its `manifest.json` and `result.json`; modern experiment journals have complete hash chains. Per-run reports preserve failures and scope. Artifact consistency checks do not claim external signatures or historical neural-training reexecution. Source, commands, exact hashes and chronological negative findings remain in the tracked `PROGRESS.md`.

@@ -1,6 +1,6 @@
 # Conventional teacher and disconnected student runtime
 
-Status: implemented and tested; no validated poker teacher, corpus, transfer result or poker learning claim exists yet. The live table still runs the explicitly labeled fixture.
+Status: full-hand conventional teacher candidates V1–V10 failed qualification; V11 is registered. The small shove/fold teacher and cue-transfer/removal component passed their restricted tests. The fixture, circuit and full native dashboards work; the current full fly is cue-conditioned and poker-unvalidated.
 
 ## Teacher algorithm
 
@@ -36,13 +36,13 @@ Use the locked environment with `uv sync --frozen --extra data --extra teacher`,
 .venv/bin/python -m flyholdem.teacher.evaluation --policy runs/teacher-nfsp-v1-policy --config configs/teacher_evaluation.yaml --profile development --output runs/teacher-nfsp-v1-development
 ```
 
-Only a qualifying development policy should advance to the separate confirmatory seeds using `--profile confirmatory` and a new output path. A matching passing confirmation is required for:
+Only a qualifying development policy can advance to the separate confirmatory seeds using `--profile confirmatory --development-reference <matching-development-run>` and a new output path. A matching passing confirmation is required for:
 
 ```sh
 .venv/bin/python -m flyholdem.teacher.corpus --policy runs/teacher-nfsp-v1-policy --validation runs/teacher-nfsp-v1-confirmation/result.json --config configs/corpus.yaml --output runs/teacher-nfsp-v1-corpus
 ```
 
-Training, evaluation and corpus commands support `--resume` with unchanged config/source/environment. Public CLI consolidation and actual local/surrogate transfer runners remain subsequent work. Optional teacher tests skip when PyTorch is absent; the core fixture/native separation tests require no full dataset.
+Training, evaluation and corpus commands support `--resume` with unchanged config/source/environment. Public CLI commands and local/surrogate transfer runners are implemented; their later evidence is recorded below. Optional teacher tests skip when PyTorch is absent; the core fixture/native separation tests require no full dataset.
 
 ## Initial 25,000-hand result — validation failed
 
@@ -246,3 +246,14 @@ Resume recomputes the dependency. `verify-evaluation`, corpus qualification and 
 ```
 
 The actual failed V9 development result (SHA 0fd06b781bfc89d5be2e26d310c0839934c95882d025df246a9d01d5e29c3931) was rejected through the public command dispatcher before any policy inference, confirmation deal or output creation. Reserved full confirmation deals remain unused. Tiny synthetic prerequisite records used in engineering tests are explicitly separate from the original project registration and cannot qualify a public teacher.
+
+
+## V10 failed development; longer unchanged-method V11 registered
+
+V10's fixed final policy 762b180986a3983e8a43f4744c6d89cf11299e16b611df6aba2e8b62a4206955 completed the original 128 paired development deals per opponent. Results in BB/hand, with suite-adjusted bootstrap intervals: random +1.843750 [0.535156, 3.167493]; calling station +2.480469 [1.506812, 3.407727]; tight-aggressive +0.328125 [-0.478040, 1.100134]; equity-bucket -0.013672 [-1.121094, 1.142627]. Only random and station have positive lower bounds. The full suite failed; the policy is barred from teaching. All 32 hidden-hole/future-deck/teacher-label checks passed. Independent complete-journal/statistical recomputation passed. Result SHA 9aa3b092046284baf4f3801f62af956d57e7f394816855675584b73d4e3ca37f; manifest e9df1243b6beac3137c977e262f91f9b65197bdbb880e7129878e39e5f235f39; paired journal 7c99f473bc77a7bafe287aac3ef83b86d965f3a581331f4c9d483a16d2f8bbf7. Reports and generated records remain local.
+
+A read-only diagnostic replay reproduced all 512 paired records exactly. Of 1,948 actual teacher decisions, 23 states were unseen and 11 seen states had zero own-reach average mass. River coverage was thinner: 13/179 unseen, and 164/166 seen river decisions used states visited at most 100 times. Across the entire training table, visit quartiles were 1/1/3 and 123,129/152,391 states had zero own-reach average mass because full counterfactual branching also visits zero-reach continuations. These counts motivate a duration experiment; they do not establish a causal explanation of the failed strategic result.
+
+V11 changes only the fixed horizon from 30,000 to 100,000 traversals in configs/teacher_external_regret_v11.yaml (SHA bcab450348d8aeb9abba80ddd6e35f0a9b47bd876a331a394ffbb7b23aa764c2). It restarts from the same initialization and sampling/deal sequence, so the first 30,000 operations should reproduce V10; it does not modify or relabel V10's completed run. Same algorithm, full public/private-bucket recall, eight equity buckets, 64 samples, original equal opponent mixture, averaging, stack depth and final-only export. Training deals 1,000,000–1,099,999 remain disjoint from all reserved development/confirmation probes. There is no biological or opponent selection from poker profit. This is a separate development candidate, without a strength or equilibrium claim.
+
+After checked publication, freeze exact src/lock/configs and a separate existing equity binary in runs/teacher-runtime-v11. Execute `PYTHONPATH="$PWD/runs/teacher-runtime-v11/src" .venv/bin/python -m flyholdem.cli teacher train-regret --config runs/teacher-runtime-v11/configs/teacher_external_regret_v11.yaml --output runs/teacher-external-regret-v11 --stop-after 128`; verify this prefix against V10, then resume the same command with --resume runs/teacher-external-regret-v11 instead of --output/--stop-after. The same frozen source includes the enforced development prerequisite for confirmation. Export only the fixed final model, publish its identity before the original development suite, and independently verify the result. Full confirmation remains unused; no full corpus or Gate 2A certificate exists. Gates 3–6 remain pending. Current dashboards and human play remain available. No environment/shared binary changes.
