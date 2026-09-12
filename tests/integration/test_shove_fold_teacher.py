@@ -107,3 +107,46 @@ def test_tabular_cli_runs_and_reports_actual_small_chance_traversals(tmp_path,ca
     assert 'three terminal branches' in report['hand_unit'] and not report['allowed_as_teacher']
     main(['teacher','export-shove-fold','--run',str(run),'--output',str(tmp_path/'policy')])
     assert load_policy(tmp_path/'policy')[1]['allowed_as_teacher'] is False
+
+
+def evaluation_fixture(root):
+    config={'schema':'tabular-shove-fold-training-v1','algorithm':ALGORITHM,'curriculum':CURRICULUM,
+        'status':'development','iterations':8,'deal_seed_start':6211000,'progress_iterations':8}
+    run=root/'training';train(config,run);policy=root/'policy';export_training(run,policy)
+    from flyholdem.poker.opponents import VERSIONS
+    suite={'schema':'tabular-shove-fold-suite-v1','curriculum':CURRICULUM,
+        'training_deal_range':[6211000,6211008],'opponents':list(VERSIONS),'bootstrap_seed':6290000,'bootstrap_repeats':100,
+        'profiles':{'development':{'seed_start':6401000,'paired_deals_per_opponent':2},
+                    'confirmatory':{'seed_start':6501000,'paired_deals_per_opponent':2}}}
+    return run,policy,suite
+
+
+def test_small_evaluation_recovery_recomputes_all_pairs_without_qualifying_full_teacher(tmp_path):
+    from flyholdem.teacher.shove_fold_evaluation import evaluate,verify_run,boundary_check
+    from flyholdem.connectome.registry import digest
+    training,policy,config=evaluation_fixture(tmp_path)
+    original=tmp_path/'evaluation';restored=tmp_path/'restored'
+    result=evaluate(policy,config,original,training_run=training)
+    assert not result['allowed_as_teacher'] and not result['allowed_as_small_game_teacher']
+    assert result['information_boundary']['decisions_checked']==32
+    with pytest.raises(KeyboardInterrupt):evaluate(policy,config,restored,training_run=training,stop_after=3)
+    evaluate(policy,config,restored,resume=True,training_run=training)
+    assert (original/'paired-deals.jsonl').read_bytes()==(restored/'paired-deals.jsonl').read_bytes()
+    verify_run(original,config,digest(policy/'manifest.json'),'development')
+    result['opponents']['random']['bb_per_hand']+=1
+    (original/'result.json').write_text(json.dumps(result))
+    with pytest.raises(ValueError,match='recorded paired'):verify_run(original,config,digest(policy/'manifest.json'),'development')
+    with pytest.raises(ValueError,match='requires passing development'):
+        evaluate(policy,config,tmp_path/'confirm',profile='confirmatory',training_run=training)
+    assert not (tmp_path/'confirm').exists()
+
+
+def test_small_evaluation_rejects_training_overlap_and_unrelated_training_before_running(tmp_path):
+    from flyholdem.teacher.shove_fold_evaluation import evaluate
+    training,policy,config=evaluation_fixture(tmp_path)
+    config['profiles']['development']['seed_start']=6211001
+    with pytest.raises(ValueError,match='disjoint'):evaluate(policy,config,tmp_path/'overlap',training_run=training)
+    assert not (tmp_path/'overlap').exists()
+    config['profiles']['development']['seed_start']=6401000
+    manifest=training/'manifest.json';value=json.loads(manifest.read_text());value['config']['iterations']+=1;manifest.write_text(json.dumps(value))
+    with pytest.raises(ValueError,match='completed registered'):evaluate(policy,config,tmp_path/'different',training_run=training)

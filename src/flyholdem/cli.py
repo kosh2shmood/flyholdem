@@ -66,6 +66,11 @@ def parser():
     small.add_argument('--config',default='configs/shove_fold_teacher.yaml');small.add_argument('--stop-after',type=int);_output_options(small)
     small_export=ts.add_parser('export-shove-fold',help='Export the small tabular reference; does not qualify a full teacher')
     small_export.add_argument('--run',required=True);small_export.add_argument('--output',required=True)
+    small_eval=ts.add_parser('evaluate-shove-fold',help='Evaluate the small tabular reference on disjoint paired deals')
+    small_eval.add_argument('--policy',required=True);small_eval.add_argument('--training-run',required=True)
+    small_eval.add_argument('--config',default='configs/shove_fold_teacher_evaluation.yaml')
+    small_eval.add_argument('--profile',choices=['development','confirmatory'],default='development')
+    small_eval.add_argument('--development-reference');_output_options(small_eval)
     train=ts.add_parser('train',help='Train registered NFSP self-play')
     train.add_argument('--config',required=True);train.add_argument('--stop-after',type=int);_output_options(train)
     export=ts.add_parser('export',help='Export a numeric frozen average-policy checkpoint, still unvalidated')
@@ -142,6 +147,9 @@ def dispatch(args):
         if action=='train-shove-fold':
             from flyholdem.teacher.shove_fold_training import train
             result=train(config,out,resume,args.stop_after)
+        elif action=='evaluate-shove-fold':
+            from flyholdem.teacher.shove_fold_evaluation import evaluate
+            result=evaluate(args.policy,config,out,args.profile,resume,args.development_reference,training_run=args.training_run)
         elif action=='train':
             from flyholdem.teacher.training import train
             result=train(config,out,resume,args.stop_after)

@@ -19,3 +19,17 @@ Configuration `configs/shove_fold_teacher.yaml` registers 200,000 sampled deals 
 Long execution uses an immutable source/config/lock snapshot, as other experiments do. Training and exported artifacts stay ignored/local. The CLI writes the ordinary verified report and labels its count as sampled deals traversed through all three branches. A separate held-out small-game evaluation is still required before this reference can teach; it cannot satisfy the unchanged full 20 BB teacher gate.
 
 Verification: eight checks cover exact class multiplicities, actual settlement, counterfactual reach weighting, two analytically solved toy games, hidden-hole/future-deck invariance, out-of-domain rejection, source/tensor identity, exact old-checkpoint replay, and real CLI training/export/report. A 100-traversal engineering throughput check took 0.20116 seconds with peak RSS 53,641,216 bytes. This is a resource measurement, not poker-strength evidence.
+
+## Completed training and registered held-out evaluation
+
+The first 200,000-traversal run completed in 427.01477 seconds with minimum 531 visits per card class/position. Training manifest 4f2d9b1e048c037230085e1722d8ea54afd65da75083d72b99338f406a630d2b, journal head 21ff5c436106e3132fe860d767c1f3f386fff9546b30a25567b8137c5a7ffe4e, frozen policy manifest 8a378ff881fc1bf11ae65f00687d271cafc05b847ef8dc7b117de8a91af5e1b1. No strength or equilibrium claim follows from training completion.
+
+Configuration `configs/shove_fold_teacher_evaluation.yaml` registers the unchanged four original fixed policies, constrained by the small game's legal masks. Development uses 512 seat-swapped paired deals per opponent from seed 6400000; confirmation uses 2048 from 6500000. The 200,000 training deals start at 6000000; 32 actual information-boundary probes use the two decision nodes of 16 separate deals from 6300000. All ranges are disjoint and checked against the policy's matching completed training manifest/journal.
+
+The same 5,000-resample Bonferroni suite bootstrap requires every opponent's lower confidence bound above zero. Confirmation requires independently recomputed passing development evidence for the same frozen table. The result's `allowed_as_teacher` remains false regardless: only a separately named `allowed_as_small_game_teacher` may become true after its own confirmation. Neither can satisfy the full 20 BB teacher prerequisite. Frozen policies and deterministic per-pair RNG permit recovery at any complete paired deal.
+
+```sh
+.venv/bin/flyholdem teacher evaluate-shove-fold --policy runs/shove-fold-teacher-v1-policy --training-run runs/shove-fold-teacher-v1 --config configs/shove_fold_teacher_evaluation.yaml --output runs/shove-fold-teacher-v1-development
+```
+
+Add `--profile confirmatory --development-reference runs/shove-fold-teacher-v1-development` only after passing development, and choose a distinct output. Replace `--output RUN` with `--resume RUN` after interruption. Two additional tests cover real paired-game recovery, recomputed summaries and rejected overlap/mismatched training; full suite 143 passed / 2 isolated-oracle skips. Evaluation has not run at this registration checkpoint.
