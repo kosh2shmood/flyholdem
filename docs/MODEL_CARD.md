@@ -29,4 +29,4 @@ The default fixture is a synthetic Euler prototype with schematic engineering ro
 This describes the native full-data controller, not the synthetic fixture. No living fly, consciousness, faithful whole-brain emulation or proven poker learner is claimed.
 
 
-The first 256-hand full-model baseline completed with unchanged weights and only fold/all-in actions. Its small-sample positive returns are explicitly not a poker-learning claim. Four genuine PokerKit curriculum environments and teacher-free paired evaluation exist; gated poker learning/control experiments remain subsequent work. See CURRICULA.md.
+The first 256-hand full-model baseline completed with unchanged weights and only fold/all-in actions. Its small-sample positive returns are explicitly not a poker-learning claim. Four genuine PokerKit curriculum environments, isolated paired evaluation and the gated multi-seed learning/control runner are implemented. Only numerical-fixture orchestration has executed; actual full-graph poker experiments still require a passing full teacher/corpus and preceding curriculum gates. See CURRICULA.md.

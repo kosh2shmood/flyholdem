@@ -60,12 +60,12 @@ def evidence(run):
     result_path=root/'result.json';manifest_path=root/'manifest.json'
     if not result_path.is_file() or not manifest_path.is_file():raise ValueError('Report requires result.json and manifest.json in a run directory')
     result=_json(result_path.read_text());manifest=_json(manifest_path.read_text())
-    supported={'conditioning-result-v1','exact-transfer-result-v1','nfsp-training-v1','tabular-shove-fold-training-result-v1','tabular-shove-fold-evaluation-v1','teacher-evaluation-v1','frozen-poker-evaluation-result-v1','controllability-result-v1'}
+    supported={'native-poker-curriculum-result-v1','conditioning-result-v1','exact-transfer-result-v1','nfsp-training-v1','tabular-shove-fold-training-result-v1','tabular-shove-fold-evaluation-v1','teacher-evaluation-v1','frozen-poker-evaluation-result-v1','controllability-result-v1'}
     if result.get('schema') not in supported:raise ValueError('Unsupported experiment report schema')
     manifest_hash=_digest(manifest_path)
     if result.get('manifest_sha256',manifest_hash)!=manifest_hash:raise ValueError('Result/manifest checksum mismatch')
     files={'result.json':_digest(result_path),'manifest.json':manifest_hash};journals={}
-    for name in ('trials.jsonl','hands.jsonl','evaluation.jsonl','paired-deals.jsonl','events.jsonl'):
+    for name in ('trials.jsonl','hands.jsonl','evaluation.jsonl','paired-deals.jsonl','events.jsonl','phases.jsonl'):
         path=root/name
         if path.is_file():
             journals[name]=audit_legacy_trials(path) if result['schema']=='controllability-result-v1' else audit_journal(path)
@@ -77,7 +77,7 @@ def evidence(run):
         if (root/name).is_file():files[name]=_digest(root/name)
     if 'preregistration_sha256' in result and files.get('preregistration.json')!=result['preregistration_sha256']:
         raise ValueError('Preregistration checksum mismatch')
-    expected_rows=result.get('operations',result.get('hands_completed'))
+    expected_rows=result.get('operations',result.get('hands_completed',result.get('completed_phases')))
     if expected_rows is not None and sum(j['rows'] for j in journals.values())!=expected_rows:
         raise ValueError('Result journal count mismatch')
     rows=[]
@@ -86,10 +86,14 @@ def evidence(run):
         for key,value in item.items():
             if '/' in key and isinstance(value,(int,float)) and not isinstance(value,bool):
                 rows.append({'series':key,'seed':seed,'value':value,'unit':'accuracy'})
+    if result['schema']=='native-poker-curriculum-result-v1':
+        plan=manifest['config']['plan']
+        for phase,values in result.get('endpoints',{}).get('seed_returns',{}).items():
+            rows.extend({'series':phase,'seed':seed,'value':value,'unit':'BB/100 hands'} for seed,value in zip(plan['seeds'],values))
     summaries=[]
     for series in sorted({r['series'] for r in rows}):
         values=[r['value'] for r in rows if r['series']==series]
-        summaries.append({'series':series,'n':len(values),'mean':statistics.mean(values),'minimum':min(values),'maximum':max(values),'unit':'accuracy'})
+        summaries.append({'series':series,'n':len(values),'mean':statistics.mean(values),'minimum':min(values),'maximum':max(values),'unit':next(r['unit'] for r in rows if r['series']==series)})
     if result['schema']=='controllability-result-v1':
         for phase in ('confirmatory','shuffled_input'):
             if phase in result:
@@ -102,19 +106,22 @@ def evidence(run):
     status=result.get('status') or ('pass' if result.get('passes_fixed_suite') else 'fail' if 'passes_fixed_suite' in result else 'recorded')
     if result.get('profile')=='development' and (result.get('passes_fixed_suite') or result.get('development_criteria_met')):
         status='development-qualified; confirmation still required'
+    context=manifest.get('config',{}).get('plan',manifest.get('config',{}))
+    if result['schema']=='native-poker-curriculum-result-v1' and result['status']=='complete':
+        status='confirmed gate passed' if result['gate_passed'] else 'development criteria met; confirmation required' if result['endpoints']['criteria_met'] and context['profile']=='development' else 'complete; no learning claim'
     for name,digest in files.items():
         if _digest(root/name)!=digest:raise ValueError('Run changed during report generation')
     return {'schema':'flyholdem-report-v1','run':str(root),'run_schema':result.get('schema'),'scope':scope,'status':status,
-        'profile':result.get('profile',manifest.get('config',{}).get('profile','development')),
-        'mode':result.get('mode',manifest.get('config',{}).get('mode','unspecified')),
-        'learning_mode':result.get('learning_mode',manifest.get('config',{}).get('learning_mode','not applicable')),
+        'profile':result.get('profile',context.get('profile','development')),
+        'mode':result.get('mode',context.get('mode','unspecified')),
+        'learning_mode':result.get('learning_mode',context.get('learning_mode','not applicable')),
         'recorded_learning_claim':bool(result.get('learning_claim',False)),
         'allowed_as_teacher':bool(result.get('allowed_as_teacher',False)),
         'allowed_as_small_game_teacher':result.get('allowed_as_small_game_teacher'),
         'execution_commit':manifest.get('commit'),'source_hash':manifest.get('source_hash'),
         'graph_hash':manifest.get('graph_hash'),'binary_hash':manifest.get('binary_hash'),
         'files':files,'journal_verification':journals,'summaries':summaries,'seed_values':rows,
-        'paired_evidence':result.get('paired_evidence',{}),'elapsed_seconds':result.get('elapsed_seconds_this_invocation',result.get('elapsed_seconds')),
+        'paired_evidence':result.get('paired_evidence',result.get('endpoints',{}).get('paired_evidence',{})),'elapsed_seconds':result.get('elapsed_seconds_this_invocation',result.get('elapsed_seconds')),
         'peak_rss_bytes':result.get('peak_rss_bytes'),
         'retention_criterion_met':result.get('retention_criterion_met'),
         'information_boundary_verified':result.get('information_boundary_verified'),

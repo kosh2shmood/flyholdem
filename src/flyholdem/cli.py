@@ -60,6 +60,17 @@ def parser():
     _learning_options(train)
     distill=sub.add_parser('distill',help='Run registered exact-cue local or bounded-edge surrogate transfer')
     _learning_options(distill)
+    curriculum=sub.add_parser('curriculum',help='Run or reverify gated multi-seed native poker curricula')
+    cs=curriculum.add_subparsers(dest='curriculum_command',required=True)
+    run=cs.add_parser('run',help='Require Gate 2A, prior curriculum and development before the corresponding experiment')
+    run.add_argument('--config',default='configs/poker_curricula.yaml');run.add_argument('--gate2a',required=True)
+    run.add_argument('--stage',required=True,choices=['3','4','5','6'])
+    run.add_argument('--profile',choices=['development','confirmatory'],default='development')
+    run.add_argument('--learning-mode',required=True,choices=['bio-plastic','distilled-connectome'])
+    run.add_argument('--previous');run.add_argument('--development');run.add_argument('--stop-after',type=int,help='Stop after this many complete phases')
+    _output_options(run)
+    verify=cs.add_parser('verify',help='Recompute all curriculum phases, native decisions, paired endpoints and prerequisites')
+    verify.add_argument('--run',required=True);verify.add_argument('--require-pass',action='store_true')
     gates=sub.add_parser('gate',help='Reverify prerequisite evidence before biological poker training')
     gs=gates.add_subparsers(dest='gate_command',required=True)
     certify=gs.add_parser('certify-transfer',help='Require the full 20 BB teacher, reproduced corpus and actual cue transfer/removal')
@@ -108,6 +119,12 @@ def parser():
 
 
 def dispatch(args):
+    if args.command=='curriculum':
+        from flyholdem.experiments.curriculum_protocol import run_curriculum,verify_curriculum
+        if args.curriculum_command=='verify':return verify_curriculum(args.run,args.require_pass)
+        output,resume=run_path(args,'poker-curriculum')
+        return run_curriculum(configuration(args.config),output,args.stage,args.profile,args.learning_mode,args.gate2a,
+            previous=args.previous,development=args.development,resume=resume,stop_after=args.stop_after)
     if args.command=='gate':
         if args.gate_command=='certify-transfer':
             from flyholdem.experiments.gates import certify_gate2a

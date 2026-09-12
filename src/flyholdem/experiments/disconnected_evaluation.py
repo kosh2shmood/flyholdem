@@ -27,7 +27,9 @@ def evaluate_disconnected(config,output,model,graph=None,resume=False,stop_after
     git_directory=subprocess.check_output(['git','rev-parse','--absolute-git-dir'],cwd=ROOT,text=True).strip()
     contract={'schema':'isolated-frozen-evaluation-runtime-v1','config':config,'config_hash':identity(config),
         'model_sha256':digest(model/'manifest.json'),'graph_manifest_sha256':digest(graph/'manifest.json'),
-        'project':str(ROOT.resolve()),'graph':str(graph),'git_directory':git_directory,'source_files':sources,
+        'project':str(ROOT.resolve()),'graph':str(graph),'git_directory':git_directory,
+        'unavailable_training_paths':[str(Path(p).resolve()) for p in config.get('unavailable_training_paths',[])],
+        'source_files':sources,
         'source_files_hash':identity(sources),'lock_sha256':digest(ROOT/'uv.lock'),'binary_sha256':digest(LIBRARY)}
     if resume:
         if list((runtime/'src').rglob('*.pyc')):raise ValueError('Isolated runtime must compile its verified source without cached bytecode')
@@ -62,6 +64,7 @@ def evaluate_disconnected(config,output,model,graph=None,resume=False,stop_after
     finally:
         for sig,handler in handlers.items():signal.signal(sig,handler)
     result=json.loads((root/'evaluation/result.json').read_text());isolation=json.loads((root/'isolation-result.json').read_text())
-    if not isolation['teacher_import_denied'] or not isolation['external_training_files_denied'] or isolation['teacher_modules_loaded']:
+    if (not isolation['teacher_import_denied'] or not isolation['external_training_files_denied'] or isolation['teacher_modules_loaded']
+            or isolation.get('unavailable_training_paths_denied')!=contract['unavailable_training_paths']):
         raise ValueError('Isolated evaluation did not enforce its teacher boundary')
     return {'run':str(root/'evaluation'),'isolation_sha256':digest(root/'isolation.json'),'isolation':isolation,'result':result}

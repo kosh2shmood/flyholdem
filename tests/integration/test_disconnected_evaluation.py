@@ -35,6 +35,8 @@ def native_model(root):
 
 def test_isolated_native_poker_evaluation_denies_teacher_and_resumes_exactly(tmp_path,monkeypatch):
     config,model,graph=native_model(tmp_path)
+    external=tmp_path/'external-teacher';external.mkdir();(external/'teacher.py').write_text('private training source')
+    config['unavailable_training_paths']=[str(external)]
     import flyholdem.experiments.evaluate as original
     load=original.load_frozen
     monkeypatch.setattr(original,'load_frozen',lambda path,unused:load(path,graph))
@@ -43,6 +45,7 @@ def test_isolated_native_poker_evaluation_denies_teacher_and_resumes_exactly(tmp
     assert first['result']['status']=='interrupted' and first['isolation']['hands_completed']==7
     result=evaluate_disconnected(config,tmp_path/'isolated',model,graph,resume=True)
     assert result['isolation']['teacher_import_denied'] and result['isolation']['external_training_files_denied']
+    assert result['isolation']['unavailable_training_paths_denied']==[str(external)]
     assert result['result']['opponents']==direct['opponents'] and result['result']['hands_completed']==16
     assert (tmp_path/'direct/hands.jsonl').read_bytes()==(tmp_path/'isolated/evaluation/hands.jsonl').read_bytes()
     assert not (tmp_path/'isolated/runtime/src/flyholdem/teacher').exists()

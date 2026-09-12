@@ -81,3 +81,8 @@ Seven added native integration checks cover strict/local/surrogate/terminal-dist
 
 
 Synthetic topology controls now export a distinct prepared graph and an explicit shuffled-control mode, preserving their actual endpoint permutation and original scaled edge strengths. The exported null graph uses scale one because the registered global gain is already present in its stored weights. Loading its frozen model against the original connectome is rejected. An encoder-row shuffle retains the exact row multiset, gains and readouts. A native integration check proves exact reloaded count/score/action bytes and rejects original-graph substitution. This enables honest isolated control evaluation; it grants no learning result.
+
+
+## Gated multi-seed orchestration implemented
+
+The previously listed top-level orchestration work is now implemented through `curriculum run` / `curriculum verify`. It includes fixed independent seeds, all matched native controls, explicit null graphs, inherited-edge persistence, terminal fine-tuning, frozen snapshots, an actual conventional reference, isolated evaluations, retention/erasure and seed-level statistical endpoints. Full teacher/corpus qualification is still missing, so no actual biological poker curriculum has run. See POKER_TRAINING.md for the registered protocol, exact commands, recovery, verified fixture scope and remaining scientific gates.

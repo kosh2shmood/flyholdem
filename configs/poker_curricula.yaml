@@ -1,0 +1,57 @@
+schema: gated-native-poker-curricula-v1
+scope: Full MaleCNS; both modes separately; no biological parameter selection from poker profit
+training_seed_stride: 100000
+temperature:
+  start: 0.5
+  end: 0.1
+profiles:
+  development:
+    seeds: [81001, 81002, 81003]
+    deal_offset: 0
+    paired_deals_per_opponent: 128
+  confirmatory:
+    seeds: [81101, 81102, 81103, 81104, 81105]
+    deal_offset: 2000000
+    paired_deals_per_opponent: 512
+stages:
+  '3':
+    curriculum: shove-fold-10bb-v1
+    previous: null
+    stack_bb: 10
+    hands: 10000
+    train_deal_start: 50000000
+    evaluation_deal_start: 150000000
+  '4':
+    curriculum: river-20bb-v1
+    previous: '3'
+    stack_bb: 20
+    hands: 10000
+    train_deal_start: 60000000
+    evaluation_deal_start: 160000000
+  '5':
+    curriculum: hu-20bb-v1
+    previous: '4'
+    stack_bb: 20
+    hands: 20000
+    train_deal_start: 70000000
+    evaluation_deal_start: 170000000
+  '6':
+    curriculum: hu-100bb-v1
+    previous: '5'
+    stack_bb: 100
+    hands: 20000
+    train_deal_start: 80000000
+    evaluation_deal_start: 180000000
+endpoints:
+  bootstrap_seed: 81900
+  bootstrap_repeats: 5000
+  strength_samples: 256
+  minimum_bucket_decisions: 20
+  minimum_shove_span: 0.1
+  minimum_action_frequency: 0.01
+  maximum_action_frequency: 0.95
+small_teacher:
+  policy: runs/shove-fold-teacher-v1-policy
+  policy_sha256: 8a378ff881fc1bf11ae65f00687d271cafc05b847ef8dc7b117de8a91af5e1b1
+  confirmation: runs/shove-fold-teacher-v1-confirmatory
+  result_sha256: 5a224b6f3dc68b744a371a349b9cfbd2a9cd7f2b563632e874320922a780ef98

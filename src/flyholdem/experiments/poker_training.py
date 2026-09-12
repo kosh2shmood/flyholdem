@@ -64,6 +64,16 @@ def _train_arm(player,config,output,*,teacher=None,teacher_sha256=None,shuffled_
         if completed>len(journal.rows) or extra['journal_head']!=(journal.rows[completed-1]['hash'] if completed else '0'*64):
             raise ValueError('Poker arm checkpoint/journal mismatch')
         player.restore_state(arrays,extra['player'])
+        if completed==hands and (out/'result.json').is_file():
+            result=json.loads((out/'result.json').read_text())
+            if (len(journal.rows)!=hands or result['status']!='training-complete'
+                    or result['journal_head']!=journal.rows[-1]['hash']
+                    or result['manifest_sha256']!=digest(out/'manifest.json')
+                    or result['final_weights_sha256']!=hashlib.sha256(player.brain.weights.tobytes()).hexdigest()
+                    or result['initial_weights_sha256']!=initial_hash
+                    or result['hands_completed']!=hands or result['planned_hands']!=hands):
+                journal.close();raise ValueError('Completed training result differs from its restored final state')
+            journal.close();return result
     def checkpoint():
         nonlocal last_checkpoint
         if in_hand:return

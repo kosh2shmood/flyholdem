@@ -12,6 +12,9 @@ def main():
     contract=json.loads((root/'isolation.json').read_text());project=Path(contract['project']).resolve()
     graph=Path(contract['graph']).resolve();environment=Path(sys.prefix).resolve()
     allowed=(root,graph,environment,Path(contract['git_directory']).resolve())
+    unavailable=[Path(p).resolve() for p in contract.get('unavailable_training_paths',[])]
+    if any(any(p.is_relative_to(a) for a in allowed) for p in unavailable):
+        raise ValueError('An unavailable training path overlaps an allowed evaluation artifact')
     if (runtime/'src/flyholdem/teacher').exists():raise ValueError('Teacher code must not be present in this runtime')
     class NoTeacher(importlib.abc.MetaPathFinder):
         def find_spec(self,fullname,path=None,target=None):
@@ -21,7 +24,7 @@ def main():
     def protect(event,values):
         if event!='open' or not values or not isinstance(values[0],(str,bytes)):return
         path=Path(values[0].decode() if isinstance(values[0],bytes) else values[0]).resolve()
-        if path.is_relative_to(project) and not any(path.is_relative_to(item) for item in allowed):
+        if (path.is_relative_to(project) or any(path.is_relative_to(p) for p in unavailable)) and not any(path.is_relative_to(item) for item in allowed):
             raise PermissionError('Project training artifacts are unavailable to isolated evaluation')
     sys.addaudithook(protect)
     # Demonstrate both boundaries before loading the frozen neural model.
@@ -31,6 +34,10 @@ def main():
     try:open(project/'src/flyholdem/teacher/__init__.py').close()
     except PermissionError:pass
     else:raise AssertionError('External project training files were not denied')
+    for path in unavailable:
+        try:open(path/'__flyholdem_training_access_probe__').close()
+        except PermissionError:pass
+        else:raise AssertionError('An external training path was not denied')
     from flyholdem.experiments.evaluate import evaluate
     from flyholdem.neural.checkpoint import atomic_json
     import yaml
@@ -39,7 +46,8 @@ def main():
     if any(name.startswith('flyholdem.teacher') for name in sys.modules):raise AssertionError('Teacher module was imported')
     atomic_json(root/'isolation-result.json',{'schema':'disconnected-native-evaluation-v1','teacher_import_denied':True,
         'external_training_files_denied':True,'teacher_modules_loaded':False,'hands_completed':result['hands_completed'],
-        'weights_unchanged':result['weights_unchanged'],'status':result['status'],'learning_claim':False})
+        'weights_unchanged':result['weights_unchanged'],'status':result['status'],'learning_claim':False,
+        'unavailable_training_paths_denied':[str(p) for p in unavailable]})
     print(json.dumps(result,indent=2))
 
 
