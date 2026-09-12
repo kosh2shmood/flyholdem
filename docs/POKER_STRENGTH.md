@@ -52,3 +52,6 @@ At this registration milestone, V12 has no exported model, poker result, corpus 
 
 
 Engineering verification: 26 focused checks passed in 8.66 seconds; the complete suite passed 248 tests with two isolated-oracle skips in 94.52 seconds. The actual active V11 run was refused before output creation. These checks establish extraction integrity, not strategic strength.
+
+
+V12 conventional runtime is now frozen and preflighted at runs/teacher-runtime-v12. Code commit 0a1a6c7cc9d7a602796db4c789875c8356853687; source SHA 38b9e758a439054a701f22917a2bc5516b0d84f885d517eab8a5a813d7dfea0f; file ledger 13e329b06e516bd64ae63126cafc0484c198e09cda997c868e440d91c7c9b17c. Its complete file ledger and original evaluation YAML 5fb344fad4c27a5a5556764db0d0c43b1f64177ccadafc68b3d81453f52ca9c1 verified. The separate existing equity binary is 80846bbc3357982b6310ef05c3c8f9921621c0caa9db1d0c17a1c54cc43207ea; it was copied, not rebuilt. A fresh process from this exact runtime passed real tiny numeric extraction/evaluation/qualification tests in 2.06 seconds, with Torch absent before and after. It also rejected active V11 before policy output creation. No full model or held-out trial was produced by these preflight checks.
