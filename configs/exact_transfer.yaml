@@ -1,0 +1,63 @@
+schema: exact-cue-local-transfer-v1
+mode: circuit
+learning_mode: distilled-connectome
+preregistration: runs/controllability-circuit-v1/preregistration.json
+preregistration_sha256: 684eae7f91852b8fd71ff4add4a099bb1cc76cd6d9339759d119c5ff63d4c7a9
+cue:
+  actions:
+  - 0
+  - 1
+  cells_per_cue: 32
+  seed: 74001
+  selection: disjoint-shared-paths-ranked-by-minimum-original-strength
+  amplitude_jitter: 0.15
+plasticity:
+  pre_tau_ms: 20
+  eligibility_tau_ms: 5000
+  coincidence_scale: 0.001
+  bin_ms: 5
+  weight_bounds:
+  - 0.1
+  - 2.0
+learning_rates:
+- 0.3
+dopamine:
+  pulse_ms: 200
+  gain: 12
+  positive_annotation: PAM
+  negative_annotation: PPL1
+  reward: exact-teacher-probability-advantage-times-two
+  baseline: past-only-mean-all-cues
+retention_ms: 5000
+profiles:
+  smoke:
+    seeds:
+    - 74100
+    training_trials: 40
+    evaluation_trials_per_cue: 4
+  development:
+    seeds:
+    - 74101
+    - 74102
+    - 74103
+    training_trials: 400
+    evaluation_trials_per_cue: 32
+  confirmatory:
+    seeds:
+    - 74201
+    - 74202
+    - 74203
+    - 74204
+    - 74205
+    training_trials: 400
+    evaluation_trials_per_cue: 64
+criterion:
+  mean_accuracy: 0.8
+  minimum_seed_accuracy: 0.7
+  mean_improvement: 0.15
+  maximum_retention_drop: 0.05
+  one_sided_p: 0.05
+  bootstrap_seed: 74300
+  bootstrap_repeats: 5000
+conditioning_reference: runs/conditioning-full-confirm-v1/result.json
+conditioning_reference_sha256: 8fec88ae335b4940f97c09a3c8e5f6e026b1059dd8444b29f5ce63102409cca5
