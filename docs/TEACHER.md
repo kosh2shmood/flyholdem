@@ -1,6 +1,6 @@
 # Conventional teacher and disconnected student runtime
 
-Status: full-hand conventional teacher candidates V1–V11 failed the original development suite. V12 is exported but has not been evaluated or qualified. The small shove/fold teacher and cue-transfer/removal component passed their restricted tests. The fixture, circuit and full native dashboards work; the current full fly is cue-conditioned and poker-unvalidated.
+Status: full-hand conventional teacher candidates V1–V12 failed the original development suite. V12 also failed the original development suite; genuine two-player self-play is now being implemented. The small shove/fold teacher and cue-transfer/removal component passed their restricted tests. The fixture, circuit and full native dashboards work; the current full fly is cue-conditioned and poker-unvalidated.
 
 ## Teacher algorithm
 
@@ -283,4 +283,24 @@ Twenty relevant tabular/neural corpus, regret-policy and qualification checks pa
 
 ## V12: fixed final regret-matching candidate
 
-The user-observed shove/fold collapse is quantified from the live frozen model. Poker strength takes priority. A separate positive-final-regret extraction was registered before V11 completed. Following V11's failed development, V12 was exported from the same completed numeric state through its reviewed frozen runtime: policy SHA `6b14ca2d9b1dd559fb5de1f8649611a38de488d5eae2f73dc190f97a0367440a`. Its numeric/source/recovery checks and execution order are in [POKER_STRENGTH.md](POKER_STRENGTH.md). V12 has not been evaluated or qualified; it must pass the unchanged original development suite before using reserved confirmation. It has no equilibrium or strength claim and does not alter V11's original average policy or the visible neural model.
+The user-observed shove/fold collapse is quantified from the live frozen model. Poker strength takes priority. A separate positive-final-regret extraction was registered before V11 completed. Following V11's failed development, V12 was exported from the same completed numeric state through its reviewed frozen runtime: policy SHA `6b14ca2d9b1dd559fb5de1f8649611a38de488d5eae2f73dc190f97a0367440a`. Its numeric/source/recovery checks and execution order are in [POKER_STRENGTH.md](POKER_STRENGTH.md). V12 subsequently failed the unchanged original development suite, as recorded below; reserved confirmation remains unused. It has no equilibrium or strength claim and does not alter V11's original average policy or the visible neural model.
+
+
+## V12 failed the original full development suite
+
+The fixed final-positive-regret policy `6b14ca2d9b1dd559fb5de1f8649611a38de488d5eae2f73dc190f97a0367440a` completed all 128 paired development deals per original opponent:
+
+| Opponent | BB/hand | Suite-adjusted interval |
+| --- | ---: | --- |
+| random | +2.021484 | [0.519958, 3.507861] |
+| calling-station | +4.255859 | [3.300684, 5.224133] |
+| tight-aggressive | +0.072266 | [-0.786157, 0.862805] |
+| equity-bucket | -0.273438 | [-1.403870, 0.815979] |
+
+Only random and calling station have positive lower confidence bounds. V12 failed, remains unqualified and did not use full confirmation. All 32 hidden-hole/future-deck/teacher-label probes passed. Complete-journal/statistical recomputation and actual PokerKit replay reproduced all 512 paired records. Result SHA `ed2e619b3c8f66648a9e1ab871c61cf618332095c882719b7b8c2858be292ae5`; manifest `c105b481429c8d801f51dea428925a79fdf26f18e7b3864763277a8f86e6476c`; paired journal `f45c94a6bed725485b88543182f393004adba6330fbd6ae40bcfaa4dcff2e52e`.
+
+The 2,537 actual decisions comprised 132 folds, 798 checks, 343 calls, 526 half-pot raises, 576 pot raises and 162 all-ins. Decision trace `a512b3fd21c1e32243b6c94efe50da098bfebc8e6c131b22bc2552d0684131f9`. These counts show conventional action variety, not sufficient strength or a change to the native fly. Both original V11 and separately registered V12 negative results remain preserved.
+
+The next engineering work implements genuine two-player external-sampling self-play, with a frozen strategy profile across each pair of traversals and opponent-node sampled averaging. Independent exact tiny-game regret/averaging checks and an explicit abstraction-recall review must pass before a new experiment is registered. This is a change from a fixed-population response objective; it does not promise strict positive profits against every scripted opponent or establish finite-run equilibrium. No new self-play horizon, seed range, trained policy or qualification is registered or claimed at this checkpoint. No biological parameter or evaluated opponent is selected from these poker returns.
+
+Full confirmation remains unused. No full-hand teacher corpus, full Gate 2A certificate or native poker model exists. The cue-conditioned visible fly, existing native runtime and environment are unchanged. Gates 3–6 remain pending and the full goal remains active.

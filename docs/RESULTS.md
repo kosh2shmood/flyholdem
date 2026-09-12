@@ -1,6 +1,6 @@
 # FlyHoldem — current measured results
 
-Status: development, 12 September 2026. The application works with fixture, circuit and full-connectome controllers. Full-graph cue conditioning is confirmed; poker learning remains unvalidated. Conventional teacher candidates through V11 failed the full development suite. V12 is exported but has not been evaluated or qualified. This is an interim evidence index, not a completed scientific release.
+Status: development, 12 September 2026. The application works with fixture, circuit and full-connectome controllers. Full-graph cue conditioning is confirmed; poker learning remains unvalidated. Conventional teacher candidates through V12 failed the full development suite. V12 also failed the original development suite; genuine two-player self-play is now being implemented. This is an interim evidence index, not a completed scientific release.
 
 > A simulated network using the wiring of one reconstructed male fruit-fly central nervous system controls an engineered heads-up no-limit Hold'em interface.
 
@@ -34,7 +34,7 @@ These tasks concern two engineered cues. The observed conditioning mechanism inc
 
 ## Poker teacher results
 
-Full 20 BB candidates V1–V11 failed the unchanged original development suite. Positive returns against an individual opponent do not pass that suite. V9's terminal fold-value correction produced identical recorded paired outcomes to V8. The reserved full confirmation deals remain unused, and no full-hand teacher corpus or poker-trained student exists.
+Full 20 BB candidates V1–V12 failed the unchanged original development suite. Positive returns against an individual opponent do not pass that suite. V9's terminal fold-value correction produced identical recorded paired outcomes to V8. The reserved full confirmation deals remain unused, and no full-hand teacher corpus or poker-trained student exists.
 
 A separate tabular CFR teacher passed its own 10 BB shove/fold confirmation against all four original opponents. It is qualified only for that restricted subgame. It cannot substitute for the full-hand teacher gate. See the [small-game report](SHOVE_FOLD_TEACHER.md).
 
@@ -42,7 +42,7 @@ V10 is a separately registered external-sampling tabular regret response to the 
 
 V11's fixed average policy `52bd9fbf298031415bf03f99072c4a144539d0f4f620452ee03f2aaf65f22df7` failed the original 128 paired development deals per opponent: random +2.576172 BB/hand [1.083459, 4.097754], station +3.568359 [2.699695, 4.446313], tight-aggressive +0.314453 [−0.438977, 1.031775], equity-bucket −0.515625 [−1.595703, 0.639673]. These are suite-adjusted intervals; only random and station have positive lower bounds. Independent qualification recomputation and replay of all 512 actual paired records passed, preserving the negative outcome. All 32 information-boundary checks passed.
 
-That replay counted 2,226 teacher decisions: 105 folds, 575 checks, 236 calls, 309 half-pot raises, 800 pot raises and 201 all-ins. The teacher uses all five abstract actions, but this variety does not establish poker strength or change the cue-trained live fly. The separate V12 final-positive-regret policy is now exported, SHA `6b14ca2d9b1dd559fb5de1f8649611a38de488d5eae2f73dc190f97a0367440a`; it has no evaluation or qualification yet. It must pass its own original development and confirmation suites before teaching.
+That replay counted 2,226 teacher decisions: 105 folds, 575 checks, 236 calls, 309 half-pot raises, 800 pot raises and 201 all-ins. The teacher uses all five abstract actions, but this variety does not establish poker strength or change the cue-trained live fly. The separate V12 final-positive-regret policy is now exported, SHA `6b14ca2d9b1dd559fb5de1f8649611a38de488d5eae2f73dc190f97a0367440a`; it also failed the original development suite. The detailed negative result is preserved in [POKER_STRENGTH.md](POKER_STRENGTH.md). Neither candidate can teach.
 
 Full teacher confirmation now requires a verified passing development run for the same frozen policy. Confirmation, recovery and downstream corpus/Gate 2A checks bind and reverify its exact artifacts. The real failed V9 result was rejected before policy inference, confirmation deals or output creation.
 

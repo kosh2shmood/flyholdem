@@ -24,7 +24,7 @@ The visible model will be replaced only by an actually trained, verified native 
 
 ## Fixed training and separate final-strategy candidate
 
-V11 is completing the previously registered 100,000-traversal population-response run. Its original frozen source, sampled deals, opponents and historical-average export remain unchanged. Only the fixed final checkpoint may be exported; the original development suite must then run and independently verify.
+V11 completed the previously registered 100,000-traversal population-response run and failed development; V12 subsequently also failed, as recorded below. Its original frozen source, sampled deals, opponents and historical-average export remain unchanged. Only the fixed final checkpoint may be exported; the original development suite must then run and independently verify.
 
 V12 is a separately registered extraction from that same completed final numeric state. At each information set it normalizes the positive final accumulated regrets over legal actions. If every legal regret is nonpositive, it uses the existing legal uniform prior. The rule does not choose a checkpoint, temperature, opponent, action override or mixture from poker results. Unseen states keep the declared uniform prior. Its manifest explicitly distinguishes it from V11's time-averaged strategy.
 
@@ -128,3 +128,23 @@ PYTHONPATH="$PWD/runs/teacher-runtime-v12-reviewed/src" .venv/bin/python runs/te
 ```
 
 Evaluation resume replaces `--output` with `--resume` for the same directory. Full confirmation remains unused and requires a passing independently verified development result for this exact V12 policy. No qualified full teacher/corpus, full Gate 2A certificate or native poker model exists. The visible fly remains cue-conditioned; Gates 3–6 and the full goal remain pending.
+
+
+## V12 failed the original full development suite
+
+The fixed final-positive-regret policy `6b14ca2d9b1dd559fb5de1f8649611a38de488d5eae2f73dc190f97a0367440a` completed all 128 paired development deals per original opponent:
+
+| Opponent | BB/hand | Suite-adjusted interval |
+| --- | ---: | --- |
+| random | +2.021484 | [0.519958, 3.507861] |
+| calling-station | +4.255859 | [3.300684, 5.224133] |
+| tight-aggressive | +0.072266 | [-0.786157, 0.862805] |
+| equity-bucket | -0.273438 | [-1.403870, 0.815979] |
+
+Only random and calling station have positive lower confidence bounds. V12 failed, remains unqualified and did not use full confirmation. All 32 hidden-hole/future-deck/teacher-label probes passed. Complete-journal/statistical recomputation and actual PokerKit replay reproduced all 512 paired records. Result SHA `ed2e619b3c8f66648a9e1ab871c61cf618332095c882719b7b8c2858be292ae5`; manifest `c105b481429c8d801f51dea428925a79fdf26f18e7b3864763277a8f86e6476c`; paired journal `f45c94a6bed725485b88543182f393004adba6330fbd6ae40bcfaa4dcff2e52e`.
+
+The 2,537 actual decisions comprised 132 folds, 798 checks, 343 calls, 526 half-pot raises, 576 pot raises and 162 all-ins. Decision trace `a512b3fd21c1e32243b6c94efe50da098bfebc8e6c131b22bc2552d0684131f9`. These counts show conventional action variety, not sufficient strength or a change to the native fly. Both original V11 and separately registered V12 negative results remain preserved.
+
+The next engineering work implements genuine two-player external-sampling self-play, with a frozen strategy profile across each pair of traversals and opponent-node sampled averaging. Independent exact tiny-game regret/averaging checks and an explicit abstraction-recall review must pass before a new experiment is registered. This is a change from a fixed-population response objective; it does not promise strict positive profits against every scripted opponent or establish finite-run equilibrium. No new self-play horizon, seed range, trained policy or qualification is registered or claimed at this checkpoint. No biological parameter or evaluated opponent is selected from these poker returns.
+
+Full confirmation remains unused. No full-hand teacher corpus, full Gate 2A certificate or native poker model exists. The cue-conditioned visible fly, existing native runtime and environment are unchanged. Gates 3–6 remain pending and the full goal remains active.
