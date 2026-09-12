@@ -1,5 +1,7 @@
 # Downstream execution snapshots
 
+Current path: V13 self-play is training, with its separately checked downstream runtime recorded in the final section. V11 and V12 failed development; their earlier conditional sections are retained as history and do not authorize teaching.
+
 `runs/poker-runtime-v11` prepares later corpus, Gate 2A verification and native curriculum work without changing V11's active training. It combines orchestration from commit `52016bfde9efae1611a6969a961f02d3d98f5da5` with the seven exact policy implementation files from V11's original runtime. Their source checks are preserved, not bypassed. The snapshot is local and ignored; its `SOURCE.json` records every copied source/config/binary hash and each explicitly linked prerequisite.
 
 The original training snapshot stays at `runs/teacher-runtime-v11`, source `d16984f8442b6fb8fec62f962ff4992d74dc3bedbca69ee7da017249a60ed48a`. Use that original runtime for V11 resume, fixed-final export and the already registered development/confirmation evaluation. Do not substitute the downstream snapshot into its training command.
@@ -90,3 +92,47 @@ PYTHONPATH="$PWD/runs/poker-runtime-v12/src" .venv/bin/python -m flyholdem.cli g
 ```
 
 Use this same downstream source, frozen curriculum registration and `runs/gate2a-v12.json` for dependent native work only after the certificate verifies. Stop the advancing full spectator before starting any full native worker, record exact execution identities and measure the first phase's resource use. No native learning rate, encoder, readout or biological mapping parameter changes follow from teacher poker results.
+
+
+## Conditional V13 self-play downstream runtime
+
+`runs/poker-runtime-v13` is now prepared and preflighted from the exact immutable V13 source, with no policy-module overrides. It includes separate copies of the existing equity/native binaries and the same ten individually pinned prerequisite links. Original V13 training, fixed-final export and qualification continue through `runs/teacher-runtime-v13`. This downstream copy grants no teaching or native-training permission.
+
+| Item | SHA-256 |
+| --- | --- |
+| Implementation commit | `107fe26ea26a527648f2ac9cec84a6bf6e9f5db2` |
+| Exact V13 source | `46a10cd749bfbc0c17c1de7189ed5ec0df8a99ee231199c1969f53be02ed82e5` |
+| Self-play policy implementation | `69b486631ae346f29758b864f4d7211d0814483d4f9ba605eb598764f346f232` |
+| Complete copied file ledger | `cd101db732e3550b6fe835dde10596d6838066a44bc9b591483ab97f42c750c2` |
+| Downstream SOURCE record | `4a8363016f3bc26ef6b807460e6f74f9d8103e9ab4a4774795fa029e6681b771` |
+| Corpus configuration | `5e2c85c9b588bae55fa2f7bd50651fa7000d041288df1a18a84e86464e265241` |
+| Native curriculum configuration | `3c4d239ab4e7384e288080366618a3f4ef39668ba5e53cbd07ed8f151b23142a` |
+| Existing native binary | `44f5ce277154c953b213f41105b0d7f61e40af0cdd8d685289609c10b06be897` |
+
+The preflight actually trained a four-iteration/eight-traversal engineering self-play fixture, interrupted/resumed it, exported its final numeric average and verified both roles' original checkpoint-array bindings. Completed resume was unchanged, partial export was refused, and all 32 information-boundary probes passed. Actual collection and journal replay reproduced 32 prescribed engineering hands and 161 canonical target rows: train/validation/test 120/24/17, streets 72/49/25/15, positions 82/79. Targets matched the core's role averages; canonical splits were disjoint. These temporary artifacts were explicitly unqualified and removed after verification.
+
+Both original and downstream runtimes loaded the real V12 final-regret policy and identically recomputed its existing failed 512-record development summary. This was not another actual-play replay or new held-out trial. The unchanged real corpus-export, qualified-corpus-verification and Gate 2A functions all refused V12 before output creation. No qualification substitutions were used. The positive guarded corpus export/resume path remains conditional on actual V13 confirmation and was not exercised by this preflight; the existing integration suite separately covers its engineering behavior.
+
+Every copied file and all ten previously pinned prerequisite sets were unchanged after preflight. Native inference identity remains `1b2c99883afc6e6e30b65e8cf9aafef456953177c10caa443a8d62d531da09ca`. No native worker, teacher-removal experiment, new scientific evaluation or certificate was created; no environment or binary was rebuilt. This bounded check did not repeat every full graph payload checksum or cue statistical recomputation. Actual Gate 2A must repeat its complete prerequisite verification and teacher removal when a full teacher exists.
+
+Only after the exact final V13 policy independently passes original development and the reserved confirmation may these commands run:
+
+```sh
+PYTHONPATH="$PWD/runs/poker-runtime-v13/src" .venv/bin/python -m flyholdem.cli teacher export-corpus \
+  --policy runs/teacher-self-play-regret-v13-policy \
+  --validation runs/teacher-self-play-regret-v13-confirmatory/result.json \
+  --config runs/poker-runtime-v13/configs/corpus.yaml \
+  --output runs/teacher-self-play-regret-v13-corpus
+
+PYTHONPATH="$PWD/runs/poker-runtime-v13/src" .venv/bin/python -m flyholdem.cli teacher verify-qualified-corpus \
+  --policy runs/teacher-self-play-regret-v13-policy \
+  --validation-run runs/teacher-self-play-regret-v13-confirmatory \
+  --corpus runs/teacher-self-play-regret-v13-corpus
+
+PYTHONPATH="$PWD/runs/poker-runtime-v13/src" .venv/bin/python -m flyholdem.cli gate certify-transfer \
+  --policy runs/teacher-self-play-regret-v13-policy \
+  --confirmation runs/teacher-self-play-regret-v13-confirmatory \
+  --corpus runs/teacher-self-play-regret-v13-corpus --output runs/gate2a-v13.json
+```
+
+Corpus resume replaces --output with --resume for the same run. Full native curriculum work requires a verified certificate, frozen cue-selected parameters, stopped advancing full spectator, recorded execution identity and a measured native resource boundary. V13 training is still in progress; no full teacher, qualified corpus or new native poker model exists. Full Gate 2A and Gates 3–6 remain pending.
