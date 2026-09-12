@@ -88,6 +88,10 @@ def parser():
     removal.add_argument('--model',required=True);removal.add_argument('--graph',required=True);removal.add_argument('--transfer-run',required=True)
     teacher=sub.add_parser('teacher',help='Independent conventional teacher workflow; never fly inference')
     ts=teacher.add_subparsers(dest='teacher_command',required=True)
+    self_play=ts.add_parser('train-self-play-regret',help='Train synchronous two-player external-sampling self-play')
+    self_play.add_argument('--config',required=True);self_play.add_argument('--stop-after',type=int);_output_options(self_play)
+    self_play_export=ts.add_parser('export-self-play-regret',help='Export only the completed average self-play policy, still unvalidated')
+    self_play_export.add_argument('--run',required=True);self_play_export.add_argument('--output',required=True)
     regret=ts.add_parser('train-regret',help='Train a separate conventional external-sampling population response')
     regret.add_argument('--config',default='configs/teacher_external_regret_v10.yaml');regret.add_argument('--stop-after',type=int);_output_options(regret)
     export_regret=ts.add_parser('export-regret',help='Export the completed numeric regret-average policy, still unvalidated')
@@ -192,6 +196,9 @@ def dispatch(args):
         result=run(config,out,args.profile,args.learning_rate,resume,args.development_reference,args.stop_after)
     elif args.command=='teacher':
         action=args.teacher_command
+        if action=='export-self-play-regret':
+            from flyholdem.teacher.self_play_policy import export_policy
+            return export_policy(args.run,args.output)
         if action=='export-final-regret':
             from flyholdem.teacher.regret_current_policy import export_current
             return export_current(configuration(args.config),args.output)
@@ -221,7 +228,10 @@ def dispatch(args):
             return verify_corpus(args.corpus)
         out,resume=run_path(args,'teacher-'+action)
         config=configuration(args.config)
-        if action=='train-regret':
+        if action=='train-self-play-regret':
+            from flyholdem.teacher.self_play_training import train
+            result=train(config,out,resume,args.stop_after)
+        elif action=='train-regret':
             from flyholdem.teacher.regret_training import train
             result=train(config,out,resume,args.stop_after)
         elif action=='train-shove-fold':

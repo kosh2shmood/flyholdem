@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 
-@pytest.mark.parametrize('strategy',['average','final-current'])
+@pytest.mark.parametrize('strategy',['average','final-current','self-play'])
 def test_tabular_corpus_exports_replays_and_resumes_without_torch(tmp_path,monkeypatch,strategy):
     original_import=builtins.__import__
     def without_torch(name,*args,**kwargs):
@@ -27,9 +27,16 @@ def test_tabular_corpus_exports_replays_and_resumes_without_torch(tmp_path,monke
     settings.update(iterations=4,deal_seed_start=991700000,sampling_seed=97700)
     settings['abstraction']['equity_samples']=16
     training=tmp_path/'training';policy_path=tmp_path/'policy'
-    train(settings,training)
+    if strategy=='self-play':
+        from flyholdem.teacher.self_play_training import train as train_self_play
+        from flyholdem.teacher.self_play_policy import export_policy as export_self_play
+        from flyholdem.teacher.self_play_regret import SCHEMA,AGGREGATION
+        settings={key:settings[key] for key in ('iterations','stack_bb','sampling_seed','deal_seed_start','abstraction')}
+        settings.update(schema=SCHEMA,aggregation=AGGREGATION)
+        train_self_play(settings,training);export_self_play(training,policy_path)
+    else:train(settings,training)
     if strategy=='average':export_policy(training,policy_path)
-    else:
+    elif strategy=='final-current':
         from flyholdem.teacher.regret_current_policy import export_current,EXTRACTION,AGGREGATION
         saved=json.loads((training/'manifest.json').read_text())
         export_current({'schema':EXTRACTION,'status':'development','aggregation':AGGREGATION,

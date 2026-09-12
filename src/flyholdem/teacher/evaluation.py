@@ -93,7 +93,7 @@ def evaluate(policy_path, config, output, profile='development', resume=False, d
     elif development_reference is not None:
         raise ValueError('A development reference is only valid for confirmation')
     policy, policy_record = load_policy(policy_path)
-    if policy_record['schema'] not in ('teacher-external-regret-policy-v1','teacher-final-regret-policy-v1'):
+    if policy_record['schema'] not in ('teacher-external-regret-policy-v1','teacher-final-regret-policy-v1','teacher-self-play-regret-policy-v1'):
         import torch
         torch.set_num_threads(1); torch.use_deterministic_algorithms(True)
     if policy_record['provenance'].get('stack_bb') != config['stack_bb']:

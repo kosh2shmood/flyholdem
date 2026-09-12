@@ -68,3 +68,42 @@ def test_legacy_control_trials_never_claim_a_hash_chain(tmp_path):
     (root/'trials.jsonl').write_text(json.dumps({'phase':'development','target':0,'repeat':0,'seed':1,'selected':0})+'\n')
     report=evidence(root);assert not report['journal_verification']['trials.jsonl']['chain_verified']
     out=write_report(root);assert 'no chain' in Path(out['report']).read_text()
+
+
+def test_actual_self_play_cli_resume_export_and_report_counts(tmp_path,capsys):
+    import yaml
+    from flyholdem.teacher.self_play_regret import AGGREGATION,SCHEMA
+    from flyholdem.teacher.regret import VERSION
+    from flyholdem.teacher.self_play_policy import load_policy
+    config={'schema':SCHEMA,'aggregation':AGGREGATION,'iterations':2,'stack_bb':2,
+        'sampling_seed':913101,'deal_seed_start':991810000,'progress_iterations':100,
+        'abstraction':{'feature_version':VERSION,'stack_bb':2,'equity_buckets':8,
+            'equity_samples':2,'max_information_sets':10000,'max_nodes_per_traversal':10000}}
+    config_path=tmp_path/'self-play.yaml';config_path.write_text(yaml.safe_dump(config))
+    root=tmp_path/'self-play'
+    main(['teacher','train-self-play-regret','--config',str(config_path),'--output',str(root),'--stop-after','1'])
+    partial=json.loads(capsys.readouterr().out)
+    assert partial['result']['status']=='interrupted'
+    assert partial['report']['status']=='interrupted'
+    assert evidence(root)['journal_verification']['iterations.jsonl']['rows']==1
+    main(['teacher','train-self-play-regret','--config',str(config_path),'--resume',str(root)])
+    completed=json.loads(capsys.readouterr().out)
+    assert completed['result']['status']=='trained-unvalidated'
+    report=json.loads(Path(completed['report']['json']).read_text())
+    assert report['iterations_completed']==report['planned_iterations']==2
+    assert report['traversals_completed']==4
+    assert report['journal_verification']['iterations.jsonl']['rows']==2
+    assert not report['allowed_as_teacher'] and not report['recorded_learning_claim']
+    assert 'complete player traversals: 4' in Path(completed['report']['report']).read_text()
+    assert 'Complete player traversals' in Path(completed['report']['html']).read_text()
+    policy=tmp_path/'policy'
+    main(['teacher','export-self-play-regret','--run',str(root),'--output',str(policy)])
+    exported=json.loads(capsys.readouterr().out)
+    assert exported==hashlib.sha256((policy/'manifest.json').read_bytes()).hexdigest()
+    assert load_policy(policy)[1]['provenance']['iterations_completed']==2
+    result=json.loads((root/'result.json').read_text())
+    for change in ({'operations':2},{'iterations_completed':1,'operations':2},{'iterations_completed':True,'operations':2}):
+        atomic_json(root/'result.json',{**result,**change})
+        with pytest.raises(ValueError,match='traversals|journal count'):
+            evidence(root)
+    atomic_json(root/'result.json',result)

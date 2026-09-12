@@ -60,12 +60,12 @@ def evidence(run):
     result_path=root/'result.json';manifest_path=root/'manifest.json'
     if not result_path.is_file() or not manifest_path.is_file():raise ValueError('Report requires result.json and manifest.json in a run directory')
     result=_json(result_path.read_text());manifest=_json(manifest_path.read_text())
-    supported={'external-regret-training-result-v1','native-poker-curriculum-result-v1','conditioning-result-v1','exact-transfer-result-v1','nfsp-training-v1','tabular-shove-fold-training-result-v1','tabular-shove-fold-evaluation-v1','teacher-evaluation-v1','frozen-poker-evaluation-result-v1','controllability-result-v1'}
+    supported={'self-play-regret-training-result-v1','external-regret-training-result-v1','native-poker-curriculum-result-v1','conditioning-result-v1','exact-transfer-result-v1','nfsp-training-v1','tabular-shove-fold-training-result-v1','tabular-shove-fold-evaluation-v1','teacher-evaluation-v1','frozen-poker-evaluation-result-v1','controllability-result-v1'}
     if result.get('schema') not in supported:raise ValueError('Unsupported experiment report schema')
     manifest_hash=_digest(manifest_path)
     if result.get('manifest_sha256',manifest_hash)!=manifest_hash:raise ValueError('Result/manifest checksum mismatch')
     files={'result.json':_digest(result_path),'manifest.json':manifest_hash};journals={}
-    for name in ('trials.jsonl','hands.jsonl','evaluation.jsonl','paired-deals.jsonl','events.jsonl','phases.jsonl','traversals.jsonl'):
+    for name in ('trials.jsonl','hands.jsonl','evaluation.jsonl','paired-deals.jsonl','events.jsonl','phases.jsonl','traversals.jsonl','iterations.jsonl'):
         path=root/name
         if path.is_file():
             journals[name]=audit_legacy_trials(path) if result['schema']=='controllability-result-v1' else audit_journal(path)
@@ -78,6 +78,14 @@ def evidence(run):
     if 'preregistration_sha256' in result and files.get('preregistration.json')!=result['preregistration_sha256']:
         raise ValueError('Preregistration checksum mismatch')
     expected_rows=result.get('operations',result.get('hands_completed',result.get('completed_phases')))
+    if result['schema']=='self-play-regret-training-result-v1':
+        expected_rows=result.get('iterations_completed')
+        planned=result.get('planned_iterations')
+        if (type(expected_rows) is not int or type(planned) is not int
+                or not 0 <= expected_rows <= planned or planned < 1
+                or type(result.get('operations')) is not int or result['operations']!=2*expected_rows
+                or set(journals)!={'iterations.jsonl'}):
+            raise ValueError('Self-play report requires two traversals per complete iteration')
     if expected_rows is not None and sum(j['rows'] for j in journals.values())!=expected_rows:
         raise ValueError('Result journal count mismatch')
     rows=[]
@@ -125,6 +133,8 @@ def evidence(run):
         'peak_rss_bytes':result.get('peak_rss_bytes'),
         'retention_criterion_met':result.get('retention_criterion_met'),
         'information_boundary_verified':result.get('information_boundary_verified'),
+        'iterations_completed':result.get('iterations_completed'),'planned_iterations':result.get('planned_iterations'),
+        'traversals_completed':result.get('operations') if result['schema']=='self-play-regret-training-result-v1' else None,
         'hands_completed':result.get('hands_completed'),'planned_hands':result.get('planned_hands'),'hand_unit':result.get('hand_unit'),
         'caution':'Artifact verification checks bytes and chain consistency; it does not replace numerical, leakage or statistical validation. No model is loaded and no new evaluation is run.'}
 
@@ -142,6 +152,8 @@ def markdown(report):
             interval=row.get('interval',[row.get('minimum'),row.get('maximum')])
             lines.append(f"| {_cell(row['series'])} | {row['n']} | {_number(row['mean'])} | {row['unit']} | {' to '.join(_number(v) for v in interval)} |")
         lines+=['','Accuracy ranges are min/max across seeds; opponent intervals retain the registered suite-adjusted bootstrap confidence bounds.']
+    if report.get('traversals_completed') is not None:
+        lines+=['',f"Synchronous self-play iterations: {report['iterations_completed']} / {report['planned_iterations']}; complete player traversals: {report['traversals_completed']}. Each iteration freezes one strategy profile for both player updates."]
     if report['hands_completed'] is not None:
         label='Completed units' if report.get('hand_unit') else 'Training hands'
         lines+=['',f"{label}: {report['hands_completed']} / {report['planned_hands']}."]
@@ -175,6 +187,8 @@ def html_report(report):
         'Graph mode':report['mode'],'Learning mode':report['learning_mode'],'Profile':report['profile'],
         'Recorded task learning claim':report['recorded_learning_claim'],'Allowed as poker teacher':report['allowed_as_teacher'],
         'Small-game teacher qualification':report['allowed_as_small_game_teacher'] if report.get('allowed_as_small_game_teacher') is not None else 'not applicable',
+        **({'Self-play iterations':str(report['iterations_completed'])+' / '+str(report['planned_iterations']),
+            'Complete player traversals':report['traversals_completed']} if report.get('traversals_completed') is not None else {}),
         'Runtime (s)':_number(report['elapsed_seconds']),'Peak RSS (MiB)':_number(None if report['peak_rss_bytes'] is None else report['peak_rss_bytes']/1024**2)}.items())
     return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FlyHoldem evidence report</title><style>body{margin:48px auto;max-width:1040px;padding:0 24px;background:#101a15;color:#deeadf;font:15px/1.6 system-ui}h1{font:46px Georgia,serif;margin:10px 0}h2{font:26px Georgia,serif;margin-top:36px}.eyebrow{letter-spacing:2px;font-size:11px;color:#b4dfc7}.status{display:inline-block;padding:6px 12px;border:1px solid #81967e;border-radius:4px}dl{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;border-top:1px solid #34423a;padding-top:24px;margin-top:32px}dt,.muted{font-size:12px;color:#9db09f}dd{margin:6px 0;font-size:16px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:12px 8px;border-bottom:1px solid #34423a;vertical-align:top}th{color:#b4dfc7}code{overflow-wrap:anywhere;font-size:11px}.note{padding:16px;background:#1d2b22;border-left:3px solid #b4dfc7}.path{overflow-wrap:anywhere}@media(max-width:650px){body{margin:24px auto;padding:0 16px}h1{font-size:34px}dl{grid-template-columns:repeat(2,1fr)}td,th{padding:8px 4px;font-size:11px}}@media print{body{background:white;color:black;margin:0}.muted,dt{color:#444}.note{background:#eee}}</style></head><body><div class="eyebrow">FLYHOLDEM · RECORDED EVIDENCE</div><h1>Experiment report</h1><span class="status">'+esc(report['status'])+'</span><p>'+esc(report['scope'])+'</p><p class="note">'+esc(report['caution'])+'</p><dl>'+details+'</dl>'+table+'<h2>Provenance</h2><p>Execution commit <code>'+esc(report['execution_commit'])+'</code><br>Source hash <code>'+esc(report['source_hash'])+'</code></p><p class="path">'+esc(report['run'])+'</p><table><thead><tr><th>Artifact</th><th>SHA-256</th></tr></thead><tbody>'+hashes+'</tbody></table><p class="muted">Inspected '+str(sum(v['rows'] for v in report['journal_verification'].values()))+' recorded rows. Modern journals have full chain checks; historical controllability has file checksums only. Full paired statistics and exact metadata are included in REPORT.md and report.json.</p></body></html>'
 

@@ -1,8 +1,8 @@
 # Conventional teacher and disconnected student runtime
 
-Status: full-hand conventional teacher candidates V1–V12 failed the original development suite. V12 also failed the original development suite; genuine two-player self-play is now being implemented. The small shove/fold teacher and cue-transfer/removal component passed their restricted tests. The fixture, circuit and full native dashboards work; the current full fly is cue-conditioned and poker-unvalidated.
+Status: full-hand conventional teacher candidates V1–V12 failed the original development suite. The independently checked [V13 two-player self-play method](SELF_PLAY_TEACHER.md) is registered at a fixed 100,000 iterations; no V13 training or qualification is claimed yet. The small shove/fold teacher and cue-transfer/removal component passed their restricted tests. The fixture, circuit and full native dashboards work; the current full fly is cue-conditioned and poker-unvalidated.
 
-## Teacher algorithm
+## Original NFSP teacher algorithm
 
 The conventional control uses neural fictitious self-play, following [Heinrich and Silver (2016)](https://arxiv.org/abs/1603.01121). Two independent agents maintain Q/target networks, transition replay, and an average policy trained on a uniform reservoir of their own best-response behavior. Each agent samples its best-response/average-policy mixture once per hand. This implementation is an experiment in the project's five-action no-limit abstraction; the paper's results do not establish this implementation's strength or equilibrium convergence.
 

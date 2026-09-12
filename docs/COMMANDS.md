@@ -62,3 +62,8 @@ Completed native curriculum arms can now be viewed with `serve --training-run <e
 
 
 For a future qualifying V11 teacher, [DOWNSTREAM_RUNTIME.md](DOWNSTREAM_RUNTIME.md) pins the separate corpus/gate/native orchestration snapshot while preserving the original policy implementation. V11 training, final export and its registered evaluation continue through the original teacher-runtime-v11 source. No V11 qualification is implied.
+
+
+## Registered two-player self-play
+
+The V13 method, exact frozen-runtime training/resume/export commands and qualification order are in [SELF_PLAY_TEACHER.md](SELF_PLAY_TEACHER.md). Start only after its checked runtime ledger is recorded. The standalone deterministic recall witness runs with `.venv/bin/python -O scripts/audit_self_play_recall.py`; it uses only prescribed engineering deals and performs no learning or poker evaluation.

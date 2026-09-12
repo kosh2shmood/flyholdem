@@ -37,11 +37,19 @@ def numeric_training(tmp_path_factory):
     return root, settings
 
 
-@pytest.fixture(scope='module', params=['average', 'final-current'])
+@pytest.fixture(scope='module', params=['average', 'final-current', 'self-play'])
 def measured_play(request, numeric_training):
     root, settings = numeric_training
     policy_path = root / (request.param + '-policy')
-    if request.param == 'average':
+    if request.param == 'self-play':
+        from flyholdem.teacher.self_play_training import train as train_self_play
+        from flyholdem.teacher.self_play_policy import export_policy as export_self_play
+        from flyholdem.teacher.self_play_regret import SCHEMA, AGGREGATION
+        current = {key: settings[key] for key in ('iterations', 'stack_bb', 'sampling_seed', 'deal_seed_start', 'abstraction')}
+        current.update(schema=SCHEMA, aggregation=AGGREGATION)
+        train_self_play(current, root / 'self-play-training')
+        export_self_play(root / 'self-play-training', policy_path)
+    elif request.param == 'average':
         export_policy(root / 'training', policy_path)
     else:
         from flyholdem.teacher.regret_current_policy import EXTRACTION, AGGREGATION, export_current

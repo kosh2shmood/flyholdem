@@ -4,6 +4,7 @@ from pathlib import Path
 
 
 def sampling(record):
+    if record['schema']=='teacher-self-play-regret-policy-v1':return 'frozen-average-two-player-external-sampling-self-play'
     if record['schema']=='teacher-final-regret-policy-v1':return 'frozen-normalized-positive-final-regrets'
     if record['schema']=='teacher-external-regret-policy-v1':return 'frozen-reach-weighted-regret-average-fixed-population'
     if record['schema']=='teacher-average-policy-v1':return 'frozen-average-policy-probabilities'
@@ -15,7 +16,9 @@ def sampling(record):
 def load_policy(path):
     record=json.loads((Path(path)/'manifest.json').read_text())
     sampling(record)
-    if record['schema']=='teacher-external-regret-policy-v1':
+    if record['schema']=='teacher-self-play-regret-policy-v1':
+        from .self_play_policy import load_policy as load
+    elif record['schema']=='teacher-external-regret-policy-v1':
         from .regret_policy import load_policy as load
     elif record['schema']=='teacher-final-regret-policy-v1':
         from .regret_current_policy import load_policy as load

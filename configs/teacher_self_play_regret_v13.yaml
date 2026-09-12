@@ -1,0 +1,17 @@
+schema: synchronous-two-player-external-sampling-regret-v1
+mode: conventional-teacher-control
+algorithm: two-player-external-sampling-regret-matching-with-synchronous-updates
+scope: Conventional abstract-game self-play; no finite-run equilibrium or fly-learning claim
+stack_bb: 20
+iterations: 100000
+sampling_seed: 92001
+deal_seed_start: 1200000
+aggregation: opponent-node-sampled-average-synchronous-profile-v1
+progress_iterations: 100
+abstraction:
+  feature_version: visible-equity-recall-public-history-v1
+  stack_bb: 20
+  equity_buckets: 8
+  equity_samples: 64
+  max_information_sets: 2000000
+  max_nodes_per_traversal: 100000

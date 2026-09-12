@@ -29,7 +29,7 @@ def audit_play(run,policy_path,registered_config=None):
     config=registered_suite() if registered_config is None else registered_config
     verified=verify_evaluation(run,policy_path,config,require_confirmatory=False)
     policy,record=load_policy(policy_path)
-    if record['schema'] not in ('teacher-external-regret-policy-v1','teacher-final-regret-policy-v1'):
+    if record['schema'] not in ('teacher-external-regret-policy-v1','teacher-final-regret-policy-v1','teacher-self-play-regret-policy-v1'):
         import torch
         torch.set_num_threads(1);torch.use_deterministic_algorithms(True)
     by_street={street:action_counter() for street in STREETS}
