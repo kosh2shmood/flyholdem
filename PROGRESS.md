@@ -1,5 +1,17 @@
 # FlyHoldem progress
 
+## Current state: stopped at the user's request
+
+The user explicitly requested a summary and a logical stop, without finishing the full training run, while preserving easy on-demand watching and human play. Do not automatically resume experiments without a new user request. The overall research objective remains unfinished; no additional gate or stronger-poker claim is made.
+
+V13 trainer PID 83580 received one SIGINT and exited normally at 63,737/100,000 synchronous rounds, 127,474 player traversals and 775,307 information sets. Saved generation `step000000063737-6ab358e0`, metadata SHA `e354bae223c2537be57682f26ec99d37ba74c42bddeaead7d635998754e6e9bd`, journal head `de2e7b89e0dff91418c88532ebc14ca7fc8a1a87a1bbfaf55c34340f6f08c28d`. Through the original frozen runtime, the complete stopped journal, all numeric checkpoint arrays/restoration, runtime bindings, role counts and sampling RNG verified. No final policy export or V13 held-out evaluation occurred. Full confirmation remains unused. Earlier entries describing a live worker are historical.
+
+Only on a later explicit request, resume from the repository with `PYTHONDONTWRITEBYTECODE=1 PYTHONPATH="$PWD/runs/teacher-runtime-v13/src" .venv/bin/python -B -m flyholdem.cli teacher train-self-play-regret --config runs/teacher-runtime-v13/configs/teacher_self_play_regret_v13.yaml --resume runs/teacher-self-play-regret-v13`. Preserve the fixed final-only export and qualification order in docs/V13_QUALIFICATION_COMMANDS.md.
+
+The full cue-conditioned watch/play dashboard remains at http://127.0.0.1:8767. Live watches; Play against fly starts a private match; Live ends the match and resumes watching. The native model is still poker-unvalidated and largely push/fold. The old ancillary fixture and training-replay servers were gracefully closed. Local deliverables in the projectless outputs directory include FLYHOLDEM_HANDOFF.md, Open FlyHoldem.command with launch_flyholdem.py, training-stop-verification.json, and fresh watch/play browser reports and screenshots. The launcher reuses an existing full server or cold-starts the installed full model without training; both paths were exercised. Manual start: `.venv/bin/python -m flyholdem.cli serve --mode full --model runs/conditioning-full-confirm-v1-model --port 8767`.
+
+Last full local implementation suite: 329 passed / two isolated-oracle skips. Prior checked milestone 73bf7f39e0605aaa2e4a377320f586a2df82d189 passed CI 34721209931. Gate 0/1/2 evidence remains passed; preferred local transfer failed, small surrogate cue transfer passed, restricted shove/fold teacher qualified only for its subgame, full teachers V1–V12 failed development, and full Gate 2A/Gates 3–6 remain pending. The handoff summarizes exact results and limitations. Models, data and generated reports remain local and ignored.
+
 ## Current phase
 Gate 2 is complete and conditioning-v0 is published. Gates 0 and 1 also passed. The native full/circuit spectator dashboard now runs real frozen neural decisions with every retained neuron rendered; the default fixture remains available. Full local suite: 74 passed / 2 isolated-oracle skips. Native desktop/mobile and fixture replay/avatar checks pass.
 
