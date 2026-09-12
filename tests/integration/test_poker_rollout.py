@@ -9,6 +9,7 @@ from flyholdem.learning.curriculum import CURRICULA,CurriculumHand
 from flyholdem.learning.poker_rollout import poker_hand
 from flyholdem.experiments.evaluate import frozen_hand
 from flyholdem.poker.infoset import FIELDS
+from flyholdem.learning.spike_record import record_spikes,restore_spikes
 
 
 def make(mode='bio-plastic',method='terminal-local-eligibility'):
@@ -42,6 +43,11 @@ def test_complete_frozen_hands_match_the_existing_native_evaluator(curriculum):
         for a,b in zip(old['neural_decisions'],new['neural_decisions']):
             assert all(a[key]==b[key] for key in a)
             assert b['teaching_after_commit'] is None and b['teacher_input_id'] is None
+            activity=restore_spikes(b['recorded_spikes'],b['counts_sha256'],player.brain.n)
+            assert activity.sum()==b['recorded_spikes']['total']
+            from flyholdem.interface.population import neural_scores
+            rates,scores=neural_scores(activity,player.controller.ensembles,100,[0]*5,100)
+            assert rates.tolist()==b['raw_rates_hz'] and scores.tolist()==b['scores']
         assert new['weights_before_sha256']==new['weights_after_sha256']
         assert not new['teacher_connected'] and not new['terminal_reinforcement']['reward_delivered']
         assert CurriculumHand.restore(new['private_hand_checkpoint']).view()==new['public_terminal']
@@ -201,3 +207,34 @@ def test_online_distillation_never_queries_targets_for_validation_or_test_inform
     assert skipped and queries and delivered==len(queries) and not set(skipped)&set(queries)
     with pytest.raises(ValueError,match='Only teaching arms'):
         poker_hand(player,'hu-20bb-v1','random',17699,0,teacher_split='train')
+
+
+def test_lossless_activity_handles_silence_and_rejects_corrupt_or_noncanonical_vectors():
+    import hashlib
+    for activity in (np.zeros(17,dtype=np.int32),np.array([0,2,0,0,7,0],dtype=np.int32)):
+        checksum=hashlib.sha256(activity.tobytes()).hexdigest();record=record_spikes(activity)
+        assert np.array_equal(restore_spikes(record,checksum,len(activity)),activity)
+        bad=copy.deepcopy(record);bad['total']+=1
+        with pytest.raises(ValueError,match='sparse native'):restore_spikes(bad,checksum)
+        import base64,zlib
+        bad=copy.deepcopy(record);bad['nonzero']=2;bad['total']=2
+        pairs=np.array([[0,1],[0,1]],dtype='<i4')
+        bad['payload']=base64.b64encode(zlib.compress(pairs.tobytes(),6)).decode('ascii')
+        with pytest.raises(ValueError,match='sparse native'):restore_spikes(bad,checksum)
+        bad=copy.deepcopy(record);bad['payload']='not-base64!'
+        with pytest.raises(ValueError,match='compressed native'):restore_spikes(bad,checksum)
+        # Decoder bounds its output even for a valid high-expansion deflate stream.
+        bad=copy.deepcopy(record);bad['payload']=base64.b64encode(zlib.compress(bytes(100000),6)).decode('ascii')
+        with pytest.raises(ValueError,match='compressed native'):restore_spikes(bad,checksum)
+        with pytest.raises(ValueError,match='checksum'):restore_spikes(record,'0'*64)
+        with pytest.raises(ValueError,match='shape'):restore_spikes(record,checksum,len(activity)+1)
+    with pytest.raises(ValueError,match='native int32'):record_spikes(np.array([.5,2]))
+    with pytest.raises(ValueError,match='native int32'):record_spikes(np.array([-1,2],dtype=np.int32))
+
+
+def test_recorded_full_graph_activity_is_lossless_and_compact():
+    import json,hashlib
+    activity=np.zeros(166700,dtype=np.int32);activity[::59]=3
+    record=record_spikes(activity)
+    assert len(json.dumps(record))<20000
+    assert np.array_equal(restore_spikes(record,hashlib.sha256(activity.tobytes()).hexdigest()),activity)

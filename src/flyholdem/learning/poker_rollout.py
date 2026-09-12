@@ -9,6 +9,7 @@ from flyholdem.poker.infoset import canonical_state, canonical_information_id
 from flyholdem.poker.observation import canonical_bytes
 from flyholdem.poker.opponents import Opponent, VERSIONS
 from .curriculum import CurriculumHand
+from .spike_record import record_spikes
 
 
 def poker_hand(player, curriculum, opponent, deal_seed, seat, *, learning=False,
@@ -57,6 +58,7 @@ def poker_hand(player, curriculum, opponent, deal_seed, seat, *, learning=False,
                 or not np.isfinite(scores).all() or scores.shape!=(5,)
                 or temperature==0 and action!=int(np.argmax(np.where(legal,scores,-np.inf)))):
             raise AssertionError('Committed poker action must come from finite legal native scores')
+        spikes=record_spikes(decision['counts'])
         # Canonical action is committed before any teaching target is requested.
         committed=game.act(action);counts[action]+=1
         target=None;original_target=None;target_id=None
@@ -77,7 +79,7 @@ def poker_hand(player, curriculum, opponent, deal_seed, seat, *, learning=False,
                     target[legal]=target_rng.permutation(target[legal])
         event=player.commit_action(learning and (not distilled or target is not None),teacher_target=target)
         record={key:value for key,value in decision.items() if key not in ('counts','encoded')}
-        record.update(counts_sha256=hashlib.sha256(decision['counts'].tobytes()).hexdigest(),
+        record.update(recorded_spikes=spikes,counts_sha256=hashlib.sha256(decision['counts'].tobytes()).hexdigest(),
             committed_action=committed,teaching_after_commit=event,
             teacher_input_id=target_id,original_teacher_target=original_target,
             legal_target_permutation=target_rng is not None and target is not None,

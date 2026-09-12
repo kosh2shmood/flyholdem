@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import signal
 import time
+import zlib
 import numpy as np
 from flyholdem.provenance import identity,manifest,assert_compatible
 from flyholdem.connectome.registry import digest
@@ -46,7 +47,7 @@ def _train_arm(player,config,output,*,teacher=None,teacher_sha256=None,shuffled_
     if player.baseline.contexts or player.last_decision is not None or player.brain.time_ms!=0:
         raise ValueError('Construct a fresh registered starting player before training or recovery')
     initial_hash=hashlib.sha256(player.brain.weights.tobytes()).hexdigest()
-    config_record={**config,'learning_mode':player.mode,'optimization':player.optimization,
+    config_record={**config,'activity_recording':'lossless-sparse-readout-window-v1','activity_codec_runtime':zlib.ZLIB_RUNTIME_VERSION,'neuron_count':player.brain.n,'learning_mode':player.mode,'optimization':player.optimization,
         'player_config':player.config,'plasticity_registration':player.eligible.registration,
         'controller_registration':player.controller.registration,'initial_weights_sha256':initial_hash,
         'initial_rng':player.controller.rng.bit_generator.state,'teacher_sha256':teacher_sha256,

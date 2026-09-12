@@ -54,3 +54,12 @@ Commit exact source/config before a long run. A source snapshot must include the
 ## Engineering verification
 
 Real seven-neuron native fixtures exercise two independent terminal-learning seeds, all controls, isolated evaluations, report generation and interruption after three phases; recovered training/evaluation records are byte-identical. A separate fixture exercises the full distilled phase path and canonical train-only targets. Tests also cover exact conventional-policy reference replay, altered-score rejection after journal rehashing, inherited-edge serialization, seed-level statistics, and prerequisite/confirmation ordering. These synthetic numerical checks cannot qualify a full-connectome curriculum.
+
+
+## Exact recorded activity for training inspection
+
+Future training journals retain the actual complete readout-window spike vector in a compact, lossless sparse form, captured before action commitment or teaching. Sorted nonzero index/count pairs use fixed little-endian int32 packing, zlib level 6 and base64 inside the existing per-hand hash chain. Original native dtype, neuron count, total spikes and the existing full-vector checksum are preserved. The training manifest records the codec runtime and actual neuron count. A bounded decoder rejects malformed, duplicate, out-of-range, negative, truncated, trailing or checksum-inconsistent data, including excess decompression output. Silent vectors remain exactly silent. No activity is reconstructed from a policy estimate.
+
+The curriculum auditor reconstructs the original native bytes and rederives each training readout rate/score from the registered ensembles, baseline and timing. After auditing, only the two matched-reward scheduling scalars are retained between control arms; bulky replay data stays on disk. Actual frozen hands still match the existing evaluator, and complete training/checkpoint recovery remains exact in both learning modes. A synthetic 166,700-entry sparse vector verifies compact storage without claiming a full-graph experiment.
+
+This supplies exact activity for a subsequent training-replay adapter. It does not yet add a `serve --run` training viewer. Existing spectator/human-play streams are unchanged. Historical frozen source snapshots retain their own format; they are not silently migrated. No full-graph poker learning run has started.

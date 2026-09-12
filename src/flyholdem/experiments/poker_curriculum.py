@@ -97,6 +97,18 @@ def _training_rows(path,plan,seed,arm):
             raise ValueError('Final training weights do not match the last complete hand')
         if arm=='frozen' and row['weights_before_sha256']!=row['weights_after_sha256']:
             raise ValueError('Frozen training changed weights')
+        if config.get('activity_recording')!='lossless-sparse-readout-window-v1':
+            raise ValueError('Registered lossless training activity recording required')
+        from flyholdem.learning.spike_record import restore_spikes
+        from flyholdem.interface.population import neural_scores
+        registration=config['controller_registration']
+        ensembles=[np.asarray(group['indices'],dtype=np.int64) for group in registration['ensembles']]
+        for decision in row['neural_decisions']:
+            activity=restore_spikes(decision['recorded_spikes'],decision['counts_sha256'],config['neuron_count'])
+            rates,scores=neural_scores(activity,ensembles,registration['config']['decision_ms']['readout'],
+                registration['baseline_hz'],registration['config']['score_scale_hz'])
+            if rates.tolist()!=decision['raw_rates_hz'] or scores.tolist()!=decision['scores']:
+                raise ValueError('Training scores differ from their recorded native spike counts')
         if plan['optimization']=='terminal-local-eligibility' and arm!='frozen':
             raw=row['neural_return_bb'] if control_rewards is None else float(control_rewards[index])
             reward=baseline.event(raw,'position-'+str(int(seat==0)),config['player_config']['reward_scale_bb'])
@@ -115,7 +127,9 @@ def _training_rows(path,plan,seed,arm):
                 info=canonical_information_id(decision['observation'])
                 if info!=decision['teacher_input_id'] or decision['teacher_target_held_out']!=(split_for_id(info)!='train'):
                     raise ValueError('Held-out teacher target exclusion mismatch')
-    return [item['value'] for item in rows]
+    # Only the matched control schedule needs these two fields after the full
+    # audit. Keep bulky replay/spike records on disk between learning arms.
+    return [{key:item['value'][key] for key in ('neural_return_bb','neural_seat')} for item in rows]
 
 
 def _execute_curriculum(plan,output,factory,*,teacher=None,teacher_sha256=None,frozen_opponents=None,

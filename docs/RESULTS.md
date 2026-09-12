@@ -44,7 +44,7 @@ Full teacher confirmation now requires a verified passing development run for th
 
 ## Validation and resources
 
-The latest complete local suite passed 191 tests, with two isolated-oracle skips, in 80.57 seconds. CI separately runs the scalar/Brian2 oracle, data-free import checks, and fixture live/replay/avatar/private-play browser checks. Native desktop/mobile checks also passed locally. The new published control panel was inspected at 1440×1080 and 390×844 with no horizontal overflow; all nine displayed accuracies match the original result files.
+The latest complete local suite passed 193 tests, with two isolated-oracle skips, in 82.04 seconds. CI separately runs the scalar/Brian2 oracle, data-free import checks, and fixture live/replay/avatar/private-play browser checks. Native desktop/mobile checks also passed locally. The new published control panel was inspected at 1440×1080 and 390×844 with no horizontal overflow; all nine displayed accuracies match the original result files.
 
 | Recorded experiment | Work | Wall time | Peak process RSS |
 | --- | --- | ---: | ---: |

@@ -35,7 +35,7 @@ Locked dependencies live in `uv.lock`. The UI uses plain browser APIs plus pinne
 - Human heads-up play: implemented and browser-verified with private cards and legal actions. Poker learning Gates 3–6 remain pending; no strategic fly-learning claim.
 - Native dashboard: all 166,700 retained neurons rendered, annotated positions distinguished from missing-coordinate grid, actual frozen neural scores drive the table. Full data remain local and checksum-verified.
 - Gated curriculum runner: implemented for both modes, with independent seeds, controls, isolated evaluation and reverified endpoints. No full-graph poker experiment has passed; see [POKER_TRAINING.md](docs/POKER_TRAINING.md).
-- Current local suite: 191 passed / 2 isolated-oracle skips; fixture/live/replay/avatar, native desktop/mobile and private human-play browser checks pass.
+- Current local suite: 193 passed / 2 isolated-oracle skips; fixture/live/replay/avatar, native desktop/mobile and private human-play browser checks pass.
 
 See the [current results index](docs/RESULTS.md), [PROGRESS.md](PROGRESS.md), [visual gate report](docs/VISUAL_GATE.md), [protocol](docs/PROTOCOL.md), [model card](docs/MODEL_CARD.md), and [browser evidence](docs/review/browser-check.json). Live logs are written to ignored, timestamped `runs/live-*/events.jsonl` directories, flushed at every completed hand. Hash chains detect modifications; seeds regenerate the loop exactly on the same locked runtime. Cross-architecture numerical comparison uses absolute 1e-12 tolerance for floating diagnostics with exact cards/actions/spike counts; recorded playback is byte-exact everywhere. V0 does not yet resume a running neural state from a checkpoint.
 
