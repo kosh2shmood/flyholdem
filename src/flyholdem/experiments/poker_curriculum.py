@@ -76,6 +76,8 @@ def _training_rows(path,plan,seed,arm):
             or result['manifest_sha256']!=digest(path/'manifest.json') or runtime['config_hash']!=identity(config)
             or config['seed']!=seed or config['arm']!=arm or result['learning_claim'] is not False):
         raise ValueError('Complete registered training-arm evidence required')
+    from .recorded_poker import audit_recorded_hand
+    action_rng=np.random.default_rng();action_rng.bit_generator.state=config['initial_rng']
     for index,item in enumerate(rows):
         row=item['value'];kind=plan['training']['opponent_cycle'][(index//2)%len(plan['training']['opponent_cycle'])]
         deal=plan['training_starts'][str(seed)]+index//2;seat=index%2
@@ -99,16 +101,9 @@ def _training_rows(path,plan,seed,arm):
             raise ValueError('Frozen training changed weights')
         if config.get('activity_recording')!='lossless-sparse-readout-window-v1':
             raise ValueError('Registered lossless training activity recording required')
-        from flyholdem.learning.spike_record import restore_spikes
-        from flyholdem.interface.population import neural_scores
-        registration=config['controller_registration']
-        ensembles=[np.asarray(group['indices'],dtype=np.int64) for group in registration['ensembles']]
-        for decision in row['neural_decisions']:
-            activity=restore_spikes(decision['recorded_spikes'],decision['counts_sha256'],config['neuron_count'])
-            rates,scores=neural_scores(activity,ensembles,registration['config']['decision_ms']['readout'],
-                registration['baseline_hz'],registration['config']['score_scale_hz'])
-            if rates.tolist()!=decision['raw_rates_hz'] or scores.tolist()!=decision['scores']:
-                raise ValueError('Training scores differ from their recorded native spike counts')
+        schedule=config['temperature'];fraction=min(1,index/schedule['decay_hands'])
+        temperature=schedule['start']+fraction*(schedule['end']-schedule['start'])
+        audit_recorded_hand(row,config['controller_registration'],config['neuron_count'],action_rng,temperature)
         if plan['optimization']=='terminal-local-eligibility' and arm!='frozen':
             raw=row['neural_return_bb'] if control_rewards is None else float(control_rewards[index])
             reward=baseline.event(raw,'position-'+str(int(seat==0)),config['player_config']['reward_scale_bb'])
