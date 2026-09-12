@@ -6,7 +6,7 @@ Status: development, 12 September 2026. The application works with fixture, circ
 
 ## What you can use
 
-The live/recorded dashboard connects genuine PokerKit hands to actual neural scores, legal actions and activity. The side-seated fly and abstract opponent animate their actions. Large face-up hand and community-card panels show the cards clearly, and chip piles follow each player's balance. Human heads-up play keeps cards private, validates legal actions and restores a match after a browser reload while the server is running.
+The live/recorded dashboard connects genuine PokerKit hands to actual neural scores, legal actions and activity. The side-seated fly and abstract opponent animate their actions. Large face-up hand and community-card panels show the cards clearly, and chip piles follow each player's balance. Human heads-up play keeps cards private, validates legal actions and restores a match after a browser reload while the server is running. A separate [audited training replay](TRAINING_REPLAY.md) now displays completed native curriculum arms using their actual saved spikes, original teaching labels and seat-correct cards, without executing a neural solver. It is verified with numerical fixtures; no full-graph poker arm exists yet.
 
 The native display represents all 166,700 retained neurons and simulates 25,582,938 retained edges. Anatomical positions and the separate missing-coordinate grid are labeled. The current full model is cue-conditioned and frozen; neither the animation nor its demo chip return demonstrates poker learning. The evidence panel shows independent historical control comparisons.
 
@@ -44,7 +44,7 @@ Full teacher confirmation now requires a verified passing development run for th
 
 ## Validation and resources
 
-The latest complete local suite passed 208 tests, with two isolated-oracle skips, in 80.85 seconds. CI separately runs the scalar/Brian2 oracle, data-free import checks, and fixture live/replay/avatar/private-play browser checks. Native desktop/mobile checks also passed locally. The new published control panel was inspected at 1440×1080 and 390×844 with no horizontal overflow; all nine displayed accuracies match the original result files.
+The latest complete local suite passed 220 tests, with two isolated-oracle skips, in 138.67 seconds. CI separately runs the scalar/Brian2 oracle, data-free import checks, and fixture live/replay/avatar/private-play browser checks. Native desktop/mobile checks also passed locally. The new published control panel was inspected at 1440×1080 and 390×844 with no horizontal overflow; all nine displayed accuracies match the original result files.
 
 | Recorded experiment | Work | Wall time | Peak process RSS |
 | --- | --- | ---: | ---: |

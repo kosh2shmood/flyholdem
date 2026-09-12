@@ -52,7 +52,7 @@ def _model(player,path,reference):
     return digest(path/'manifest.json')
 
 
-def _training_rows(path,plan,seed,arm):
+def _training_rows(path,plan,seed,arm,*,include_records=False):
     path=Path(path);result=json.loads((path/'result.json').read_text());runtime=json.loads((path/'manifest.json').read_text())
     rows=read_journal(path/'hands.jsonl');config=runtime['config']
     expected={**plan['training'],'schema':'poker-training-arm-v1','arm':arm,'curriculum':plan['curriculum'],
@@ -124,6 +124,7 @@ def _training_rows(path,plan,seed,arm):
                     raise ValueError('Held-out teacher target exclusion mismatch')
     # Only the matched control schedule needs these two fields after the full
     # audit. Keep bulky replay/spike records on disk between learning arms.
+    if include_records:return [item['value'] for item in rows]
     return [{key:item['value'][key] for key in ('neural_return_bb','neural_seat')} for item in rows]
 
 

@@ -56,3 +56,6 @@ The conventional stationary-population regret teacher uses `teacher train-regret
 
 
 Full teacher confirmation now explicitly requires `teacher evaluate --profile confirmatory --development-reference PASSED_DEVELOPMENT_RUN --policy POLICY --config configs/teacher_evaluation.yaml --output RUN`. The matching complete development evidence is reverified before any policy/deal execution and on resume. Confirmation manifests bind that dependency, and downstream qualification reverifies it. Historical development reports retain their existing format; unbound confirmation cannot authorize a corpus. See TEACHER.md.
+
+
+Completed native curriculum arms can now be viewed with `serve --training-run <experiment>/<seed>/<arm>/training --graph <exact-prepared-graph> --start-hand 0 --hands 16 --port 8768`. The service audits the complete record, replays actual saved activity and preserves card privacy without a neural worker or live player. See [TRAINING_REPLAY.md](TRAINING_REPLAY.md) for source requirements, labels, resource limits and checked fixture examples. This does not change any scientific gate.

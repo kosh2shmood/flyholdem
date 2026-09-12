@@ -12,8 +12,18 @@ from .events import Demo, dumps, verify_stream
 ROOT = Path(__file__).resolve().parents[3]
 
 
-def create_app(seed=20260912, replay=None, interval=.9, log_path=None, mode='fixture', preregistration=None, model=None):
-    if mode == 'fixture':
+def create_app(seed=20260912, replay=None, interval=.9, log_path=None, mode='fixture', preregistration=None, model=None,
+               training_run=None, graph_path=None, start_hand=0, hands=16):
+    training = training_run is not None
+    if training:
+        if replay or preregistration or model or mode != 'fixture' or graph_path is None:
+            raise ValueError('Training replay requires --graph and no --mode/--model/--preregistration/--replay override')
+        from .training import RecordedTraining
+        demo = RecordedTraining(training_run, graph_path, start_hand, hands)
+        mode = demo.mode
+    elif graph_path is not None or start_hand != 0 or hands != 16:
+        raise ValueError('Graph and hand-range options require --training-run')
+    elif mode == 'fixture':
         if model or preregistration:
             raise ValueError('Native model/registration requires circuit or full mode')
         demo = Demo(seed)
@@ -25,7 +35,7 @@ def create_app(seed=20260912, replay=None, interval=.9, log_path=None, mode='fix
     fixture_graph = demo.brain.graph_view() if mode == 'fixture' else Demo(seed).brain.graph_view()
     fixture_graph.update(mode='fixture', native_cloud=False, neuron_count=len(fixture_graph['nodes']))
     queues = set()
-    recorded = [json.loads(line) for line in Path(replay).read_text().splitlines()] if replay else None
+    recorded = demo.events if training else [json.loads(line) for line in Path(replay).read_text().splitlines()] if replay else None
     if recorded is not None:
         verify_stream(recorded)
         if not recorded:
@@ -109,7 +119,7 @@ def create_app(seed=20260912, replay=None, interval=.9, log_path=None, mode='fix
     @app.get('/api/health')
     def health():
         task = getattr(app.state, 'producer', None)
-        return {'ok': bool(task and not task.done()), 'mode': mode, 'replay': bool(recorded), 'weights_frozen': mode != 'fixture', 'spectator_paused_for_play': play_opening or play_session is not None}
+        return {'ok': bool(task and not task.done()), 'mode': mode, 'replay': bool(recorded), 'weights_frozen': None if training else mode != 'fixture', 'spectator_paused_for_play': play_opening or play_session is not None, 'recorded_training': training, 'human_play_available': not training}
 
     @app.get('/api/graph')
     def graph(mode: str | None = None):
@@ -162,6 +172,8 @@ def create_app(seed=20260912, replay=None, interval=.9, log_path=None, mode='fix
     async def start_play(request: Request):
         nonlocal play_session,play_opening
         check_origin(request)
+        if training:
+            raise HTTPException(409, 'Historical training replay has no live player. Open a live dashboard to play.')
         from .play import FrozenPlayer,HumanSession,PlayError
         async with play_lock:
             play_opening=True

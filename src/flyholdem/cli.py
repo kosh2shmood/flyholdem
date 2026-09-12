@@ -44,6 +44,10 @@ def parser():
     serve.add_argument('--mode',choices=['fixture','circuit','full'],default='fixture')
     serve.add_argument('--preregistration',help='Checked native controllability artifact')
     serve.add_argument('--model',help='Teacher-disconnected frozen connectome model directory')
+    serve.add_argument('--training-run',help='Completed curriculum child training arm to replay without neural execution')
+    serve.add_argument('--graph',help='Exact prepared graph for the recorded training arm')
+    serve.add_argument('--start-hand',type=int,default=0,help='Zero-based start within the recorded arm')
+    serve.add_argument('--hands',type=int,default=16,help='Show up to 1–128 consecutive recorded training hands')
     record=sub.add_parser('record',help='Generate a deterministic compact fixture demonstration')
     record.add_argument('--hands',type=int,default=6);record.add_argument('--seed',type=int,default=20260912)
     record.add_argument('--output',default='examples/fixture-demo.jsonl')
@@ -146,7 +150,7 @@ def dispatch(args):
         from flyholdem.server.app import create_app
         stamp=datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
         uvicorn.run(create_app(args.seed,args.replay,args.interval,f'runs/live-{stamp}/events.jsonl',
-            args.mode,args.preregistration,args.model),host='127.0.0.1',port=args.port)
+            args.mode,args.preregistration,args.model,args.training_run,args.graph,args.start_hand,args.hands),host='127.0.0.1',port=args.port)
         return None
     if args.command=='record':
         if args.hands<1:raise ValueError('At least one fixture hand is required')
