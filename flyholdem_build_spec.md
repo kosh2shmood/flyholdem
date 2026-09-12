@@ -474,6 +474,12 @@ Every training/evaluation command writes a run directory containing:
 
 ## 12. Implementation milestones
 
+### V0 — visual-first vertical slice
+
+Complete this before the remaining milestones. Use the deterministic fixture graph and the minimal real PokerKit loop to deliver one-command live and replay dashboards showing the table, fixture neural activity, five action scores, legal mask, selected action, and reinforcement/plasticity events. The UI must be browser-tested and clearly labeled as a fixture visual prototype. Commit the verified result and tag it `visual-demo-v0` before downloading or integrating the full MaleCNS graph.
+
+This gate establishes the public experience and the event contract early. It does not count as a full-connectome or learning result.
+
 ### M0 — repository and provenance
 
 Create the package, CI, configs, docs, source registry, license attribution, and fixture graph. Port only generic, understood pieces from DOOMFLY. Exit when fixture tests and data-lock tests pass.
@@ -505,6 +511,12 @@ Build the synchronized table, decision, brain, plasticity, and evidence panels. 
 ### M7 — packaging
 
 Add Docker or reproducible local setup, smoke data, one-command demo, operational docs, model card, claims page, and a compact public result bundle that does not redistribute third-party data incorrectly.
+
+## 12A. Progress and recovery contract
+
+Develop on `astra/visual-first` and save progress as verified Git commits after every stable milestone. Push each commit when authentication is available. Maintain `PROGRESS.md` with the current phase, completed checks, exact commands, test results, decisions, failures, last stable commit, resume command, and next step. Never rewrite pushed milestone history during the active build.
+
+Generated experiments use append-only per-hand logs and atomic checkpoints at least every five minutes and on graceful shutdown. Retain the newest three checkpoints plus the best registered validation checkpoint. Keep them in ignored run directories rather than Git. Every long run records the exact Git commit and hashes of its configuration, sources, graph, encoder, decoder, teacher, and starting checkpoint.
 
 ## 13. Definition of done for the first public release
 
