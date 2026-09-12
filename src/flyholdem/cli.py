@@ -107,7 +107,7 @@ def parser():
     export.add_argument('--run',required=True);export.add_argument('--output',required=True);export.add_argument('--which',choices=['latest','best'],default='latest')
     evaluate=ts.add_parser('evaluate',help='Evaluate the entire registered held-out paired opponent suite')
     evaluate.add_argument('--policy',required=True);evaluate.add_argument('--config',default='configs/teacher_evaluation.yaml')
-    evaluate.add_argument('--profile',choices=['development','confirmatory'],default='development');_output_options(evaluate)
+    evaluate.add_argument('--profile',choices=['development','confirmatory'],default='development');evaluate.add_argument('--development-reference');_output_options(evaluate)
     corpus=ts.add_parser('export-corpus',help='Export disjoint canonical states only from a confirmed validated teacher')
     corpus.add_argument('--policy',required=True);corpus.add_argument('--validation',required=True)
     corpus.add_argument('--config',required=True);_output_options(corpus)
@@ -226,7 +226,7 @@ def dispatch(args):
             result=train(config,out,resume,args.stop_after)
         elif action=='evaluate':
             from flyholdem.teacher.evaluation import evaluate
-            result=evaluate(args.policy,config,out,args.profile,resume)
+            result=evaluate(args.policy,config,out,args.profile,resume,args.development_reference)
         else:
             from flyholdem.teacher.corpus import export_corpus
             return export_corpus(args.policy,args.validation,config,out,resume)

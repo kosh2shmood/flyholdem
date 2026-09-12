@@ -53,3 +53,6 @@ Gate prerequisite commands are documented in GATES.md. `gate certify-transfer` r
 
 
 The conventional stationary-population regret teacher uses `teacher train-regret --config configs/teacher_external_regret_v10.yaml --output RUN`, with `--stop-after 128` for the registered initial resource check and `--resume RUN` for continuation. `teacher export-regret --run RUN --output POLICY` requires the completed fixed final iteration and writes an atomic numeric average policy. The same original `teacher evaluate` / `verify-evaluation` / guarded corpus path applies. Commit and freeze source/config before execution; use that snapshot for recovery and export. This is a conventional population-response experiment, not fly learning or a self-play equilibrium claim. Details: EXTERNAL_REGRET_TEACHER.md.
+
+
+Full teacher confirmation now explicitly requires `teacher evaluate --profile confirmatory --development-reference PASSED_DEVELOPMENT_RUN --policy POLICY --config configs/teacher_evaluation.yaml --output RUN`. The matching complete development evidence is reverified before any policy/deal execution and on resume. Confirmation manifests bind that dependency, and downstream qualification reverifies it. Historical development reports retain their existing format; unbound confirmation cannot authorize a corpus. See TEACHER.md.

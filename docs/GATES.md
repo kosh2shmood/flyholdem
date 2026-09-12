@@ -25,3 +25,6 @@ The actual surrogate model c3876173e83c739738706ee4bd2e0a28c7854b934e63fc67ffbab
 ```
 
 The actual failed V6 teacher was rejected by both the certification function and public CLI before any biological model or nonexistent corpus was loaded. No rejected certificate file was created.
+
+
+Full teacher qualification now additionally requires a confirmation manifest bound to the same policy's passed development run. The result, manifest, complete paired journal and registered configuration are reverified; missing or changed development evidence prevents both confirmation execution and downstream Gate 2A qualification. No full confirmation result predates this guard.

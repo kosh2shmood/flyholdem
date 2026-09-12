@@ -1,4 +1,5 @@
 """Numerical artifact fixtures only; these are not measured poker results."""
+from pathlib import Path
 import copy
 import json
 import numpy as np
@@ -7,14 +8,18 @@ from flyholdem.connectome.registry import digest
 from flyholdem.experiments.journal import Journal
 from flyholdem.provenance import identity
 from flyholdem.poker.opponents import VERSIONS
-from flyholdem.teacher.evaluation import evaluation_summary
-from flyholdem.teacher.validation import verify_evaluation
+from flyholdem.teacher.evaluation import evaluation_summary,evaluate
+from flyholdem.teacher.loaders import sampling
+from flyholdem.teacher.validation import verify_evaluation,verify_passing_development
 
 
-def fixture(root,profile='confirmatory',positive=True):
-    run=root/'evaluation';run.mkdir();policy=root/'policy';policy.mkdir()
-    np.save(policy/'fixture.npy',np.array([1],dtype=np.float32),allow_pickle=False)
-    (policy/'manifest.json').write_text(json.dumps({'schema':'teacher-average-policy-v1',
+def fixture(root,profile='confirmatory',positive=True,policy=None):
+    root.mkdir(parents=True,exist_ok=True)
+    run=root/'evaluation';run.mkdir()
+    if policy is None:
+        policy=root/'policy';policy.mkdir()
+        np.save(policy/'fixture.npy',np.array([1],dtype=np.float32),allow_pickle=False)
+        (policy/'manifest.json').write_text(json.dumps({'schema':'teacher-average-policy-v1',
         'provenance':{'stack_bb':20,'scope':'synthetic numerical evidence fixture'},
         'files':{'fixture.npy':digest(policy/'fixture.npy')}}))
     policy_hash=digest(policy/'manifest.json')
@@ -23,6 +28,9 @@ def fixture(root,profile='confirmatory',positive=True):
         'profiles':{'development':{'seed_start':100,'paired_deals_per_opponent':3},
                     'confirmatory':{'seed_start':200,'paired_deals_per_opponent':3}}}
     runtime_config={**config,'profile':profile,'policy_sha256':policy_hash}
+    if profile=='confirmatory':
+        development,_,_=fixture(root/'development','development',True,policy)
+        runtime_config['development_reference']=verify_passing_development(development,policy,config)
     (run/'manifest.json').write_text(json.dumps({'config':runtime_config,'config_hash':identity(runtime_config)}))
     grouped={kind:[] for kind in VERSIONS};journal=Journal(run/'paired-deals.jsonl')
     for kind in VERSIONS:
@@ -36,6 +44,7 @@ def fixture(root,profile='confirmatory',positive=True):
         'information_boundary':{'hidden_hole_future_deck_and_teacher_label_invariance':True,'decisions_checked':32},
         'allowed_as_teacher':profile=='confirmatory' and positive,'journal_head':journal.rows[-1]['hash'],
         'manifest_sha256':digest(run/'manifest.json')}
+    result['sampling']=sampling(json.loads((policy/'manifest.json').read_text()))
     journal.close();(run/'result.json').write_text(json.dumps(result))
     return run,policy,config
 
@@ -87,3 +96,65 @@ def test_tensor_mutation_and_truncated_journal_cannot_qualify(tmp_path):
     (policy/'fixture.npy').write_bytes(original)
     path=run/'paired-deals.jsonl';path.write_bytes(path.read_bytes()[:-1])
     with pytest.raises(ValueError,match='Truncated'):verify_evaluation(run,policy,config)
+
+
+def test_confirmation_refuses_missing_or_failed_development_before_loading_or_output(tmp_path,monkeypatch,capsys):
+    development,policy,config=fixture(tmp_path/'negative','development',False)
+    def forbidden(*args,**kwargs):raise AssertionError('A failed prerequisite reached the policy or poker evaluator')
+    monkeypatch.setattr('flyholdem.teacher.loaders.load_policy',forbidden)
+    monkeypatch.setattr('flyholdem.teacher.evaluation.paired_match',forbidden)
+    for reference,message in [(None,'requires verified'),(development,'has not passed')]:
+        with pytest.raises(ValueError,match=message):
+            evaluate(policy,config,tmp_path/'forbidden','confirmatory',development_reference=reference)
+        assert not (tmp_path/'forbidden').exists()
+    from flyholdem.cli import main
+    protocol=tmp_path/'suite.yaml'
+    import yaml
+    protocol.write_text(yaml.safe_dump(config))
+    with pytest.raises(SystemExit) as stopped:
+        main(['teacher','evaluate','--policy',str(policy),'--config',str(protocol),'--profile','confirmatory',
+            '--development-reference',str(development),'--output',str(tmp_path/'cli-forbidden')])
+    assert stopped.value.code==2 and 'has not passed' in capsys.readouterr().err
+    assert not (tmp_path/'cli-forbidden').exists()
+
+
+def test_confirmation_reverifies_development_hashes_and_rejects_cycles(tmp_path):
+    run,policy,config=fixture(tmp_path)
+    assert verify_evaluation(run,policy,config)['development_reference_verified']
+    with pytest.raises(ValueError,match='must be a development'):
+        verify_passing_development(run,policy,config)
+    dependency=json.loads((run/'manifest.json').read_text())['config']['development_reference']
+    development=Path(dependency['path'])
+    # Even a harmless extra field changes the exact bound development evidence.
+    mutate(development/'result.json',lambda value:value.update(extra_note='changed after confirmation'))
+    assert verify_evaluation(development,policy,config,False)['passes_fixed_suite']
+    with pytest.raises(ValueError,match='registered suite'):
+        verify_evaluation(run,policy,config)
+
+
+def test_actual_tabular_confirmation_and_recovery_bind_the_prerequisite(tmp_path):
+    # Actual model export and PokerKit evaluation. Only this tiny, separately
+    # registered fixture's prerequisite returns are synthetic; public project
+    # qualification must reject this fixture suite.
+    from flyholdem.teacher.regret_training import train,SCHEMA,AGGREGATION
+    from flyholdem.teacher.regret import VERSION
+    from flyholdem.teacher.regret_policy import export_policy
+    config={'schema':SCHEMA,'stack_bb':20,'iterations':2,'sampling_seed':91200,'deal_seed_start':993000000,
+        'opponents':list(VERSIONS),'opponent_probabilities':[.25]*4,'aggregation':AGGREGATION,
+        'abstraction':{'feature_version':VERSION,'stack_bb':20,'equity_buckets':8,'equity_samples':16,
+            'max_information_sets':20000,'max_nodes_per_traversal':100000}}
+    train(config,tmp_path/'training');export_policy(tmp_path/'training',tmp_path/'policy')
+    development,policy,suite=fixture(tmp_path/'synthetic-development','development',True,tmp_path/'policy')
+    run=tmp_path/'actual-confirmation'
+    result=evaluate(policy,suite,run,'confirmatory',development_reference=development)
+    journal=(run/'paired-deals.jsonl').read_bytes()
+    restored=evaluate(policy,suite,run,'confirmatory',resume=True,development_reference=development)
+    assert result==restored and (run/'paired-deals.jsonl').read_bytes()==journal
+    found=verify_evaluation(run,policy,suite,require_confirmatory=False)
+    assert found['development_reference_verified'] and found['summary_recomputed']
+    with pytest.raises(ValueError,match='registered suite'):
+        verify_evaluation(run,policy,require_confirmatory=False)
+    mutate(development/'result.json',lambda value:value.update(passes_fixed_suite=False))
+    with pytest.raises(ValueError,match='summary differs'):
+        evaluate(policy,suite,run,'confirmatory',resume=True,development_reference=development)
+    assert (run/'paired-deals.jsonl').read_bytes()==journal

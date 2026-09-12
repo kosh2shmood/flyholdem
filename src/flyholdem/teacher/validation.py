@@ -35,8 +35,15 @@ def verify_evaluation(run, policy_path, registered_config=None, require_confirma
     if (result.get('schema')!='teacher-evaluation-v1' or profile not in ('development','confirmatory')
             or require_confirmatory and profile!='confirmatory'):
         raise ValueError('A confirmatory validated teacher evaluation is required')
-    if (tuple(expected['opponents'])!=tuple(VERSIONS) or config!={**expected,'profile':profile,'policy_sha256':policy_hash}
-            or runtime.get('config_hash')!=identity(config)):
+    base_config={**expected,'profile':profile,'policy_sha256':policy_hash}
+    if tuple(expected['opponents'])!=tuple(VERSIONS):
+        raise ValueError('Teacher evaluation differs from its registered suite or configuration')
+    if profile=='confirmatory':
+        dependency=config.get('development_reference')
+        if not isinstance(dependency,dict) or not dependency.get('path'):
+            raise ValueError('Confirmation requires verified passing development for this exact policy')
+        base_config['development_reference']=verify_passing_development(dependency['path'],policy_path,expected)
+    if config!=base_config or runtime.get('config_hash')!=identity(config):
         raise ValueError('Teacher evaluation differs from its registered suite or configuration')
     if (result.get('manifest_sha256')!=digest(run/'manifest.json')
             or result.get('policy_sha256')!=policy_hash
@@ -86,4 +93,30 @@ def verify_evaluation(run, policy_path, registered_config=None, require_confirma
         'passes_fixed_suite':recalculated['passes_fixed_suite'],'policy_sha256':policy_hash,
         'evaluation_result_sha256':digest(run/'result.json'),'evaluation_manifest_sha256':digest(run/'manifest.json'),
         'paired_deals_sha256':audit['sha256'],'paired_deals':audit['rows'],
-        'summary_recomputed':True,'registered_schedule_verified':True}
+        'summary_recomputed':True,'registered_schedule_verified':True,
+        'development_reference_verified':profile=='confirmatory'}
+
+
+def verify_passing_development(run, policy_path, config):
+    """Verify the same frozen policy before any reserved confirmation deal.
+
+    Check the profile before recursive verification, so a confirmation cannot
+    reference itself or another confirmation. Historical development evidence
+    retains its original schema and exact schedule/statistical checks.
+    """
+    if run is None:
+        raise ValueError('Confirmation requires verified passing development for this exact policy')
+    run=Path(run).resolve()
+    if _json((run/'result.json').read_text()).get('profile')!='development':
+        raise ValueError('The confirmation prerequisite must be a development evaluation')
+    evidence=verify_evaluation(run,policy_path,config,require_confirmatory=False)
+    if not evidence['passes_fixed_suite']:
+        raise ValueError('Teacher has not passed its complete registered development suite')
+    development=config['profiles']['development'];confirmation=config['profiles']['confirmatory']
+    a=development['seed_start'];b=confirmation['seed_start']
+    if max(a,b)<min(a+development['paired_deals_per_opponent'],b+confirmation['paired_deals_per_opponent']):
+        raise ValueError('Development and confirmation must use disjoint registered deals')
+    return {'schema':'verified-full-teacher-development-reference-v1','path':str(run),
+        'policy_sha256':evidence['policy_sha256'],'result_sha256':evidence['evaluation_result_sha256'],
+        'manifest_sha256':evidence['evaluation_manifest_sha256'],'paired_deals_sha256':evidence['paired_deals_sha256'],
+        'registered_config_sha256':identity(config)}

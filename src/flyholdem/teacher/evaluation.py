@@ -75,7 +75,7 @@ def verify_information_boundary(policy, seeds=(821001, 821002, 821003, 821004)):
     return {'hidden_hole_future_deck_and_teacher_label_invariance': True, 'decisions_checked': checked}
 
 
-def evaluate(policy_path, config, output, profile='development', resume=False):
+def evaluate(policy_path, config, output, profile='development', resume=False, development_reference=None):
     import json
     from pathlib import Path
     import signal
@@ -86,6 +86,12 @@ def evaluate(policy_path, config, output, profile='development', resume=False):
     from .loaders import load_policy, sampling
     if profile not in config['profiles'] or set(config['opponents']) != set(VERSIONS):
         raise ValueError('Use the complete registered opponent suite and profile')
+    dependency = None
+    if profile == 'confirmatory':
+        from .validation import verify_passing_development
+        dependency = verify_passing_development(development_reference, policy_path, config)
+    elif development_reference is not None:
+        raise ValueError('A development reference is only valid for confirmation')
     policy, policy_record = load_policy(policy_path)
     if policy_record['schema'] != 'teacher-external-regret-policy-v1':
         import torch
@@ -98,6 +104,7 @@ def evaluate(policy_path, config, output, profile='development', resume=False):
     output = Path(output); output.mkdir(parents=True, exist_ok=resume)
     policy_hash = digest(Path(policy_path) / 'manifest.json')
     runtime_config = {**config, 'profile': profile, 'policy_sha256': policy_hash}
+    if dependency is not None: runtime_config['development_reference'] = dependency
     runtime = manifest(runtime_config, 'conventional-teacher-no-connectome',
                        identity(policy_record['feature_version']), identity(policy_record['aggregation']), policy_record.get('inference_backend','pytorch-cpu'))
     if resume:
@@ -154,10 +161,10 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--policy', required=True); p.add_argument('--config', required=True)
     p.add_argument('--output', required=True); p.add_argument('--profile', choices=['development','confirmatory'], default='development')
-    p.add_argument('--resume', action='store_true')
+    p.add_argument('--resume', action='store_true'); p.add_argument('--development-reference')
     args = p.parse_args()
     print(json.dumps(evaluate(args.policy, yaml.safe_load(Path(args.config).read_text()), args.output,
-                              args.profile, args.resume), indent=2))
+                              args.profile, args.resume, args.development_reference), indent=2))
 
 
 if __name__ == '__main__':

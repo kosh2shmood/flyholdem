@@ -233,3 +233,16 @@ The fixed boundary policy a15dacb25161be56227eb9ec8f581c932ccc1ba616ec8c492fd7b7
 The next conventional candidate learns a tabular regret response to the fixed uniform original opponent population. It enumerates every legal own action on each sampled PokerKit chance/opponent traversal, records actual terminal BB values and averages strategies by own prefix reach. The eight-bucket visible-card abstraction remembers every earlier street bucket and the complete public action history. It makes no self-play equilibrium claim. Source, exact algorithm limitations, recovery, numeric export, resource probes and the fixed 30,000-traversal protocol are documented in [EXTERNAL_REGRET_TEACHER.md](EXTERNAL_REGRET_TEACHER.md).
 
 V10 is registered but has no held-out result yet. Reserved development, confirmation and boundary deals are excluded before training output creation. The original qualification suite and all prior negative results remain unchanged. No full corpus or Gate 2A certificate exists, and the fly's inference and biological parameters are unchanged.
+
+
+## Full teacher confirmation requires passing development
+
+`teacher evaluate --profile confirmatory` now requires `--development-reference DEVELOPMENT_RUN`. Before policy loading, output creation or a reserved deal, it independently recomputes that development run against the exact supplied frozen policy and complete configured opponent suite. The prerequisite must be development (never another confirmation), pass every adjusted lower bound, and use deals disjoint from confirmation. The confirmation manifest binds the development path, policy, result, manifest, journal and registered-config hashes.
+
+Resume recomputes the dependency. `verify-evaluation`, corpus qualification and Gate 2A also reverify it; an unbound historical confirmation cannot authorize teaching. All historical development reports remain readable and unchanged. A changed prerequisite, different policy, missing/failed development, overlapping schedule or reference cycle is rejected. The original opponents, sampled actions, paired deals, bootstrap calculations and thresholds are unchanged. This closes an execution guard that previously depended on following the written run order.
+
+```sh
+.venv/bin/flyholdem teacher evaluate --policy POLICY --config configs/teacher_evaluation.yaml --profile confirmatory --development-reference PASSED_DEVELOPMENT_RUN --output CONFIRMATION_RUN
+```
+
+The actual failed V9 development result (SHA 0fd06b781bfc89d5be2e26d310c0839934c95882d025df246a9d01d5e29c3931) was rejected through the public command dispatcher before any policy inference, confirmation deal or output creation. Reserved full confirmation deals remain unused. Tiny synthetic prerequisite records used in engineering tests are explicitly separate from the original project registration and cannot qualify a public teacher.
