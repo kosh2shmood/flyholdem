@@ -71,3 +71,10 @@ The worker preserves the complete-hand append-only journal and atomic neural che
 ```
 
 Resume by replacing `--output` with `--resume` naming the same outer run directory. The actual evaluation and report live under `evaluation/`; `isolation.json` pins runtime inputs and `isolation-result.json` records enforced denials. Use resource-aware scheduling before launching another full graph alongside the dashboard.
+
+
+## Resumable complete training arms
+
+The private experiment executor now runs complete paired-seat training schedules around PokerLearningPlayer. It binds the initial weights/RNG, actual plasticity and controller registrations, teacher identity, control reward array and opponent versions. Every settled hand is fsynced into a hash chain. Atomic checkpoints contain all native state, eligibility traces, past-only baselines and controller RNG, at five-minute intervals and graceful shutdown. Recovery from an older complete-hand boundary reexecutes and verifies any journal tail. The only retained selected checkpoint is the registered final training boundary; it is not chosen by poker profit.
+
+Seven added native integration checks cover strict/local/surrogate/terminal-distilled learning, frozen and shuffled controls, exact state/journal recovery, missing control labels and changed configuration. These low-level fixture executions grant no teacher or biological gate authorization and have no public ungated training CLI. The top-level curriculum orchestrator must verify prerequisite certificates before calling them and combine their trained models with isolated evaluation and registered endpoints.
