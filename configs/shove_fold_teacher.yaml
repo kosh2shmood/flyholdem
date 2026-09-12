@@ -1,0 +1,7 @@
+schema: tabular-shove-fold-training-v1
+algorithm: chance-sampled-shove-fold-CFR-v1
+curriculum: shove-fold-10bb-v1
+status: development
+iterations: 200000
+deal_seed_start: 6000000
+progress_iterations: 10000

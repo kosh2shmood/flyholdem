@@ -62,6 +62,10 @@ def parser():
     _learning_options(distill)
     teacher=sub.add_parser('teacher',help='Independent conventional teacher workflow; never fly inference')
     ts=teacher.add_subparsers(dest='teacher_command',required=True)
+    small=ts.add_parser('train-shove-fold',help='Train the separate small tabular 10 BB reference')
+    small.add_argument('--config',default='configs/shove_fold_teacher.yaml');small.add_argument('--stop-after',type=int);_output_options(small)
+    small_export=ts.add_parser('export-shove-fold',help='Export the small tabular reference; does not qualify a full teacher')
+    small_export.add_argument('--run',required=True);small_export.add_argument('--output',required=True)
     train=ts.add_parser('train',help='Train registered NFSP self-play')
     train.add_argument('--config',required=True);train.add_argument('--stop-after',type=int);_output_options(train)
     export=ts.add_parser('export',help='Export a numeric frozen average-policy checkpoint, still unvalidated')
@@ -121,6 +125,9 @@ def dispatch(args):
         result=run(config,out,args.profile,args.learning_rate,resume,args.development_reference,args.stop_after)
     elif args.command=='teacher':
         action=args.teacher_command
+        if action=='export-shove-fold':
+            from flyholdem.teacher.shove_fold_training import export_training
+            return export_training(args.run,args.output)
         if action=='export':
             from flyholdem.teacher.export import export_training
             return export_training(args.run,args.output,args.which)
@@ -132,7 +139,10 @@ def dispatch(args):
             return verify_corpus(args.corpus)
         out,resume=run_path(args,'teacher-'+action)
         config=configuration(args.config)
-        if action=='train':
+        if action=='train-shove-fold':
+            from flyholdem.teacher.shove_fold_training import train
+            result=train(config,out,resume,args.stop_after)
+        elif action=='train':
             from flyholdem.teacher.training import train
             result=train(config,out,resume,args.stop_after)
         elif action=='evaluate':

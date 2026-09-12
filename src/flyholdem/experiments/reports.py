@@ -60,7 +60,7 @@ def evidence(run):
     result_path=root/'result.json';manifest_path=root/'manifest.json'
     if not result_path.is_file() or not manifest_path.is_file():raise ValueError('Report requires result.json and manifest.json in a run directory')
     result=_json(result_path.read_text());manifest=_json(manifest_path.read_text())
-    supported={'conditioning-result-v1','exact-transfer-result-v1','nfsp-training-v1','teacher-evaluation-v1','frozen-poker-evaluation-result-v1','controllability-result-v1'}
+    supported={'conditioning-result-v1','exact-transfer-result-v1','nfsp-training-v1','tabular-shove-fold-training-result-v1','teacher-evaluation-v1','frozen-poker-evaluation-result-v1','controllability-result-v1'}
     if result.get('schema') not in supported:raise ValueError('Unsupported experiment report schema')
     manifest_hash=_digest(manifest_path)
     if result.get('manifest_sha256',manifest_hash)!=manifest_hash:raise ValueError('Result/manifest checksum mismatch')
@@ -117,7 +117,7 @@ def evidence(run):
         'peak_rss_bytes':result.get('peak_rss_bytes'),
         'retention_criterion_met':result.get('retention_criterion_met'),
         'information_boundary_verified':result.get('information_boundary_verified'),
-        'hands_completed':result.get('hands_completed'),'planned_hands':result.get('planned_hands'),
+        'hands_completed':result.get('hands_completed'),'planned_hands':result.get('planned_hands'),'hand_unit':result.get('hand_unit'),
         'caution':'Artifact verification checks bytes and chain consistency; it does not replace numerical, leakage or statistical validation. No model is loaded and no new evaluation is run.'}
 
 
@@ -134,7 +134,10 @@ def markdown(report):
             interval=row.get('interval',[row.get('minimum'),row.get('maximum')])
             lines.append(f"| {_cell(row['series'])} | {row['n']} | {_number(row['mean'])} | {row['unit']} | {' to '.join(_number(v) for v in interval)} |")
         lines+=['','Accuracy ranges are min/max across seeds; opponent intervals retain the registered suite-adjusted bootstrap confidence bounds.']
-    if report['hands_completed'] is not None:lines+=['',f"Training hands: {report['hands_completed']} / {report['planned_hands']}."]
+    if report['hands_completed'] is not None:
+        label='Completed units' if report.get('hand_unit') else 'Training hands'
+        lines+=['',f"{label}: {report['hands_completed']} / {report['planned_hands']}."]
+        if report.get('hand_unit'):lines+=['',report['hand_unit']+'.']
     if report['paired_evidence']:
         lines+=['','| Paired comparison | Mean difference | 95% seed bootstrap | One-sided sign-flip p |','|---|---:|---|---:|']
         for name,v in report['paired_evidence'].items():
