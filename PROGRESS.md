@@ -329,3 +329,12 @@ Every operation of full conditioning, successful surrogate transfer and failed l
 Five added CI checks use real tiny native decisions and reject rehashed schedule, native argmax, summary and evaluation-learning corruption. Full suite: 160 passed / 2 isolated-oracle skips. Source and inference-core identities remain separate; existing exported models remain compatible. Docs/GATES.md explains scope and exact commands.
 
 V7 remains active from its unchanged frozen 5a6ebe8 source, last inspected 140,000 / 500,000 hands. At 10 minutes its resident memory was 1,182,368 KiB with 60 GiB disk free; existing full viewer was 102,768 KiB. No environment/shared binary changes. Resume with the previously recorded V7 command plus --resume. Next: general multi-seed poker/control orchestration using the now implemented certificate boundary; wait for the unchanged completed teacher schedule before evaluation. Full Gate 2A and poker Gates 3–6 remain pending.
+
+
+## Terminal fine-tuning and actual frozen neural opponents verified
+
+Enabled terminal-return fine-tuning while retaining the distilled-connectome origin label. That method accepts no teacher input and uses the same bounded local rule and past-only position baseline as strict terminal learning; actual fixture trajectories, weights and interrupted continuation match the strict terminal mechanism. Added hash-pinned frozen native snapshot opponents with own-information-only input, actual native legal argmax, complete opponent decision records and unchanged-weight checks. Shared mutable player/opponent weights are rejected, maintaining one learning seat.
+
+Two added integration checks pass; full suite 162 passed / 2 isolated-oracle skips. Published corpus and Gate 2A source CI passed (34695976274 / 34696368167). No biological poker training or concurrent full-graph snapshot match has run. Existing model/inference-core files, environment and binaries remain unchanged.
+
+V7 remains active on its immutable source, last inspected 220,000 / 500,000 hands; use its earlier recorded command plus --resume for recovery. Next: finish the actual multi-seed training/control orchestrator, including genuinely disconnected evaluation phases and registered curriculum endpoints. No full Gate 2A certificate, full teacher/corpus or poker-learning claim exists yet; Gates 3–6 remain pending.

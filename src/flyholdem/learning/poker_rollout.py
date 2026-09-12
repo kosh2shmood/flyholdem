@@ -22,17 +22,25 @@ def poker_hand(player, curriculum, opponent, deal_seed, seat, *, learning=False,
         raise ValueError('Frozen evaluation has no exploration')
     if not learning and (teacher is not None or terminal_reward_override is not None or target_permutation_seed is not None):
         raise ValueError('Frozen weights accept no teacher or control reward inputs')
-    distilled=player.mode=='distilled-connectome'
+    distilled=player.requires_teacher
     if learning and distilled and teacher is None:raise ValueError('Distillation requires an independently qualified teacher')
     if not distilled and (teacher is not None or target_permutation_seed is not None):
-        raise ValueError('Bio-plastic learning accepts terminal chip reward only')
+        raise ValueError('Terminal learning accepts chip reward only')
     if distilled and terminal_reward_override is not None:raise ValueError('Distillation cannot use terminal shaping')
     if terminal_reward_override is not None and not np.isfinite(terminal_reward_override):
         raise ValueError('Finite matched-control reward required')
     if target_permutation_seed is not None and type(target_permutation_seed) is not int:
         raise ValueError('An explicit deterministic target permutation seed is required')
+    from .frozen_opponent import FrozenNeuralOpponent
+    snapshot=isinstance(opponent,FrozenNeuralOpponent)
+    if snapshot:
+        if opponent.brain is player.brain or np.shares_memory(opponent.brain.weights,player.brain.weights):
+            raise ValueError('Learning player and frozen opponent require independent mutable neural states')
+        other=opponent;opponent_name=other.name;opponent_version=other.version;other.begin_hand()
+    else:
+        if opponent not in VERSIONS:raise ValueError('Use a registered fixed opponent or an explicit frozen native snapshot')
+        other=Opponent(deal_seed+2000000,opponent);opponent_name=opponent;opponent_version=VERSIONS[opponent]
     game=CurriculumHand(curriculum,deal_seed,button=0)
-    other=Opponent(deal_seed+2000000,opponent)
     target_rng=np.random.default_rng(target_permutation_seed) if target_permutation_seed is not None else None
     player.begin_hand();decisions=[];counts=np.zeros(5,dtype=np.int64)
     weights_before=hashlib.sha256(player.brain.weights.tobytes()).hexdigest()
@@ -77,9 +85,10 @@ def poker_hand(player, curriculum, opponent, deal_seed, seat, *, learning=False,
     reinforcement=player.finish_hand(net_bb,int(seat==game.hand.button),learning,terminal_reward_override)
     weights_after=hashlib.sha256(player.brain.weights.tobytes()).hexdigest()
     if not learning and weights_after!=weights_before:raise AssertionError('Frozen poker hand changed weights')
-    return {'deal_seed':deal_seed,'neural_seat':seat,'opponent':opponent,'opponent_version':VERSIONS[opponent],
+    return {'deal_seed':deal_seed,'neural_seat':seat,'opponent':opponent_name,'opponent_version':opponent_version,
         'curriculum':curriculum,'neural_return_bb':net_bb,'action_counts':counts.tolist(),
         'neural_decisions':decisions,'public_terminal':table,'private_hand_checkpoint':game.serialize(),
-        'learning':learning,'phase':phase,'learning_mode':player.mode,'teacher_connected':learning and distilled,
-        'terminal_reinforcement':reinforcement,'weights_before_sha256':weights_before,
+        'learning':learning,'phase':phase,'learning_mode':player.mode,'optimization':player.optimization,'teacher_connected':learning and distilled,
+        'terminal_reinforcement':reinforcement,'frozen_opponent':other.finish_hand() if snapshot else None,
+        'weights_before_sha256':weights_before,
         'weights_after_sha256':weights_after,'target_permutation_seed':target_permutation_seed}

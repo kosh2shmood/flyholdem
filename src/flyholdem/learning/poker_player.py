@@ -27,9 +27,11 @@ class PokerLearningPlayer:
         self.mode=config['learning_mode'];self.optimization=config['optimization']
         if (self.mode,self.optimization) not in (
             ('bio-plastic','terminal-local-eligibility'),
+            ('distilled-connectome','terminal-local-eligibility'),
             ('distilled-connectome','teacher-advantage-local-eligibility'),
             ('distilled-connectome','direct-readout-rate-surrogate-v1')):
             raise ValueError('Unsupported registered poker learning method')
+        self.requires_teacher=self.optimization!='terminal-local-eligibility'
         self.surrogate=ReadoutSurrogate(eligible,controller.ensembles,config['surrogate']) if self.optimization=='direct-readout-rate-surrogate-v1' else None
         if config['reward_scale_bb']<=0:raise ValueError('Positive registered terminal reward scale required')
         self.last_decision=None
@@ -46,9 +48,9 @@ class PokerLearningPlayer:
     def commit_action(self,learning=False,teacher_target=None,override_advantage=None):
         if self.last_decision is None:raise ValueError('A selected neural action is required')
         decision=self.last_decision;event=None
-        if self.mode=='bio-plastic' and (teacher_target is not None or override_advantage is not None):
-            raise ValueError('Bio-plastic poker uses terminal chip reward only')
-        if self.mode=='distilled-connectome' and learning:
+        if not self.requires_teacher and (teacher_target is not None or override_advantage is not None):
+            raise ValueError('Terminal poker learning uses chip reward only')
+        if self.requires_teacher and learning:
             target=np.asarray(teacher_target,dtype=float);legal=np.asarray(decision['legal_mask'],dtype=bool)
             if target.shape!=(5,) or not np.isfinite(target).all() or np.any(target<0) or np.any(target[~legal]) or not np.isclose(target.sum(),1,atol=1e-10,rtol=0):
                 raise ValueError('A legal teacher distribution is required after action selection')
@@ -72,7 +74,7 @@ class PokerLearningPlayer:
     def finish_hand(self,net_bb,position,learning=False,override_reward=None):
         if self.last_decision is not None:raise ValueError('Commit the last action before terminal reinforcement')
         if not learning:return {'teacher_connected':False,'reward_delivered':False,'raw_net_bb':float(net_bb)}
-        if self.mode!='bio-plastic':
+        if self.requires_teacher:
             if override_reward is not None:raise ValueError('Distillation does not use terminal reward shaping')
             return {'teacher_connected':False,'reward_delivered':False,'raw_net_bb':float(net_bb)}
         raw=net_bb if override_reward is None else override_reward

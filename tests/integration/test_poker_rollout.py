@@ -139,3 +139,40 @@ def test_rewired_control_changes_only_endpoint_order_and_preserves_checkpoint_we
     one=shuffled_rewards(rewards,positions,71);two=shuffled_rewards(rewards,positions,71)
     assert np.array_equal(one,two) and not np.array_equal(one,rewards)
     for position in (0,1):assert np.array_equal(np.sort(one[positions==position]),np.sort(rewards[positions==position]))
+
+
+
+def test_terminal_finetuning_preserves_distilled_label_but_uses_only_actual_chip_reward():
+    _,bio=make();_,distilled=make('distilled-connectome','terminal-local-eligibility')
+    a=poker_hand(bio,'hu-20bb-v1','random',904,0,learning=True,temperature=.2)
+    b=poker_hand(distilled,'hu-20bb-v1','random',904,0,learning=True,temperature=.2)
+    assert b['learning_mode']=='distilled-connectome' and b['optimization']=='terminal-local-eligibility'
+    assert {k:v for k,v in a.items() if k!='learning_mode'}=={k:v for k,v in b.items() if k!='learning_mode'}
+    assert b['terminal_reinforcement']['reward_delivered'] and not b['teacher_connected']
+    assert all(d['teacher_input_id'] is None for d in b['neural_decisions'])
+    arrays,extra=distilled.state();_,restored=make('distilled-connectome','terminal-local-eligibility');restored.restore_state(arrays,extra)
+    assert poker_hand(distilled,'hu-20bb-v1','random',905,1,learning=True)==poker_hand(restored,'hu-20bb-v1','random',905,1,learning=True)
+    with pytest.raises(ValueError,match='chip reward only'):
+        poker_hand(restored,'hu-20bb-v1','random',906,0,learning=True,teacher=VisibleTeacher())
+
+
+
+def test_frozen_native_opponent_plays_actual_scores_with_only_one_learning_seat():
+    from flyholdem.learning.frozen_opponent import FrozenNeuralOpponent
+    opponent_controller,_=make();opponent=FrozenNeuralOpponent(opponent_controller,'a'*64)
+    _,player=make();initial=opponent.brain.weights.copy()
+    a=poker_hand(player,'hu-20bb-v1',opponent,1702,0,learning=True,temperature=.2)
+    assert a['frozen_opponent']['weights_unchanged'] and not a['frozen_opponent']['learning']
+    assert a['frozen_opponent']['decisions'] and np.array_equal(opponent.brain.weights,initial)
+    for row in a['frozen_opponent']['decisions']:
+        assert row['selected']==int(np.argmax(np.where(row['legal_mask'],row['scores'],-np.inf)))
+    arrays,extra=player.state();_,restored=make();restored.restore_state(arrays,extra)
+    b=poker_hand(player,'hu-20bb-v1',opponent,1703,1,learning=True)
+    fresh,_=make();other=FrozenNeuralOpponent(fresh,'a'*64)
+    assert b==poker_hand(restored,'hu-20bb-v1',other,1703,1,learning=True)
+    same=FrozenNeuralOpponent(player.controller,'b'*64)
+    with pytest.raises(ValueError,match='independent mutable'):
+        poker_hand(player,'hu-20bb-v1',same,1704,0,learning=True)
+    opponent.brain.weights[0]*=1.1
+    with pytest.raises(ValueError,match='weights changed'):
+        poker_hand(player,'hu-20bb-v1',opponent,1705,0,learning=True)
