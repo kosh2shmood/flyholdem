@@ -1,6 +1,6 @@
 # FlyHoldem — current measured results
 
-Status: development, 12 September 2026. The application works with fixture, circuit and full-connectome controllers. Full-graph cue conditioning is confirmed; poker learning remains unvalidated. Conventional teacher V10 failed the full development suite; a longer unchanged-method V11 run is registered. This is an interim evidence index, not a completed scientific release.
+Status: development, 12 September 2026. The application works with fixture, circuit and full-connectome controllers. Full-graph cue conditioning is confirmed; poker learning remains unvalidated. Conventional teacher candidates through V11 failed the full development suite. V12 is exported but has not been evaluated or qualified. This is an interim evidence index, not a completed scientific release.
 
 > A simulated network using the wiring of one reconstructed male fruit-fly central nervous system controls an engineered heads-up no-limit Hold'em interface.
 
@@ -34,11 +34,15 @@ These tasks concern two engineered cues. The observed conditioning mechanism inc
 
 ## Poker teacher results
 
-Full 20 BB candidates V1–V10 failed the unchanged original development suite. Positive returns against an individual opponent do not pass that suite. V9's terminal fold-value correction produced identical recorded paired outcomes to V8. The reserved full confirmation deals remain unused, and no full-hand teacher corpus or poker-trained student exists.
+Full 20 BB candidates V1–V11 failed the unchanged original development suite. Positive returns against an individual opponent do not pass that suite. V9's terminal fold-value correction produced identical recorded paired outcomes to V8. The reserved full confirmation deals remain unused, and no full-hand teacher corpus or poker-trained student exists.
 
 A separate tabular CFR teacher passed its own 10 BB shove/fold confirmation against all four original opponents. It is qualified only for that restricted subgame. It cannot substitute for the full-hand teacher gate. See the [small-game report](SHOVE_FOLD_TEACHER.md).
 
-V10 is a separately registered external-sampling tabular regret response to the stationary uniform original opponent population. Its 30,000-traversal schedule, seeds, abstraction and final-checkpoint rule were fixed before execution. It is a conventional candidate with no self-play equilibrium or fly-learning claim. The first 128 traversals completed in 11.78 seconds at 63.3 MB peak process RSS; the same run then continued. The fixed final run completed 30,000 traversals and 152,391 information sets at 284.5 MB peak RSS. Frozen policy SHA is `762b180986a3983e8a43f4744c6d89cf11299e16b611df6aba2e8b62a4206955`. Development returned +1.843750 / +2.480469 / +0.328125 / −0.013672 BB/hand against random / station / tight-aggressive / equity-bucket. Only random and station had positive adjusted lower bounds, so V10 failed. All 512 paired records reproduced exactly in a subsequent coverage audit. V11 changes only the fixed horizon to 100,000 traversals and starts from the same initialization. Its first 30,000 full journal records reproduced V10 byte for byte; the run is active, with no V11 held-out result yet. See the [teacher history](TEACHER.md) and [V10 protocol](EXTERNAL_REGRET_TEACHER.md).
+V10 is a separately registered external-sampling tabular regret response to the stationary uniform original opponent population. Its 30,000-traversal schedule, seeds, abstraction and final-checkpoint rule were fixed before execution. It is a conventional candidate with no self-play equilibrium or fly-learning claim. The first 128 traversals completed in 11.78 seconds at 63.3 MB peak process RSS; the same run then continued. The fixed final run completed 30,000 traversals and 152,391 information sets at 284.5 MB peak RSS. Frozen policy SHA is `762b180986a3983e8a43f4744c6d89cf11299e16b611df6aba2e8b62a4206955`. Development returned +1.843750 / +2.480469 / +0.328125 / −0.013672 BB/hand against random / station / tight-aggressive / equity-bucket. Only random and station had positive adjusted lower bounds, so V10 failed. All 512 paired records reproduced exactly in a subsequent coverage audit. V11 changed only the fixed horizon to 100,000 traversals and started from the same initialization. Its first 30,000 full journal records reproduced V10 byte for byte; final training completed with 306,943 information sets. See the [teacher history](TEACHER.md) and [V10 protocol](EXTERNAL_REGRET_TEACHER.md).
+
+V11's fixed average policy `52bd9fbf298031415bf03f99072c4a144539d0f4f620452ee03f2aaf65f22df7` failed the original 128 paired development deals per opponent: random +2.576172 BB/hand [1.083459, 4.097754], station +3.568359 [2.699695, 4.446313], tight-aggressive +0.314453 [−0.438977, 1.031775], equity-bucket −0.515625 [−1.595703, 0.639673]. These are suite-adjusted intervals; only random and station have positive lower bounds. Independent qualification recomputation and replay of all 512 actual paired records passed, preserving the negative outcome. All 32 information-boundary checks passed.
+
+That replay counted 2,226 teacher decisions: 105 folds, 575 checks, 236 calls, 309 half-pot raises, 800 pot raises and 201 all-ins. The teacher uses all five abstract actions, but this variety does not establish poker strength or change the cue-trained live fly. The separate V12 final-positive-regret policy is now exported, SHA `6b14ca2d9b1dd559fb5de1f8649611a38de488d5eae2f73dc190f97a0367440a`; it has no evaluation or qualification yet. It must pass its own original development and confirmation suites before teaching.
 
 Full teacher confirmation now requires a verified passing development run for the same frozen policy. Confirmation, recovery and downstream corpus/Gate 2A checks bind and reverify its exact artifacts. The real failed V9 result was rejected before policy inference, confirmation deals or output creation.
 
@@ -88,6 +92,7 @@ Actual native poker training remains guarded by full Gate 2A and preceding curri
 | Full conditioning | `runs/conditioning-full-confirm-v1` | `8fec88ae335b4940f97c09a3c8e5f6e026b1059dd8444b29f5ce63102409cca5` |
 | Failed local cue transfer | `runs/exact-transfer-circuit-confirm-v1` | `5110abe179cbb6dcecb13fc2d6a9527ed287b27808366607faa4c7528b37a0ab` |
 | Circuit surrogate transfer | `runs/exact-surrogate-circuit-confirm-v1` | `3a9a11fe172c6aa1fa659d3c0b7e154b9ed94dcbdd44b1e7f6b30d80e0175f4e` |
+| Failed V11 full teacher | `runs/teacher-external-regret-v11-development` | `30856a567f37c83b4a89adc2f47622ef5ce5a8756c43fbf6d71e67a458749eb8` |
 | Failed V10 full teacher | `runs/teacher-external-regret-v10-development` | `9aa3b092046284baf4f3801f62af956d57e7f394816855675584b73d4e3ca37f` |
 | Failed V9 full teacher | `runs/teacher-potential-boundary-v9-development` | `0fd06b781bfc89d5be2e26d310c0839934c95882d025df246a9d01d5e29c3931` |
 
@@ -95,7 +100,7 @@ Each named run contains its `manifest.json` and `result.json`; modern experiment
 
 Native training and its replay now keep detailed hand records on disk, with streamed audits and bounded retained windows. In a synthetic 64 MiB journal benchmark, indexed write/resume used 322,314 peak traced Python bytes versus 68,535,459 with resident records, with byte-identical files. These storage figures exclude the neural graph/state; see [training replay resources](TRAINING_REPLAY.md).
 
-A future conventional teacher runtime can use [exact PokerKit traversal reuse](POKER_TREE_PERFORMANCE.md). A small prototype workload ran about twice as fast with identical recorded and numeric results; the final helper reproduced all first 128 original training records. V11 continues its original frozen source.
+A future conventional teacher runtime can use [exact PokerKit traversal reuse](POKER_TREE_PERFORMANCE.md). A small prototype workload ran about twice as fast with identical recorded and numeric results; the final helper reproduced all first 128 original training records. V11 completed through its original frozen source.
 
 Twenty focused corpus/regret/qualification checks and a fresh process with no Torch module loaded also passed after correcting tabular corpus backend provenance. These integration fixtures do not constitute a qualified teacher or scientific corpus.
 

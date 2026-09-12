@@ -100,3 +100,31 @@ PYTHONPATH="$PWD/runs/teacher-runtime-v11/src" .venv/bin/python scripts/audit_te
 ```
 
 Evaluation resume replaces `--output` with `--resume` for that same directory. Original confirmation is still unused and requires independently verified passing development. If V11 development fails, preserve its result and proceed with the reviewed V12 fixed-final candidate; otherwise use the existing V11 confirmation/downstream path. No full teacher qualification, full corpus, Gate 2A certificate or native poker model exists yet. Gates 3–6 remain pending, and the full goal stays active.
+
+
+## V11 failed; reviewed V12 final policy frozen before development
+
+The original V11 average policy completed all 128 paired deals per original opponent and failed the unchanged full development suite:
+
+| Opponent | BB/hand | Suite-adjusted interval |
+| --- | ---: | --- |
+| random | +2.576172 | [1.083459, 4.097754] |
+| calling-station | +3.568359 | [2.699695, 4.446313] |
+| tight-aggressive | +0.314453 | [-0.438977, 1.031775] |
+| equity-bucket | -0.515625 | [-1.595703, 0.639673] |
+
+Only random and calling station have positive lower confidence bounds. Complete-journal and statistical recomputation passed, as did all 32 hidden-information probes. Result SHA `30856a567f37c83b4a89adc2f47622ef5ce5a8756c43fbf6d71e67a458749eb8`; evaluation manifest `16efe2b48dd6503c6e3c066fe77d85242643552c74a72f5924707b0ccb411245`; paired journal `8ad199317e7cb8b2b61fabffb260984f8dabbcbdbc3dd7d612b1071fd605ea3e`. V11 remains barred from teaching and did not use full confirmation.
+
+Actual PokerKit replay reproduced all 512 paired records and 2,226 decisions: 105 folds, 575 checks, 236 calls, 309 half-pot raises, 800 pot raises and 201 all-ins. The decision trace is `7680a956e2fb23a089a505a4be9781477acd161a94a435f2e46f5d615a43e1b4`. This is real action variety in a conventional candidate, not a stronger native fly or sufficient poker qualification.
+
+Following the already registered conditional order, reviewed V12 was extracted from that same completed 100,000-step final checkpoint. Its frozen policy SHA is `6b14ca2d9b1dd559fb5de1f8649611a38de488d5eae2f73dc190f97a0367440a`; 306,943 information sets; 86,871,895 disk bytes. All original checkpoint keys, legal masks and regret bytes matched their pinned hashes. A fresh load exactly rederived every action distribution and reverified the complete historical checkpoint/provenance/RNG; no Torch loaded. Final checkpoint metadata SHA `bced70b7cbb4e0b750b5216aa15a960491dbd9d2802c51eca4513371fc2c8725`; regret file SHA `773be6a96db31f28ac1858d14ad5e92003aa96dfe78c1d34d7d20eb1af2d1250`; extraction YAML `a3bd05a204bb8603ffd3e0e5946e3ff27bc2214619c97c2e4832e593c68d356a`; implementation `f6aa18842893bfceb4783ebbac827697cf957c18caf6a230e231491c0d9f1d98`. Source remains reviewed `f70a256a49f9e80274290f1835cb1f9f20d84abb9e573dceff95f4fdb3dd373a` from a97506f. This identity is recorded before V12 development; no policy temperature, checkpoint or action override was selected from the V11 outcome.
+
+After this identity is published, run:
+
+```sh
+PYTHONPATH="$PWD/runs/teacher-runtime-v12-reviewed/src" .venv/bin/python -m flyholdem.cli teacher evaluate --policy runs/teacher-final-regret-v12-policy --config runs/teacher-runtime-v12-reviewed/configs/teacher_evaluation.yaml --profile development --output runs/teacher-final-regret-v12-development
+PYTHONPATH="$PWD/runs/teacher-runtime-v12-reviewed/src" .venv/bin/python -m flyholdem.cli teacher verify-evaluation --run runs/teacher-final-regret-v12-development --policy runs/teacher-final-regret-v12-policy --allow-development
+PYTHONPATH="$PWD/runs/teacher-runtime-v12-reviewed/src" .venv/bin/python runs/teacher-runtime-v12-reviewed/scripts/audit_teacher_play.py --run runs/teacher-final-regret-v12-development --policy runs/teacher-final-regret-v12-policy --output runs/teacher-final-regret-v12-play-audit.json
+```
+
+Evaluation resume replaces `--output` with `--resume` for the same directory. Full confirmation remains unused and requires a passing independently verified development result for this exact V12 policy. No qualified full teacher/corpus, full Gate 2A certificate or native poker model exists. The visible fly remains cue-conditioned; Gates 3–6 and the full goal remain pending.

@@ -1,6 +1,6 @@
 # Conventional teacher and disconnected student runtime
 
-Status: full-hand conventional teacher candidates V1–V10 failed qualification; V11 is registered. The small shove/fold teacher and cue-transfer/removal component passed their restricted tests. The fixture, circuit and full native dashboards work; the current full fly is cue-conditioned and poker-unvalidated.
+Status: full-hand conventional teacher candidates V1–V11 failed the original development suite. V12 is exported but has not been evaluated or qualified. The small shove/fold teacher and cue-transfer/removal component passed their restricted tests. The fixture, circuit and full native dashboards work; the current full fly is cue-conditioned and poker-unvalidated.
 
 ## Teacher algorithm
 
@@ -232,7 +232,7 @@ The fixed boundary policy a15dacb25161be56227eb9ec8f581c932ccc1ba616ec8c492fd7b7
 
 The next conventional candidate learns a tabular regret response to the fixed uniform original opponent population. It enumerates every legal own action on each sampled PokerKit chance/opponent traversal, records actual terminal BB values and averages strategies by own prefix reach. The eight-bucket visible-card abstraction remembers every earlier street bucket and the complete public action history. It makes no self-play equilibrium claim. Source, exact algorithm limitations, recovery, numeric export, resource probes and the fixed 30,000-traversal protocol are documented in [EXTERNAL_REGRET_TEACHER.md](EXTERNAL_REGRET_TEACHER.md).
 
-V10 is registered but has no held-out result yet. Reserved development, confirmation and boundary deals are excluded before training output creation. The original qualification suite and all prior negative results remain unchanged. No full corpus or Gate 2A certificate exists, and the fly's inference and biological parameters are unchanged.
+At registration V10 had no held-out result; its later failure is preserved below. Reserved development, confirmation and boundary deals are excluded before training output creation. The original qualification suite and all prior negative results remain unchanged. No full corpus or Gate 2A certificate exists, and the fly's inference and biological parameters are unchanged.
 
 
 ## Full teacher confirmation requires passing development
@@ -254,9 +254,24 @@ V10's fixed final policy 762b180986a3983e8a43f4744c6d89cf11299e16b611df6aba2e8b6
 
 A read-only diagnostic replay reproduced all 512 paired records exactly. Of 1,948 actual teacher decisions, 23 states were unseen and 11 seen states had zero own-reach average mass. River coverage was thinner: 13/179 unseen, and 164/166 seen river decisions used states visited at most 100 times. Across the entire training table, visit quartiles were 1/1/3 and 123,129/152,391 states had zero own-reach average mass because full counterfactual branching also visits zero-reach continuations. These counts motivate a duration experiment; they do not establish a causal explanation of the failed strategic result.
 
-V11 changes only the fixed horizon from 30,000 to 100,000 traversals in configs/teacher_external_regret_v11.yaml (SHA bcab450348d8aeb9abba80ddd6e35f0a9b47bd876a331a394ffbb7b23aa764c2). It restarts from the same initialization and sampling/deal sequence, so the first 30,000 operations should reproduce V10; it does not modify or relabel V10's completed run. Same algorithm, full public/private-bucket recall, eight equity buckets, 64 samples, original equal opponent mixture, averaging, stack depth and final-only export. Training deals 1,000,000–1,099,999 remain disjoint from all reserved development/confirmation probes. There is no biological or opponent selection from poker profit. This is a separate development candidate, without a strength or equilibrium claim.
+V11 changes only the fixed horizon from 30,000 to 100,000 traversals in configs/teacher_external_regret_v11.yaml (SHA bcab450348d8aeb9abba80ddd6e35f0a9b47bd876a331a394ffbb7b23aa764c2). It restarted from the same initialization and sampling/deal sequence, and its first 30,000 complete journal records exactly reproduced V10; it does not modify or relabel V10's completed run. Same algorithm, full public/private-bucket recall, eight equity buckets, 64 samples, original equal opponent mixture, averaging, stack depth and final-only export. Training deals 1,000,000–1,099,999 remain disjoint from all reserved development/confirmation probes. There is no biological or opponent selection from poker profit. This is a separate development candidate, without a strength or equilibrium claim.
 
-After checked publication, freeze exact src/lock/configs and a separate existing equity binary in runs/teacher-runtime-v11. Execute `PYTHONPATH="$PWD/runs/teacher-runtime-v11/src" .venv/bin/python -m flyholdem.cli teacher train-regret --config runs/teacher-runtime-v11/configs/teacher_external_regret_v11.yaml --output runs/teacher-external-regret-v11 --stop-after 128`; verify this prefix against V10, then resume the same command with --resume runs/teacher-external-regret-v11 instead of --output/--stop-after. The same frozen source includes the enforced development prerequisite for confirmation. Export only the fixed final model, publish its identity before the original development suite, and independently verify the result. Full confirmation remains unused; no full corpus or Gate 2A certificate exists. Gates 3–6 remain pending. Current dashboards and human play remain available. No environment/shared binary changes.
+### V11 completed; original development failed
+
+The unchanged frozen runtime completed 100,000 traversals, 13,858,172 counterfactual nodes, 5,275,792 terminal branches and 306,943 information sets. Only the fixed final average policy was exported: SHA `52bd9fbf298031415bf03f99072c4a144539d0f4f620452ee03f2aaf65f22df7`. Its original 128 paired development deals per opponent gave:
+
+| Opponent | BB/hand | Suite-adjusted bootstrap interval |
+| --- | ---: | --- |
+| Random | +2.576172 | [1.083459, 4.097754] |
+| Calling station | +3.568359 | [2.699695, 4.446313] |
+| Tight-aggressive | +0.314453 | [−0.438977, 1.031775] |
+| Equity-bucket | −0.515625 | [−1.595703, 0.639673] |
+
+Only random and station have positive lower bounds, so V11 failed and cannot teach. All 32 information-boundary checks passed. Independent qualification recomputation and actual PokerKit replay reproduced all 512 paired records exactly. Development result SHA `30856a567f37c83b4a89adc2f47622ef5ce5a8756c43fbf6d71e67a458749eb8`; manifest `16efe2b48dd6503c6e3c066fe77d85242643552c74a72f5924707b0ccb411245`; paired journal `8ad199317e7cb8b2b61fabffb260984f8dabbcbdbc3dd7d612b1071fd605ea3e`.
+
+The replay's 2,226 teacher decisions comprised 105 folds, 575 checks, 236 calls, 309 half-pot raises, 800 pot raises and 201 all-ins. These are descriptive counts from the same evaluated deals, not a new trial or evidence of adequate strength. All streets included checks, calls and raises. The actual-play audit is retained locally at `runs/teacher-external-regret-v11-play-audit.json`; decision trace SHA `7680a956e2fb23a089a505a4be9781477acd161a94a435f2e46f5d615a43e1b4`.
+
+Full confirmation remains unused; no full corpus or Gate 2A certificate exists. Gates 3–6 remain pending. The live fly remains the frozen cue-conditioned model.
 
 
 ## Tabular corpus backend and dependency check
@@ -268,4 +283,4 @@ Twenty relevant tabular/neural corpus, regret-policy and qualification checks pa
 
 ## V12: fixed final regret-matching candidate
 
-The user-observed shove/fold collapse is now quantified from the live frozen model. Poker strength takes priority. A separate positive-final-regret extraction is registered before V11 completes; its numeric/source/recovery checks and conditional execution order are in [POKER_STRENGTH.md](POKER_STRENGTH.md). It has no qualified result and does not alter V11 training, original average export or the visible neural model.
+The user-observed shove/fold collapse is quantified from the live frozen model. Poker strength takes priority. A separate positive-final-regret extraction was registered before V11 completed. Following V11's failed development, V12 was exported from the same completed numeric state through its reviewed frozen runtime: policy SHA `6b14ca2d9b1dd559fb5de1f8649611a38de488d5eae2f73dc190f97a0367440a`. Its numeric/source/recovery checks and execution order are in [POKER_STRENGTH.md](POKER_STRENGTH.md). V12 has not been evaluated or qualified; it must pass the unchanged original development suite before using reserved confirmation. It has no equilibrium or strength claim and does not alter V11's original average policy or the visible neural model.
