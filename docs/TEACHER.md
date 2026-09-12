@@ -183,3 +183,10 @@ PYTHONPATH="$PWD/runs/teacher-runtime-v7/src" .venv/bin/python -m flyholdem.teac
 ```
 
 Add `--resume` after interruption. Existing environments and shared native binaries remain unchanged. Checkpoints and complete reward journals remain local and ignored.
+
+
+## Corpus qualification replays the named teacher
+
+`teacher verify-qualified-corpus --corpus CORPUS --policy POLICY --validation-run CONFIRMATION_RUN` first recomputes full teacher qualification, loads its actual numeric policy and repeats its private-information invariance probes. It then reproduces every complete PokerKit collection hand, every target, the registered mixture RNG, deduplication, per-stratum limits, first sufficient coverage boundary and exact sorted split bytes. It verifies the original configs/corpus.yaml and all teacher/evaluation/collection bindings. Rehashed but altered targets, trajectories or coverage metadata are rejected. The cheaper `verify-corpus` remains an explicitly structural check and grants no qualification.
+
+Four engineering checks use an untrained numeric policy and actual collection hands; a deliberately isolated synthetic qualification stub exists only inside collection tests. The public qualified verifier rejects that fixture. These are integrity checks, not successful teacher/corpus or biological poker results.

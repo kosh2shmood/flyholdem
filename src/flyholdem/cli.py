@@ -88,6 +88,9 @@ def parser():
     verified.add_argument('--allow-development',action='store_true',help='Audit development evidence without authorizing a teacher')
     verify=ts.add_parser('verify-corpus',help='Check target legality, hashes and canonical split disjointness')
     verify.add_argument('--corpus',required=True)
+    qualified=ts.add_parser('verify-qualified-corpus',help='Reproduce full PokerKit collection and targets from a confirmed teacher')
+    qualified.add_argument('--corpus',required=True);qualified.add_argument('--policy',required=True)
+    qualified.add_argument('--validation-run',required=True)
     return root
 
 
@@ -144,6 +147,9 @@ def dispatch(args):
         if action=='verify-evaluation':
             from flyholdem.teacher.validation import verify_evaluation
             return verify_evaluation(args.run,args.policy,require_confirmatory=not args.allow_development)
+        if action=='verify-qualified-corpus':
+            from flyholdem.teacher.corpus_validation import verify_qualified_corpus
+            return verify_qualified_corpus(args.corpus,args.policy,args.validation_run)
         if action=='verify-corpus':
             from flyholdem.teacher.corpus import verify_corpus
             return verify_corpus(args.corpus)

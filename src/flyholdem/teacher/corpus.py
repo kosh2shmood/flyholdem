@@ -39,6 +39,30 @@ def validate_targets(observation, probabilities):
     return state, probabilities
 
 
+def collection_hand(policy, config, hand_index):
+    """Reproduce one complete canonical collection hand from public targets."""
+    seed = config['seed_start'] + hand_index
+    hand = Hand(seed, button=hand_index % 2, stacks=(config['stack_bb'] * 2,) * 2)
+    rng = np.random.default_rng(seed + 1000000)
+    random_opponent = Opponent(seed + 2000000, 'random')
+    station = Opponent(seed + 3000000, 'calling-station')
+    states = []
+    while not hand.done:
+        observation = canonical_state(hand.observation())
+        probabilities = policy.probabilities(observation)
+        validate_targets(observation, probabilities)
+        states.append({'observation': observation, 'probabilities': probabilities.tolist()})
+        mixture = rng.random()
+        if mixture < config['calling_station_collection_probability']:
+            action = station.act(observation)
+        elif mixture < config['calling_station_collection_probability'] + config['random_collection_probability']:
+            action = random_opponent.act(observation)
+        else:
+            action = int(rng.choice(5, p=probabilities))
+        hand.act(action)
+    return states
+
+
 def export_corpus(policy_path, validation_path, config, output, resume=False):
     validation = json.loads(Path(validation_path).read_text())
     policy_hash = digest(Path(policy_path) / 'manifest.json')
@@ -82,25 +106,7 @@ def export_corpus(policy_path, validation_path, config, output, resume=False):
                     raise ValueError('Corpus collection journal plan changed')
                 states = cached['value']['visible_states']
             else:
-                seed = config['seed_start'] + hand_index
-                hand = Hand(seed, button=hand_index % 2, stacks=(config['stack_bb'] * 2,) * 2)
-                rng = np.random.default_rng(seed + 1000000)
-                random_opponent = Opponent(seed + 2000000, 'random')
-                station = Opponent(seed + 3000000, 'calling-station')
-                states = []
-                while not hand.done:
-                    observation = canonical_state(hand.observation())
-                    probabilities = policy.probabilities(observation)
-                    validate_targets(observation, probabilities)
-                    states.append({'observation': observation, 'probabilities': probabilities.tolist()})
-                    mixture = rng.random()
-                    if mixture < config['calling_station_collection_probability']:
-                        action = station.act(observation)
-                    elif mixture < config['calling_station_collection_probability'] + config['random_collection_probability']:
-                        action = random_opponent.act(observation)
-                    else:
-                        action = int(rng.choice(5, p=probabilities))
-                    hand.act(action)
+                states = collection_hand(policy, config, hand_index)
                 journal.record(hand_index, ['collection-hand', hand_index], {'visible_states': states})
             for item in states:
                 observation, probabilities = validate_targets(item['observation'], item['probabilities'])
