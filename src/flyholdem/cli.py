@@ -82,6 +82,8 @@ def parser():
     small_eval.add_argument('--config',default='configs/shove_fold_teacher_evaluation.yaml')
     small_eval.add_argument('--profile',choices=['development','confirmatory'],default='development')
     small_eval.add_argument('--development-reference');_output_options(small_eval)
+    boundary=ts.add_parser('export-potential-boundary',help='Apply the exact terminal fold value to a matched stack-potential Q candidate')
+    boundary.add_argument('--config',required=True);boundary.add_argument('--output',required=True)
     q_export=ts.add_parser('export-best-response',help='Extract explicitly labeled final Q components from matched completed training')
     q_export.add_argument('--config',required=True);q_export.add_argument('--output',required=True)
     train=ts.add_parser('train',help='Train registered NFSP self-play')
@@ -166,6 +168,9 @@ def dispatch(args):
         if action=='export-shove-fold':
             from flyholdem.teacher.shove_fold_training import export_training
             return export_training(args.run,args.output)
+        if action=='export-potential-boundary':
+            from flyholdem.teacher.potential_policy import export_boundary
+            return export_boundary(configuration(args.config),args.output)
         if action=='export-best-response':
             from flyholdem.teacher.q_policy import export_components
             return export_components(configuration(args.config),args.output)

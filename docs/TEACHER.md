@@ -201,3 +201,23 @@ V8 uses the already tested final-Q extraction mechanism, now bound to V7's compl
 ## Online supervision respects canonical held-out splits
 
 The complete-hand teaching mechanism can restrict queries to the deterministic canonical train split. Validation/test states still receive actual native decisions, but no teacher target is queried or delivered for them; they are explicitly logged as held out. This prevents later online distillation from accidentally teaching states reserved for corpus validation or testing. Terminal-return learning is separate and cannot take this teacher-only option. Actual native integration checks observe both delivered and skipped targets and reject use during evaluation. This mechanism is available to the forthcoming gated curriculum orchestrator; no biological poker distillation has been run.
+
+
+### V8 negative result
+
+The fixed V8 policy 4188ecd4fd8c5a13b3b940c9045f435d5129980d9664e1dd4e29b6bacd09b0c0 failed the full original development suite: random -0.941406 BB/hand [-2.553259, 0.677734], station +2.101563 [1.071265, 3.138721], TAG +0.019531 [-0.955603, 0.957556], equity -1.619141 [-2.788586, -0.492188]. Only the calling-station lower bound was positive. All 32 information-boundary probes passed and all 512 paired-deal/statistic checks recomputed exactly. Result SHA ec17ae060a7406424f18b7dba5df502a862e1a8368dc36d7a3970bfe4b79f438; evaluation manifest 1f063594818622efdbfa672dfd61747e991f6eb1d41ffed25b9f0378eae58be1; paired journal SHA ff099e4483eb34c0f421aa6ebca80d5e19b3892eb6abfb369c3440b0119f4921. Full confirmation remains unused.
+
+## V9: exact terminal fold boundary in the conventional teacher
+
+V7's fixed reward parameterization gives a legal fold exactly zero future shaped return: raw payoff (remaining stack minus initial stack)/initial stack is canceled by the current public-stack potential, with terminal potential zero. V9 substitutes that exact value for the learned fold estimate, then takes each component's legal greedy action and their equal mixture. The other four learned values and every tensor byte are unchanged. This can change decisions in either direction; it is not an instruction always to fold. Nonfinite model outputs still fail before the boundary is applied, and an illegal fold remains masked.
+
+This is an explicitly conventional value-function boundary, not a fly readout, historical NFSP average or equilibrium claim. It is valid only for the matched completed undiscounted own-stack-potential-v1 training; export binds the source V8 policy and V7 training manifest and rejects other reward definitions. No retraining, opponent change or biological parameter change occurs. Three new checks cover exact legal selection, immutable tensors, invalid values, source/reward bindings, private invariance and the full original evaluator with recomputed qualification statistics.
+
+Register configs/teacher_potential_boundary_v9.yaml and freeze src/uv.lock/extraction/evaluation configs plus a separate verified teacher-equity binary in runs/teacher-runtime-v9 before execution:
+
+```sh
+PYTHONPATH="$PWD/runs/teacher-runtime-v9/src" .venv/bin/python -m flyholdem.cli teacher export-potential-boundary --config runs/teacher-runtime-v9/configs/teacher_potential_boundary_v9.yaml --output runs/teacher-potential-boundary-v9-policy
+PYTHONPATH="$PWD/runs/teacher-runtime-v9/src" .venv/bin/python -m flyholdem.cli teacher evaluate --policy runs/teacher-potential-boundary-v9-policy --config runs/teacher-runtime-v9/configs/teacher_evaluation.yaml --profile development --output runs/teacher-potential-boundary-v9-development
+```
+
+Resume evaluation replaces `--output` with `--resume` naming that run. The original full opponent suite and untouched confirmation deals remain required before teaching. The fly's frozen inference files and action-score source are unchanged.

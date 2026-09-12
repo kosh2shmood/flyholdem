@@ -6,6 +6,7 @@ from pathlib import Path
 def sampling(record):
     if record['schema']=='teacher-average-policy-v1':return 'frozen-average-policy-probabilities'
     if record['schema']=='teacher-best-response-policy-v1':return 'frozen-equal-mixture-of-legal-greedy-Q-policies'
+    if record['schema']=='teacher-potential-boundary-policy-v1':return 'frozen-Q-mixture-with-exact-stack-potential-fold-boundary'
     raise ValueError('Unsupported full-hand conventional policy kind')
 
 
@@ -14,6 +15,8 @@ def load_policy(path):
     sampling(record)
     if record['schema']=='teacher-average-policy-v1':
         from .policy import load_policy as load
+    elif record['schema']=='teacher-potential-boundary-policy-v1':
+        from .potential_policy import load_policy as load
     else:
         from .q_policy import load_policy as load
     return load(path)

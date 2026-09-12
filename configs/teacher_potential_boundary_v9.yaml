@@ -1,0 +1,9 @@
+schema: teacher-potential-boundary-extraction-v1
+algorithm: population-Double-DQN-exact-fold-boundary-v1
+aggregation: equal-legal-greedy-Q-mixture-with-exact-zero-fold-value
+reward_parameterization: own-stack-potential-v1
+status: development
+source_policy: runs/teacher-best-response-v8-policy
+source_policy_sha256: 4188ecd4fd8c5a13b3b940c9045f435d5129980d9664e1dd4e29b6bacd09b0c0
+training_run: runs/teacher-nfsp-potential-v7
+training_manifest_sha256: da1cce8ecd5aacc5d99fe93e6f59ee20128266e8983544913dc8cfffb5a6b1fe
