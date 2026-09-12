@@ -1,6 +1,6 @@
 # Exact-cue transfer integrity
 
-Status: implementation verified, circuit experiment pending. This is one component of Gate 2A; the conventional poker teacher must independently pass its opponent suite, and corpus checks must pass before the complete gate can pass. No poker transfer or strategic learning is claimed.
+Status: circuit development qualified; independent confirmation pending. This is one component of Gate 2A; the conventional poker teacher must independently pass its opponent suite, and corpus checks must pass before the complete gate can pass. No poker transfer or strategic learning is claimed.
 
 The exact two-state teacher gives one-hot probabilities for two declared actions. Its only input is the visible cue token. During training, twice the difference between the selected action probability and the uniform-legal mean supplies the signed teaching signal. The already registered local eligibility rule subtracts a past-only signal baseline and changes only existing KC-to-MBON edges within 0.1–2.0 of their original signed strengths. The teacher is queried after the neural action, only in training. Evaluation scores come from the native circuit alone.
 
@@ -21,3 +21,17 @@ Both commands support --resume with unchanged code/config/environment. Confirmat
 ```
 
 A failed local transfer gate is preserved and blocks a local-transfer success claim. It permits the next explicitly nonbiological, bounded-edge surrogate method under a separately registered protocol; it never permits a policy bypass.
+
+## Development result and actual inference removal check
+
+Execution 1a232a5: development completed in 173.24 s / 134.1 MB RSS. Learned accuracy was 0.84375, 0.84375, 0.78125 over the three registered seeds (mean 0.8229167). Frozen/restored mean was 0.5520833; shuffled-signal mean 0.5416667. Retention decisions were unchanged. The registered development criteria passed; this does not substitute for the reserved confirmation seeds.
+
+The 40-trial smoke completed in 6.31 s / 139.9 MB. Stop/resume at operation 30 reproduced its 173-operation journal byte for byte (SHA-256 2dca8a3e4889d3b94475d9cb2e7fa33b2dc542fddd9f83f80916385d662c16a3). The actual exported development model has SHA-256 1c4d40c30ea186577c9933aacd22e99c6d3188ec512c8c641234fb906cff5704. All 64 held-out decisions exactly reproduced the actual training run, remained byte-identical after deleting teacher/corpus files, and loaded no teacher, learning or experiment modules. Decision bytes SHA-256: 27b096091d9199766c43b9b0f7a76591638341bc4f631c8eda54d641502b1ee5. A changed cue driver was rejected. Generated evidence stays local in ignored runs/.
+
+Freeze this source in ignored runs/exact-runtime-v1 (including the lockfile/config and references to immutable data/native binary). Confirmation uses the same source and selected 0.3 rate with five reserved seeds:
+
+```sh
+PYTHONPATH="$PWD/runs/exact-runtime-v1/src" .venv/bin/python -m flyholdem.experiments.exact_transfer --config runs/exact-runtime-v1/configs/exact_transfer.yaml --profile confirmatory --learning-rate 0.3 --development-reference runs/exact-transfer-circuit-dev-v1/result.json --output runs/exact-transfer-circuit-confirm-v1
+```
+
+Add --resume after interruption. Export/audit must use that same frozen runtime. Independent checkout implementation may continue; the snapshot, native binary, source data and installed environment must remain unchanged.
