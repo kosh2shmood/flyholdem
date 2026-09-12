@@ -127,3 +127,15 @@ PYTHONPATH="$PWD/runs/teacher-runtime-v5/src" .venv/bin/python -m flyholdem.teac
 ```
 
 Add --resume after interruption. Export and validation use the same PYTHONPATH. This candidate remains unvalidated until the unchanged development and reserved confirmation suites pass. Generated data/checkpoints/logs remain local. Preserve every prior failure.
+
+## Recomputed qualification before corpus export
+
+Corpus export now requires the complete evaluated run: result.json, manifest.json and its paired-deal journal. It verifies the exact registered opponent order, deal seeds/counts, policy tensors and stack, recomputes every bootstrap interval and summary, and rejects inconsistent qualification flags. The loaded policy also repeats the actual hidden-hole/future-deck/label boundary test before collection. This checks local artifact consistency; it is not a cryptographic signature or a substitute for measured validation.
+
+Audit a development candidate without authorizing it:
+
+```sh
+.venv/bin/flyholdem teacher verify-evaluation --run runs/teacher-nfsp-double-v4-development --policy runs/teacher-nfsp-double-v4-policy --allow-development
+```
+
+Omit `--allow-development` to require passing confirmation. The real v4 development evidence recomputed exactly (512 paired deals), and remains failed/unapproved. Seven new numerical-artifact checks cover altered intervals/flags, schedule substitutions, tensor changes, missing opponents and truncation. These synthetic test artifacts are not poker results.

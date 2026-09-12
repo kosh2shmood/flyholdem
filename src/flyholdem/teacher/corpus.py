@@ -47,7 +47,13 @@ def export_corpus(policy_path, validation_path, config, output, resume=False):
             or validation.get('allowed_as_teacher') is not True
             or validation.get('policy_sha256') != policy_hash or validation.get('stack_bb') != config['stack_bb']):
         raise ValueError('Corpus export requires a matching validated frozen teacher')
+    if Path(validation_path).name != "result.json":
+        raise ValueError("Teacher validation must reference result.json in its complete evaluated run")
+    from .validation import verify_evaluation
+    verify_evaluation(Path(validation_path).parent, policy_path)
     policy, policy_record = load_policy(policy_path)
+    from .evaluation import verify_information_boundary
+    verify_information_boundary(policy)
     from flyholdem.experiments.journal import Journal
     from flyholdem.provenance import manifest, assert_compatible
     output = Path(output); output.mkdir(parents=True, exist_ok=resume)

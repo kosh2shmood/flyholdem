@@ -72,6 +72,9 @@ def parser():
     corpus=ts.add_parser('export-corpus',help='Export disjoint canonical states only from a confirmed validated teacher')
     corpus.add_argument('--policy',required=True);corpus.add_argument('--validation',required=True)
     corpus.add_argument('--config',required=True);_output_options(corpus)
+    verified=ts.add_parser('verify-evaluation',help='Recompute teacher qualification from registered paired deals and numeric policy hashes')
+    verified.add_argument('--run',required=True);verified.add_argument('--policy',required=True)
+    verified.add_argument('--allow-development',action='store_true',help='Audit development evidence without authorizing a teacher')
     verify=ts.add_parser('verify-corpus',help='Check target legality, hashes and canonical split disjointness')
     verify.add_argument('--corpus',required=True)
     return root
@@ -121,6 +124,9 @@ def dispatch(args):
         if action=='export':
             from flyholdem.teacher.export import export_training
             return export_training(args.run,args.output,args.which)
+        if action=='verify-evaluation':
+            from flyholdem.teacher.validation import verify_evaluation
+            return verify_evaluation(args.run,args.policy,require_confirmatory=not args.allow_development)
         if action=='verify-corpus':
             from flyholdem.teacher.corpus import verify_corpus
             return verify_corpus(args.corpus)
