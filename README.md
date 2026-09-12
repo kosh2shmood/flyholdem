@@ -73,3 +73,8 @@ Native replay uses `--mode full --replay <complete-native-log.jsonl>` (or circui
 ## Play a private heads-up match
 
 Open either dashboard and choose **Play against fly**. Your hand stays readable beside the community-card strip, the fly's cards remain private until shown at showdown, and both rigs animate their actual actions. Buttons reflect server-validated legal wagers. Deal next hand alternates the button and resets both stacks to 20 BB; reload keeps the current match while the server is running. Select Live or Recorded replay to leave the match. The current native model has confirmed cue learning but no validated poker strategy. Details and browser-check commands are in docs/UI.md.
+
+
+## Unified research commands and reports
+
+Run `.venv/bin/flyholdem --help` for registered conditioning, exact-cue distillation, controllability, conventional teacher training/export/evaluation and guarded corpus commands. Completed workflows generate local Markdown, standalone HTML and JSON reports. To inspect existing evidence without reexecuting a model, use `.venv/bin/flyholdem report --run runs/exact-surrogate-circuit-confirm-v1`. The reporter rejects inconsistent/corrupt modern hash chains and explicitly marks the limited verification of older logs. See [command reference](docs/COMMANDS.md) for exact commands, resume conventions and current scope. General poker curriculum runners remain pending; these commands do not imply their gates passed.

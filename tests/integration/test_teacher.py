@@ -146,3 +146,17 @@ def test_double_dqn_selects_online_and_evaluates_target_with_legality_and_termin
     assert torch.equal(bootstrap_values(online,target,x,legal,terminal,'dqn'),torch.tensor([9.,0.]))
     assert not bootstrap_values(online,target,x,legal,terminal,'double-dqn').requires_grad
     with pytest.raises(ValueError):bootstrap_values(online,target,x,legal,terminal,'unknown')
+
+
+
+def test_unified_teacher_cli_executes_real_training_and_writes_verified_report(tmp_path,capsys):
+    import yaml
+    from flyholdem.cli import main
+    config=copy.deepcopy(CONFIG);config['hands']=3
+    path=tmp_path/'tiny.yaml';path.write_text(yaml.safe_dump(config))
+    out=tmp_path/'cli-training'
+    main(['teacher','train','--config',str(path),'--output',str(out)])
+    report=json.loads((out/'report/report.json').read_text())
+    assert report['status']=='trained-unvalidated' and not report['allowed_as_teacher']
+    assert report['journal_verification']['hands.jsonl']['rows']==3
+    assert json.loads((out/'result.json').read_text())['hands_completed']==3
