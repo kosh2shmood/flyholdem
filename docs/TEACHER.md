@@ -226,3 +226,10 @@ Resume evaluation replaces `--output` with `--resume` naming that run. The origi
 ### V9 negative result
 
 The fixed boundary policy a15dacb25161be56227eb9ec8f581c932ccc1ba616ec8c492fd7b7ea0c6f65f0 also failed. Its complete 512 paired-deal records were byte-identical to V8 (journal SHA ff099e4483eb34c0f421aa6ebca80d5e19b3892eb6abfb369c3440b0119f4921), with the same returns, action counts and intervals. The post-training exact fold-value correction therefore did not improve this evaluated candidate. All 32 private-information probes passed and independent statistics recomputed exactly. Result SHA 0fd06b781bfc89d5be2e26d310c0839934c95882d025df246a9d01d5e29c3931; evaluation manifest 0014d9020d29b762687570accd53681202e579732a57b468ca0234e5e3d2fbe9. Full confirmation remains unused. Neither a full-hand corpus nor biological poker training is authorized.
+
+
+## V10: registered external-sampling regret response
+
+The next conventional candidate learns a tabular regret response to the fixed uniform original opponent population. It enumerates every legal own action on each sampled PokerKit chance/opponent traversal, records actual terminal BB values and averages strategies by own prefix reach. The eight-bucket visible-card abstraction remembers every earlier street bucket and the complete public action history. It makes no self-play equilibrium claim. Source, exact algorithm limitations, recovery, numeric export, resource probes and the fixed 30,000-traversal protocol are documented in [EXTERNAL_REGRET_TEACHER.md](EXTERNAL_REGRET_TEACHER.md).
+
+V10 is registered but has no held-out result yet. Reserved development, confirmation and boundary deals are excluded before training output creation. The original qualification suite and all prior negative results remain unchanged. No full corpus or Gate 2A certificate exists, and the fly's inference and biological parameters are unchanged.

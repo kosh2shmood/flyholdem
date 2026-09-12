@@ -98,7 +98,7 @@ def evaluate(policy_path, config, output, profile='development', resume=False):
     policy_hash = digest(Path(policy_path) / 'manifest.json')
     runtime_config = {**config, 'profile': profile, 'policy_sha256': policy_hash}
     runtime = manifest(runtime_config, 'conventional-teacher-no-connectome',
-                       identity(policy_record['feature_version']), identity(policy_record['aggregation']), 'pytorch-cpu')
+                       identity(policy_record['feature_version']), identity(policy_record['aggregation']), policy_record.get('inference_backend','pytorch-cpu'))
     if resume:
         assert_compatible(json.loads((output / 'manifest.json').read_text()), runtime)
     else:

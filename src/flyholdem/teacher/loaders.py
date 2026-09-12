@@ -4,6 +4,7 @@ from pathlib import Path
 
 
 def sampling(record):
+    if record['schema']=='teacher-external-regret-policy-v1':return 'frozen-reach-weighted-regret-average-fixed-population'
     if record['schema']=='teacher-average-policy-v1':return 'frozen-average-policy-probabilities'
     if record['schema']=='teacher-best-response-policy-v1':return 'frozen-equal-mixture-of-legal-greedy-Q-policies'
     if record['schema']=='teacher-potential-boundary-policy-v1':return 'frozen-Q-mixture-with-exact-stack-potential-fold-boundary'
@@ -13,7 +14,9 @@ def sampling(record):
 def load_policy(path):
     record=json.loads((Path(path)/'manifest.json').read_text())
     sampling(record)
-    if record['schema']=='teacher-average-policy-v1':
+    if record['schema']=='teacher-external-regret-policy-v1':
+        from .regret_policy import load_policy as load
+    elif record['schema']=='teacher-average-policy-v1':
         from .policy import load_policy as load
     elif record['schema']=='teacher-potential-boundary-policy-v1':
         from .potential_policy import load_policy as load

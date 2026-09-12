@@ -84,6 +84,10 @@ def parser():
     removal.add_argument('--model',required=True);removal.add_argument('--graph',required=True);removal.add_argument('--transfer-run',required=True)
     teacher=sub.add_parser('teacher',help='Independent conventional teacher workflow; never fly inference')
     ts=teacher.add_subparsers(dest='teacher_command',required=True)
+    regret=ts.add_parser('train-regret',help='Train a separate conventional external-sampling population response')
+    regret.add_argument('--config',default='configs/teacher_external_regret_v10.yaml');regret.add_argument('--stop-after',type=int);_output_options(regret)
+    export_regret=ts.add_parser('export-regret',help='Export the completed numeric regret-average policy, still unvalidated')
+    export_regret.add_argument('--run',required=True);export_regret.add_argument('--output',required=True)
     small=ts.add_parser('train-shove-fold',help='Train the separate small tabular 10 BB reference')
     small.add_argument('--config',default='configs/shove_fold_teacher.yaml');small.add_argument('--stop-after',type=int);_output_options(small)
     small_export=ts.add_parser('export-shove-fold',help='Export the small tabular reference; does not qualify a full teacher')
@@ -182,6 +186,9 @@ def dispatch(args):
         result=run(config,out,args.profile,args.learning_rate,resume,args.development_reference,args.stop_after)
     elif args.command=='teacher':
         action=args.teacher_command
+        if action=='export-regret':
+            from flyholdem.teacher.regret_policy import export_policy
+            return export_policy(args.run,args.output)
         if action=='export-shove-fold':
             from flyholdem.teacher.shove_fold_training import export_training
             return export_training(args.run,args.output)
@@ -205,7 +212,10 @@ def dispatch(args):
             return verify_corpus(args.corpus)
         out,resume=run_path(args,'teacher-'+action)
         config=configuration(args.config)
-        if action=='train-shove-fold':
+        if action=='train-regret':
+            from flyholdem.teacher.regret_training import train
+            result=train(config,out,resume,args.stop_after)
+        elif action=='train-shove-fold':
             from flyholdem.teacher.shove_fold_training import train
             result=train(config,out,resume,args.stop_after)
         elif action=='evaluate-shove-fold':

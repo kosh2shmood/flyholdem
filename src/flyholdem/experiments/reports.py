@@ -60,12 +60,12 @@ def evidence(run):
     result_path=root/'result.json';manifest_path=root/'manifest.json'
     if not result_path.is_file() or not manifest_path.is_file():raise ValueError('Report requires result.json and manifest.json in a run directory')
     result=_json(result_path.read_text());manifest=_json(manifest_path.read_text())
-    supported={'native-poker-curriculum-result-v1','conditioning-result-v1','exact-transfer-result-v1','nfsp-training-v1','tabular-shove-fold-training-result-v1','tabular-shove-fold-evaluation-v1','teacher-evaluation-v1','frozen-poker-evaluation-result-v1','controllability-result-v1'}
+    supported={'external-regret-training-result-v1','native-poker-curriculum-result-v1','conditioning-result-v1','exact-transfer-result-v1','nfsp-training-v1','tabular-shove-fold-training-result-v1','tabular-shove-fold-evaluation-v1','teacher-evaluation-v1','frozen-poker-evaluation-result-v1','controllability-result-v1'}
     if result.get('schema') not in supported:raise ValueError('Unsupported experiment report schema')
     manifest_hash=_digest(manifest_path)
     if result.get('manifest_sha256',manifest_hash)!=manifest_hash:raise ValueError('Result/manifest checksum mismatch')
     files={'result.json':_digest(result_path),'manifest.json':manifest_hash};journals={}
-    for name in ('trials.jsonl','hands.jsonl','evaluation.jsonl','paired-deals.jsonl','events.jsonl','phases.jsonl'):
+    for name in ('trials.jsonl','hands.jsonl','evaluation.jsonl','paired-deals.jsonl','events.jsonl','phases.jsonl','traversals.jsonl'):
         path=root/name
         if path.is_file():
             journals[name]=audit_legacy_trials(path) if result['schema']=='controllability-result-v1' else audit_journal(path)

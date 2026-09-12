@@ -1,0 +1,19 @@
+schema: external-sampling-fixed-population-teacher-v1
+mode: conventional-teacher-control
+algorithm: external-sampling-regret-response-to-stationary-population
+scope: Learned conventional reference; no Nash-equilibrium or fly-learning claim
+stack_bb: 20
+iterations: 30000
+sampling_seed: 91001
+deal_seed_start: 1000000
+opponents: [random, calling-station, tight-aggressive, equity-bucket]
+opponent_probabilities: [0.25, 0.25, 0.25, 0.25]
+aggregation: own-reach-weighted-average-stationary-population-v1
+progress_iterations: 100
+abstraction:
+  feature_version: visible-equity-recall-public-history-v1
+  stack_bb: 20
+  equity_buckets: 8
+  equity_samples: 64
+  max_information_sets: 2000000
+  max_nodes_per_traversal: 100000

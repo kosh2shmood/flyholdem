@@ -41,7 +41,7 @@ def verify_evaluation(run, policy_path, registered_config=None, require_confirma
     if (result.get('manifest_sha256')!=digest(run/'manifest.json')
             or result.get('policy_sha256')!=policy_hash
             or result.get('stack_bb')!=config['stack_bb']
-            or policy.get('schema') not in ('teacher-average-policy-v1','teacher-best-response-policy-v1','teacher-potential-boundary-policy-v1')
+            or policy.get('schema') not in ('teacher-average-policy-v1','teacher-best-response-policy-v1','teacher-potential-boundary-policy-v1','teacher-external-regret-policy-v1')
             or policy.get('provenance',{}).get('stack_bb')!=config['stack_bb']):
         raise ValueError('Teacher evaluation policy, stack or manifest mismatch')
     # Tensor identities are checked offline as well as by load_policy later.
