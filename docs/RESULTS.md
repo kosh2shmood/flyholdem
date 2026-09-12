@@ -1,6 +1,6 @@
 # FlyHoldem — current measured results
 
-Status: development, 12 September 2026. The application works with fixture, circuit and full-connectome controllers. Full-graph cue conditioning is confirmed; poker learning remains unvalidated. Conventional teacher candidates through V12 failed the full development suite. The independently checked [V13 self-play candidate](SELF_PLAY_TEACHER.md) is registered before training; no V13 model or result exists yet. This is an interim evidence index, not a completed scientific release.
+Status: development, 12 September 2026. The application works with fixture, circuit and full-connectome controllers. Full-graph cue conditioning is confirmed; poker learning remains unvalidated. Conventional teacher candidates through V12 failed the full development suite. The independently checked [V13 self-play candidate](SELF_PLAY_TEACHER.md) is training for its fixed 100,000 synchronous iterations after all 256 resource-prefix traversals reproduced exactly; no V13 qualification result exists. This is an interim evidence index, not a completed scientific release.
 
 > A simulated network using the wiring of one reconstructed male fruit-fly central nervous system controls an engineered heads-up no-limit Hold'em interface.
 

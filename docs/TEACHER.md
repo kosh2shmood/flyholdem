@@ -1,6 +1,6 @@
 # Conventional teacher and disconnected student runtime
 
-Status: full-hand conventional teacher candidates V1–V12 failed the original development suite. The independently checked [V13 two-player self-play method](SELF_PLAY_TEACHER.md) is registered at a fixed 100,000 iterations; no V13 training or qualification is claimed yet. The small shove/fold teacher and cue-transfer/removal component passed their restricted tests. The fixture, circuit and full native dashboards work; the current full fly is cue-conditioned and poker-unvalidated.
+Status: full-hand conventional teacher candidates V1–V12 failed the original development suite. The independently checked [V13 two-player self-play method](SELF_PLAY_TEACHER.md) is training for its fixed 100,000 iterations after a verified resource prefix; no V13 qualification is claimed. The small shove/fold teacher and cue-transfer/removal component passed their restricted tests. The fixture, circuit and full native dashboards work; the current full fly is cue-conditioned and poker-unvalidated.
 
 ## Original NFSP teacher algorithm
 

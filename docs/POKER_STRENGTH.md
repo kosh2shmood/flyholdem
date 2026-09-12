@@ -2,7 +2,7 @@
 
 The visible full-connectome fly is a frozen two-cue conditioning model, not a trained poker policy. Its action choice is dominated by folding and moving all-in. Improving its poker strategy now takes priority over further dashboard polish.
 
-The next candidate is [V13 two-player self-play](SELF_PLAY_TEACHER.md), registered at 100,000 synchronous iterations after independent arithmetic, recall and recovery checks. Training and qualification are still pending. The V11–V12 sections below preserve the completed historical sequence and negative results.
+The next candidate is [V13 two-player self-play](SELF_PLAY_TEACHER.md), registered at 100,000 synchronous iterations after independent arithmetic, recall and recovery checks. The fixed training run is now continuing after its first 128 complete rounds reproduced exactly; qualification remains pending. The V11–V12 sections below preserve the completed historical sequence and negative results.
 
 ## Measured live behavior
 
