@@ -1,0 +1,9 @@
+{
+  "schema": "conditioning-recovery-check-v1",
+  "uninterrupted_and_resumed_journal_equal": true,
+  "sha256": "bb9ce424289968bf162de7136dc53937c4f0c2b3f0ae1a57fc7e3d8a72b3cd5a",
+  "bytes": 170537,
+  "stop_after_operations": 30,
+  "full_native_state_restored": true,
+  "logged_tail_reexecution_exact": true
+}

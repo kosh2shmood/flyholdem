@@ -1,6 +1,6 @@
 # Elementary conditioning protocol v1
 
-Status: implementation verified; no conditioning outcome yet. Gate 1's full model uses all 166,700 neurons and all 25,582,938 retained edges at the previously frozen global synaptic scale 0.25. No poker result is involved in this protocol.
+Status: full-graph smoke and exact recovery verified on 3093ac0; development and confirmation are pending. Gate 1's full model uses all 166,700 neurons and all 25,582,938 retained edges at the previously frozen global synaptic scale 0.25. No poker result is involved in this protocol.
 
 ## Registered experiment
 
@@ -32,3 +32,9 @@ Run from the repository, using the locked app environment with data tools and th
 Subsequent registered candidates use `0.1` / `0.3` and distinct output paths, only if the previous development candidate fails. Confirmation adds `--profile confirmatory --development-reference runs/conditioning-full-lr003-v1/result.json` with the selected learning rate and a new output path. Resume adds `--resume` to the original command without changing source/config/environment. `--stop-after N` is available for deterministic recovery verification; remove it when resuming.
 
 No `conditioning-v0` tag until a valid confirmation passes.
+
+## Smoke and recovery evidence
+
+The 40-trial smoke profile completed in 17.63 s with peak RSS 722,190,336 bytes. It selected 61,210 existing KC-to-MBON edges; plastic post-test accuracy was 0.5, frozen 0.5 and shuffled reward 0.625 on only eight held-out trials. These are engineering smoke measurements, not a conditioning claim or a tuning selection. The original weights restored every initial decision exactly.
+
+A second run stopped after operation 30, resumed, and produced the same 173-operation / 170,537-byte journal as the uninterrupted run (SHA-256 bb9ce424289968bf162de7136dc53937c4f0c2b3f0ae1a57fc7e3d8a72b3cd5a). A further recovery from the earlier best checkpoint exactly re-executed the already logged tail without changing a byte. Full neural arrays, eligibility and past-reward means were restored. Compact evidence is in docs/review/conditioning; complete runs remain ignored.
