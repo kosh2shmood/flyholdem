@@ -9,3 +9,11 @@ The full run completed 225 development trials in 312.3 seconds, with per-trial f
 This is input-population controllability, using direct KC interventions. It is not learned poker, conditioning, or evidence that the fixed symbolic encoder already plays well. Circuit success does not substitute for full-graph success. Dependent full-graph learning claims remain blocked until a new registered configuration passes its own checks.
 
 Machine-readable reports: docs/review/controllability/. Complete candidate/frozen mappings, manifests, trial journals and checkpoints remain in ignored runs/controllability-{circuit,full}-v1. Configuration: configs/controllability.yaml. The exact code and original resumable state remain reproducible at 529358f; a source mismatch must not be silently accepted for resume.
+
+## Registered recovery v2 — full graph passes
+
+At checkpoint 89cc61d, the ordered global-scale sensitivity preserved every edge, its sign, the cell selection and projection. Scale 0.5 passed development but one action won only 17/20 confirmation trials: failure preserved. Scale 0.25, at input drive 12 and 64 control cells, won 20/20 confirmation trials for every action. Shuffled input remained 20% overall; black input was silent. The predeclared sequence stopped and scale 0.1 was not run.
+
+The passing full model uses 0.06875 × signed contact count (0.25 of the original 0.275 proxy), a changed and explicitly labeled dynamics assumption. All 166,700 retained neurons and 25,582,938 directed edges remain. This solves the registered input-population controllability test, not learning or poker strategy. Both the base prepared graph hash and actual scaled-weight graph hash are recorded.
+
+The missing v1 failure baselines were added in a separate linked supplementary run: shuffled inputs picked readout zero throughout, and black input had no spikes. They do not alter the v1 failure. Complete mappings and checkpoints stay in runs/; compact v2 results and registration summaries are under docs/review/controllability/. The full frozen artifact is runs/controllability-full-quarter-v2/preregistration.json, SHA-256 e3e2b48df9e946d800cec63b5ef88164190c3ffa1cf451b4284a99df5cc26f23.

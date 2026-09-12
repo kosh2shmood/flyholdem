@@ -1,0 +1,77 @@
+{
+  "black_input": {
+    "baseline_spikes": 0,
+    "rates_hz": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "selected": 0,
+    "spikes": 0
+  },
+  "calibration": [],
+  "elapsed_seconds": 35.21429899998475,
+  "failure_reference": {
+    "manifest_sha256": "c54d9bb9b6eb8ba30c0fdbb523802440cb0c6a78f94c639689d0bb7f8d6133f3",
+    "original_commit": "529358f4e63c62158ab105be0e428ea931c34d37",
+    "result_sha256": "f44c03d6505be62b227aeb50ed55a46419b7095d110db8ce6fd997856865e2cc",
+    "scope": "Supplementary failure baselines, not a new confirmatory gate"
+  },
+  "gate": 1,
+  "learning_claim": false,
+  "mode": "full",
+  "reason": "Supplementary failure baselines",
+  "schema": "controllability-result-v1",
+  "shuffled_input": {
+    "confusion": [
+      [
+        5,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "control_cells": 64,
+    "gain": 12.0,
+    "phase": "failure-reference-shuffled-input",
+    "success": [
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "status": "fail"
+}

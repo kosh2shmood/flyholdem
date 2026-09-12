@@ -1,12 +1,12 @@
 # FlyHoldem model card
 
-**Version:** M2 runtime checkpoint; live poker remains the fixture prototype. **Status:** development. **Money:** play chips only.
+**Version:** M3 controllability checkpoint; live poker remains the fixture prototype. **Status:** development. **Money:** play chips only.
 
 ## What exists
 
 A fixed synthetic LIF graph acts through five neural spike readouts in a real PokerKit heads-up game. A bounded eligibility/RPE mechanism updates existing synthetic synapses. The live/replay dashboard shows actual canonical events, exact visible information, activity and plasticity.
 
-The full retained MaleCNS graph and the declared 4,505-cell circuit now import, audit and run in the native solver. A second preparation reproduced every artifact hash; the independent numerical oracle and complete-state continuation checks passed. See docs/RUNTIME.md for measured resources. The viewer uses original illustrative player rigs and displays canonical public cards and balances.
+The full retained MaleCNS graph and the declared 4,505-cell circuit now import, audit and run in the native solver. Circuit and full controllability passed their registered checks. The full passing configuration uses a uniform 0.25 synaptic scale relative to the initial model (signed contact gain 0.06875); earlier full failures remain published. No topology was removed. A second preparation reproduced every artifact hash; the independent numerical oracle and complete-state continuation checks passed. See docs/RUNTIME.md for measured resources. The viewer uses original illustrative player rigs and displays canonical public cards and balances.
 
 ## What does not yet exist
 

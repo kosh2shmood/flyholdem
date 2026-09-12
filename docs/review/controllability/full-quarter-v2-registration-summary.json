@@ -1,0 +1,394 @@
+{
+  "graph_hash": "06880f4f2e55f120ed1f9c8121306164b91611369254a3648f9af7247aad11a2",
+  "base_graph_hash": "70c9daefc6185272d0e001700d75aaa8718648c02d9aa59bbadbe6b4cd9e4c06",
+  "config_hash": "0eae043444ef22d9eac3696ba75a447866d5f5227cf8b95fc0536ce6da7d73b6",
+  "input_fanin_range": [
+    1,
+    2
+  ],
+  "selected_gain": 12.0,
+  "control_cell_count": 64,
+  "ensembles": [
+    {
+      "action": 0,
+      "cells": [
+        {
+          "class": "MBON",
+          "id": "11402",
+          "index": 1306,
+          "side": "R",
+          "type": "MBON11"
+        },
+        {
+          "class": "MBON",
+          "id": "519371",
+          "index": 130137,
+          "side": "L",
+          "type": "MBON05"
+        },
+        {
+          "class": "MBON",
+          "id": "10013",
+          "index": 9,
+          "side": "R",
+          "type": "MBON01"
+        }
+      ],
+      "direct_input_paths": [
+        {
+          "contacts": 80,
+          "post_id": "11402",
+          "pre_id": "18540"
+        },
+        {
+          "contacts": 129,
+          "post_id": "519371",
+          "pre_id": "25030"
+        },
+        {
+          "contacts": 113,
+          "post_id": "10013",
+          "pre_id": "18540"
+        }
+      ],
+      "indices": [
+        1306,
+        130137,
+        9
+      ]
+    },
+    {
+      "action": 1,
+      "cells": [
+        {
+          "class": "MBON",
+          "id": "92112",
+          "index": 69680,
+          "side": "R",
+          "type": "MBON34"
+        },
+        {
+          "class": "MBON",
+          "id": "520151",
+          "index": 130579,
+          "side": "L",
+          "type": "MBON01"
+        },
+        {
+          "class": "MBON",
+          "id": "513174",
+          "index": 126500,
+          "side": "L",
+          "type": "MBON30"
+        }
+      ],
+      "direct_input_paths": [
+        {
+          "contacts": 2,
+          "post_id": "92112",
+          "pre_id": "49544"
+        },
+        {
+          "contacts": 85,
+          "post_id": "520151",
+          "pre_id": "21778"
+        },
+        {
+          "contacts": 28,
+          "post_id": "513174",
+          "pre_id": "21778"
+        }
+      ],
+      "indices": [
+        69680,
+        130579,
+        126500
+      ]
+    },
+    {
+      "action": 2,
+      "cells": [
+        {
+          "class": "MBON",
+          "id": "531829",
+          "index": 135166,
+          "side": "L",
+          "type": "MBON10"
+        },
+        {
+          "class": "MBON",
+          "id": "10816",
+          "index": 757,
+          "side": "L",
+          "type": "MBON31"
+        },
+        {
+          "class": "MBON",
+          "id": "520186",
+          "index": 130600,
+          "side": "L",
+          "type": "MBON16"
+        }
+      ],
+      "direct_input_paths": [
+        {
+          "contacts": 7,
+          "post_id": "531829",
+          "pre_id": "54549"
+        },
+        {
+          "contacts": 46,
+          "post_id": "10816",
+          "pre_id": "54067"
+        },
+        {
+          "contacts": 21,
+          "post_id": "520186",
+          "pre_id": "76203"
+        }
+      ],
+      "indices": [
+        135166,
+        757,
+        130600
+      ]
+    },
+    {
+      "action": 3,
+      "cells": [
+        {
+          "class": "MBON",
+          "id": "540383",
+          "index": 138254,
+          "side": "R",
+          "type": "MBON10"
+        },
+        {
+          "class": "MBON",
+          "id": "519373",
+          "index": 130138,
+          "side": "L",
+          "type": "MBON03"
+        },
+        {
+          "class": "MBON",
+          "id": "562782",
+          "index": 143155,
+          "side": "R",
+          "type": "MBON16"
+        }
+      ],
+      "direct_input_paths": [
+        {
+          "contacts": 4,
+          "post_id": "540383",
+          "pre_id": "200908"
+        },
+        {
+          "contacts": 43,
+          "post_id": "519373",
+          "pre_id": "71800"
+        },
+        {
+          "contacts": 20,
+          "post_id": "562782",
+          "pre_id": "58570"
+        }
+      ],
+      "indices": [
+        138254,
+        130138,
+        143155
+      ]
+    },
+    {
+      "action": 4,
+      "cells": [
+        {
+          "class": "MBON",
+          "id": "512789",
+          "index": 126295,
+          "side": "L",
+          "type": "MBON23"
+        },
+        {
+          "class": "MBON",
+          "id": "10079",
+          "index": 66,
+          "side": "R",
+          "type": "MBON06"
+        },
+        {
+          "class": "MBON",
+          "id": "18603",
+          "index": 7840,
+          "side": "L",
+          "type": "MBON07"
+        }
+      ],
+      "direct_input_paths": [
+        {
+          "contacts": 10,
+          "post_id": "512789",
+          "pre_id": "86899"
+        },
+        {
+          "contacts": 35,
+          "post_id": "10079",
+          "pre_id": "116057"
+        },
+        {
+          "contacts": 20,
+          "post_id": "18603",
+          "pre_id": "110210"
+        }
+      ],
+      "indices": [
+        126295,
+        66,
+        7840
+      ]
+    }
+  ],
+  "selection": {
+    "anchor_cosines": [
+      [
+        1.0,
+        0.0,
+        0.0011837686519409292,
+        0.005378801354163354,
+        0.012386074983731532
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0011837686519409292,
+        0.0,
+        0.9999999999999998,
+        0.0,
+        0.005307448924342752
+      ],
+      [
+        0.005378801354163354,
+        0.0,
+        0.0,
+        1.0000000000000002,
+        0.0
+      ],
+      [
+        0.012386074983731532,
+        0.0,
+        0.005307448924342752,
+        0.0,
+        0.9999999999999994
+      ]
+    ],
+    "anchors": [
+      1306,
+      69680,
+      135166,
+      138254,
+      126295
+    ],
+    "eligible_readouts": 97
+  },
+  "run_manifest": {
+    "binary_hash": "44f5ce277154c953b213f41105b0d7f61e40af0cdd8d685289609c10b06be897",
+    "commit": "89cc61d13b2d59754262262d54bc8e1e6698e5ee",
+    "config": {
+      "amplitude_jitter": 0.1,
+      "calibration": {
+        "control_cell_counts": [
+          32,
+          64,
+          128
+        ],
+        "gains": [
+          12.0,
+          20.0,
+          32.0
+        ],
+        "seed": 53100,
+        "trials_per_action": 5
+      },
+      "confirmatory": {
+        "minimum_success": 0.95,
+        "seed": 53200,
+        "trials_per_action": 20
+      },
+      "decision_ms": {
+        "baseline": 50,
+        "inter_decision": 50,
+        "readout": 100,
+        "stimulus": 300
+      },
+      "encoder": "engineered-kc-v1",
+      "ensemble_size": 3,
+      "fanout": 32,
+      "global_weight_scale": 0.25,
+      "input_class": "Kenyon_Cell",
+      "mapping_seed": 1729,
+      "minimum_presynaptic_inputs": 8,
+      "readout_class": "MBON",
+      "schema": "neural-controllability-gain-v2",
+      "score_scale_hz": 100.0,
+      "selection": "diverse-direct-KC-connectivity-v1"
+    },
+    "config_hash": "0eae043444ef22d9eac3696ba75a447866d5f5227cf8b95fc0536ce6da7d73b6",
+    "decoder_hash": "4be86e85255e225cf57f7c598a6d9a62dbdeb2358e3c7add3c0db9e5c7480ae4",
+    "dirty_tree": false,
+    "encoder_hash": "63c4b0e0be7c7b4cbafacbae8c23b354d964cf1c8c4a108a23ce2948a41a2bdc",
+    "environment": {
+      "compiler": "Apple clang version 16.0.0 (clang-1600.0.26.6)",
+      "node": "v24.12.0",
+      "packages": {
+        "PyYAML": "6.0.3",
+        "Pygments": "2.21.0",
+        "annotated-doc": "0.0.5",
+        "annotated-types": "0.8.0",
+        "anyio": "4.15.1",
+        "certifi": "2026.7.22",
+        "click": "8.5.0",
+        "fastapi": "0.141.1",
+        "flyholdem": "0.1.0",
+        "greenlet": "3.5.5",
+        "h11": "0.16.0",
+        "httpcore": "1.0.9",
+        "httpx": "0.28.1",
+        "idna": "3.19",
+        "iniconfig": "2.3.0",
+        "numpy": "2.4.6",
+        "packaging": "26.3",
+        "pandas": "3.0.5",
+        "playwright": "1.62.0",
+        "pluggy": "1.6.0",
+        "pokerkit": "0.7.5",
+        "pyarrow": "23.0.1",
+        "pydantic": "2.13.5",
+        "pydantic_core": "2.46.5",
+        "pyee": "13.0.1",
+        "pytest": "9.1.1",
+        "python-dateutil": "2.9.0.post0",
+        "six": "1.17.0",
+        "starlette": "1.6.0",
+        "typing-inspection": "0.4.4",
+        "typing_extensions": "4.16.0",
+        "uvicorn": "0.52.4",
+        "websockets": "16.1.1"
+      },
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "python": "3.11.16 (main, Sep  1 2026, 14:08:22) [Clang 22.1.3 ]"
+    },
+    "graph_hash": "06880f4f2e55f120ed1f9c8121306164b91611369254a3648f9af7247aad11a2",
+    "initial_checkpoint_hash": null,
+    "schema": "flyholdem-run-manifest-v1",
+    "source_hash": "5518996b9de689ad1f1cf90a916f68dca12502619a85ac4b0355cad1558233f7"
+  },
+  "preregistration_path": "runs/controllability-full-quarter-v2/preregistration.json",
+  "preregistration_sha256": "e3e2b48df9e946d800cec63b5ef88164190c3ffa1cf451b4284a99df5cc26f23"
+}

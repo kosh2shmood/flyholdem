@@ -1,0 +1,170 @@
+{
+  "black_input": {
+    "baseline_spikes": 0,
+    "rates_hz": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "selected": 0,
+    "spikes": 0
+  },
+  "calibration": [
+    {
+      "confusion": [
+        [
+          5,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          5,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          5,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          5,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          5
+        ]
+      ],
+      "control_cells": 32,
+      "gain": 12.0,
+      "phase": "development",
+      "success": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "confirmatory": {
+    "confusion": [
+      [
+        20,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        3,
+        17,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        20,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        20,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        20
+      ]
+    ],
+    "control_cells": 32,
+    "gain": 12.0,
+    "phase": "confirmatory",
+    "success": [
+      1.0,
+      0.85,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "elapsed_seconds": 3.3483931660302915,
+  "gate": 1,
+  "learning_claim": false,
+  "mode": "full",
+  "preregistration_sha256": "d0738aa4b2149ac29a2fa7676f84a03d3e593f3e6c2513984996d20961179b64",
+  "schema": "controllability-result-v1",
+  "shuffled_input": {
+    "confusion": [
+      [
+        20,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        20,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        20,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        20,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        20,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "control_cells": 32,
+    "gain": 12.0,
+    "phase": "shuffled-input",
+    "success": [
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "status": "fail"
+}
