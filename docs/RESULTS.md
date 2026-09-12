@@ -1,6 +1,6 @@
 # FlyHoldem — current measured results
 
-Status: development, 12 September 2026. The application works with fixture, circuit and full-connectome controllers. Full-graph cue conditioning is confirmed; poker learning remains unvalidated. Conventional teacher V10 is training under its fixed protocol. This is an interim evidence index, not a completed scientific release.
+Status: development, 12 September 2026. The application works with fixture, circuit and full-connectome controllers. Full-graph cue conditioning is confirmed; poker learning remains unvalidated. Conventional teacher V10 completed its fixed training protocol and awaits held-out development evaluation. This is an interim evidence index, not a completed scientific release.
 
 > A simulated network using the wiring of one reconstructed male fruit-fly central nervous system controls an engineered heads-up no-limit Hold'em interface.
 
@@ -38,7 +38,7 @@ Full 20 BB candidates V1–V9 failed the unchanged original development suite. P
 
 A separate tabular CFR teacher passed its own 10 BB shove/fold confirmation against all four original opponents. It is qualified only for that restricted subgame. It cannot substitute for the full-hand teacher gate. See the [small-game report](SHOVE_FOLD_TEACHER.md).
 
-V10 is a separately registered external-sampling tabular regret response to the stationary uniform original opponent population. Its 30,000-traversal schedule, seeds, abstraction and final-checkpoint rule were fixed before execution. It is a conventional candidate with no self-play equilibrium or fly-learning claim. The first 128 traversals completed in 11.78 seconds at 63.3 MB peak process RSS; the same run then continued. Strategic performance remains unmeasured until training finishes and the original development suite runs. See the [teacher history](TEACHER.md) and [V10 protocol](EXTERNAL_REGRET_TEACHER.md).
+V10 is a separately registered external-sampling tabular regret response to the stationary uniform original opponent population. Its 30,000-traversal schedule, seeds, abstraction and final-checkpoint rule were fixed before execution. It is a conventional candidate with no self-play equilibrium or fly-learning claim. The first 128 traversals completed in 11.78 seconds at 63.3 MB peak process RSS; the same run then continued. The fixed final run completed 30,000 traversals and 152,391 information sets at 284.5 MB peak RSS. Frozen policy SHA is `762b180986a3983e8a43f4744c6d89cf11299e16b611df6aba2e8b62a4206955`. Strategic performance remains unmeasured until the original development suite runs. See the [teacher history](TEACHER.md) and [V10 protocol](EXTERNAL_REGRET_TEACHER.md).
 
 Full teacher confirmation now requires a verified passing development run for the same frozen policy. Confirmation, recovery and downstream corpus/Gate 2A checks bind and reverify its exact artifacts. The real failed V9 result was rejected before policy inference, confirmation deals or output creation.
 
