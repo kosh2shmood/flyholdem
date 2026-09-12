@@ -74,9 +74,8 @@ class RecordedTraining:
         if not self.mode.startswith('fixture-native') and protocol['authorization'] is None:
             raise ValueError('Recorded native training is missing its enclosing gate authorization')
         # This verifies complete hand/weight/control/target/graph-size bindings.
-        rows=_training_rows(run,plan,config['seed'],config['arm'],include_records=True)
-        if start_hand>=len(rows):raise ValueError('Starting hand is outside the completed training arm')
-        rows=rows[start_hand:min(len(rows),start_hand+hands)]
+        rows=_training_rows(run,plan,config['seed'],config['arm'],include_records=True,record_range=(start_hand,start_hand+hands))
+        if not rows:raise ValueError('Starting hand is outside the completed training arm')
         self.brain,self.graph=_recorded_graph(graph_path,registration,config['neuron_count'])
         self.learning_mode=config['learning_mode'];self.recorded_training=True
         self.identity={'graph_sha256':self.brain.graph_hash,'registration_sha256':self.graph.meta['registration_sha256'],

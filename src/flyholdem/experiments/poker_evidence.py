@@ -17,9 +17,23 @@ from .evaluate import summarize
 from .conditioning import paired_evidence
 
 
+def iter_journal(path):
+    """Yield audited records with bounded memory; consume fully before use.
+
+    The final digest also binds the bytes consumed to the verified file, rather
+    than reading an unchecked replacement after a separate successful audit.
+    """
+    checked=audit_journal(path);whole=hashlib.sha256();count=0
+    with Path(path).open('rb') as stream:
+        for line in stream:
+            whole.update(line);count+=1
+            yield json.loads(line)
+    if whole.hexdigest()!=checked['sha256'] or count!=checked['rows'] or digest(path)!=checked['sha256']:
+        raise ValueError('Journal changed while consuming audited records')
+
+
 def read_journal(path):
-    audit_journal(path)
-    return [json.loads(line) for line in Path(path).read_text().splitlines()]
+    return list(iter_journal(path))
 
 
 def audit_evaluation(root, expected_config=None, expected_model=None):

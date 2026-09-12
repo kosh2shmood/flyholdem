@@ -1,6 +1,6 @@
 # Registered native poker curricula
 
-`curriculum run` now combines complete-hand native learning, independent training seeds, matched controls, frozen exports, isolated evaluation, conventional references and reverified statistical endpoints. This is an implemented experiment runner, not a passed poker-learning gate. Full 20 BB teachers v1–v9 failed; no full Gate 2A certificate, full teaching corpus or poker-trained fly currently exists. The live human opponent remains the cue-conditioned, poker-unvalidated model.
+`curriculum run` now combines complete-hand native learning, independent training seeds, matched controls, frozen exports, isolated evaluation, conventional references and reverified statistical endpoints. This is an implemented experiment runner, not a passed poker-learning gate. Full 20 BB teachers v1–v10 failed; no full Gate 2A certificate, full teaching corpus or poker-trained fly currently exists. The live human opponent remains the cue-conditioned, poker-unvalidated model.
 
 ## Prerequisites and fixed choices
 
@@ -62,7 +62,7 @@ Future training journals retain the actual complete readout-window spike vector 
 
 The curriculum auditor reconstructs the original native bytes and rederives each training readout rate/score from the registered ensembles, baseline and timing. After auditing, only the two matched-reward scheduling scalars are retained between control arms; bulky replay data stays on disk. Actual frozen hands still match the existing evaluator, and complete training/checkpoint recovery remains exact in both learning modes. A synthetic 166,700-entry sparse vector verifies compact storage without claiming a full-graph experiment.
 
-This supplies exact activity for a subsequent training-replay adapter. It does not yet add a `serve --run` training viewer. Existing spectator/human-play streams are unchanged. Historical frozen source snapshots retain their own format; they are not silently migrated. No full-graph poker learning run has started.
+This supplies exact activity for `serve --training-run`, described below. Existing spectator/human-play streams are unchanged. Historical frozen source snapshots retain their own format; they are not silently migrated. No full-graph poker learning run has started.
 
 
 ## Recorded training decisions bound to actual poker and action RNG
@@ -71,7 +71,10 @@ Added a solver-free recorded-hand audit used by the curriculum verifier. It reco
 
 Fifteen added integration cases cover both seats, all four curricula and three teaching/learning methods; continuous RNG state matches the original player after both hands. Native solver and teacher calls are explicitly forbidden during audit. Changed observations are rejected even with recomputed input hashes; changed sampled actions, commitment amounts, temperatures, private decks, missing decisions and rehashed frozen-opponent input records are rejected. All 23 focused replay/curriculum checks passed in 43.96 seconds. Complete regression suite: 208 passed / 2 isolated-oracle skips in 80.85 seconds. Frozen inference identity remains 1b2c99883afc6e6e30b65e8cf9aafef456953177c10caa443a8d62d531da09ca. This is record-consistency verification, not independent historical neural execution or a scientific learning claim.
 
-V11 continues the fixed 100,000-traversal schedule from immutable code 62bf21f / source d16984f8442b6fb8fec62f962ff4992d74dc3bedbca69ee7da017249a60ed48a. Last inspected 3,600 traversals. The exact --resume command above remains valid. V10 failed the original full suite; full confirmation deals remain unused, Gate 2A and Gates 3–6 remain pending. The remaining training visualization task is a viewer adapter that consumes these audited records, preserves both player seats/private-card boundaries and labels historical teaching methods honestly; no training-run viewer is claimed yet.
+V11 continues the fixed 100,000-traversal schedule from immutable code 62bf21f / source d16984f8442b6fb8fec62f962ff4992d74dc3bedbca69ee7da017249a60ed48a. The first 30,000 complete journal records have now reproduced V10 byte for byte; only the fixed 100,000-traversal final model will be exported. The immutable-runtime resume command remains in PROGRESS.md. V10 failed the original full suite; full confirmation deals remain unused, Gate 2A and Gates 3–6 remain pending. The completed viewer below consumes these audited records, preserves both player seats/private-card boundaries and labels historical teaching methods explicitly.
 
 
 Completed native curriculum arms can now be viewed with `serve --training-run <experiment>/<seed>/<arm>/training --graph <exact-prepared-graph> --start-hand 0 --hands 16 --port 8768`. The service audits the complete record, replays actual saved activity and preserves card privacy without a neural worker or live player. See [TRAINING_REPLAY.md](TRAINING_REPLAY.md) for source requirements, labels, resource limits and checked fixture examples. This does not change any scientific gate.
+
+
+Native training keeps only row offsets and hashes in memory; detailed spike/private-hand records remain on disk, including during streamed resume. The curriculum verifier streams every hand and retains compact matched-reward scalars. Training replay retains only its selected window while still auditing the complete arm. See TRAINING_REPLAY.md for the synthetic storage benchmark and its limits. The underlying native graph, current neural state and checkpoints still require their independently measured resources.

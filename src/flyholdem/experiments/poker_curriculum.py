@@ -20,7 +20,7 @@ from flyholdem.interface.frozen import export_frozen, verify_changed_edges
 from flyholdem.learning.poker_controls import shuffled_rewards
 from .poker_training import _train_arm
 from .disconnected_evaluation import evaluate_disconnected
-from .poker_evidence import read_journal, audit_evaluation, aggregate_endpoints, compact_rows
+from .poker_evidence import read_journal, iter_journal, audit_evaluation, aggregate_endpoints, compact_rows
 from .journal import Journal
 
 
@@ -52,9 +52,12 @@ def _model(player,path,reference):
     return digest(path/'manifest.json')
 
 
-def _training_rows(path,plan,seed,arm,*,include_records=False):
+def _training_rows(path,plan,seed,arm,*,include_records=False,record_range=None):
     path=Path(path);result=json.loads((path/'result.json').read_text());runtime=json.loads((path/'manifest.json').read_text())
-    rows=read_journal(path/'hands.jsonl');config=runtime['config']
+    config=runtime['config'];planned=plan['training']['hands']
+    if record_range is not None and (not include_records or len(record_range)!=2
+            or any(type(x) is not int for x in record_range) or not 0<=record_range[0]<record_range[1]):
+        raise ValueError('Record selection requires an increasing nonnegative integer range')
     expected={**plan['training'],'schema':'poker-training-arm-v1','arm':arm,'curriculum':plan['curriculum'],
         'seed':seed,'deal_seed_start':plan['training_starts'][str(seed)],
         'teacher_split':'train' if plan['optimization']!='terminal-local-eligibility' else None}
@@ -72,13 +75,15 @@ def _training_rows(path,plan,seed,arm,*,include_records=False):
         if config['control_rewards_sha256']!=hashlib.sha256(control_rewards.tobytes()).hexdigest():
             raise ValueError('Shuffled rewards differ from the matched plastic-arm returns')
     if (result['status']!='training-complete' or result['hands_completed']!=plan['training']['hands']
-            or len(rows)!=plan['training']['hands'] or result['journal_head']!=rows[-1]['hash']
             or result['manifest_sha256']!=digest(path/'manifest.json') or runtime['config_hash']!=identity(config)
             or config['seed']!=seed or config['arm']!=arm or result['learning_claim'] is not False):
         raise ValueError('Complete registered training-arm evidence required')
     from .recorded_poker import audit_recorded_hand
     action_rng=np.random.default_rng();action_rng.bit_generator.state=config['initial_rng']
-    for index,item in enumerate(rows):
+    retained=[];count=0;head='0'*64;last_weights=None
+    for index,item in enumerate(iter_journal(path/'hands.jsonl')):
+        if index>=planned:raise ValueError('Unexpected trailing training hands')
+        count=index+1;head=item['hash']
         row=item['value'];kind=plan['training']['opponent_cycle'][(index//2)%len(plan['training']['opponent_cycle'])]
         deal=plan['training_starts'][str(seed)]+index//2;seat=index%2
         if (item['label']!=[kind,deal,seat] or row['neural_seat']!=seat or row['deal_seed']!=deal
@@ -93,10 +98,9 @@ def _training_rows(path,plan,seed,arm,*,include_records=False):
             raise ValueError('Training return differs from the actual settled PokerKit hand')
         if index==0 and row['weights_before_sha256']!=result['initial_weights_sha256']:
             raise ValueError('Training did not start with its registered initial weights')
-        if index and row['weights_before_sha256']!=rows[index-1]['value']['weights_after_sha256']:
+        if index and row['weights_before_sha256']!=last_weights:
             raise ValueError('Training weights changed between registered hands')
-        if index==len(rows)-1 and row['weights_after_sha256']!=result['final_weights_sha256']:
-            raise ValueError('Final training weights do not match the last complete hand')
+        last_weights=row['weights_after_sha256']
         if arm=='frozen' and row['weights_before_sha256']!=row['weights_after_sha256']:
             raise ValueError('Frozen training changed weights')
         if config.get('activity_recording')!='lossless-sparse-readout-window-v1':
@@ -122,10 +126,14 @@ def _training_rows(path,plan,seed,arm,*,include_records=False):
                 info=canonical_information_id(decision['observation'])
                 if info!=decision['teacher_input_id'] or decision['teacher_target_held_out']!=(split_for_id(info)!='train'):
                     raise ValueError('Held-out teacher target exclusion mismatch')
-    # Only the matched control schedule needs these two fields after the full
-    # audit. Keep bulky replay/spike records on disk between learning arms.
-    if include_records:return [item['value'] for item in rows]
-    return [{key:item['value'][key] for key in ('neural_return_bb','neural_seat')} for item in rows]
+        if include_records:
+            if record_range is None or record_range[0]<=index<record_range[1]:retained.append(row)
+        else:retained.append({key:row[key] for key in ('neural_return_bb','neural_seat')})
+    if count!=planned or head!=result['journal_head']:
+        raise ValueError('Complete registered training-arm evidence required')
+    if last_weights!=result['final_weights_sha256']:
+        raise ValueError('Final training weights do not match the last complete hand')
+    return retained
 
 
 def _execute_curriculum(plan,output,factory,*,teacher=None,teacher_sha256=None,frozen_opponents=None,

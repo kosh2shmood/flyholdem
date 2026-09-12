@@ -143,3 +143,20 @@ def test_all_matched_control_recordings_keep_their_exact_graph_and_arm(tmp_path,
             with pytest.raises(ValueError,match='base graph mismatch'):
                 RecordedTraining(parent/'51'/arm/'training',graph,hands=4)
         else:assert viewer.mode=='fixture-native'
+
+
+@pytest.mark.parametrize('damage',['truncate','payoff','weight-continuity','final-weights'])
+def test_windowed_replay_still_checks_unselected_late_hands(tmp_path,damage):
+    from flyholdem.experiments.journal import Journal
+    run,graph=training_fixture(tmp_path)
+    path=run/'hands.jsonl';rows=[json.loads(line) for line in path.read_text().splitlines()]
+    result=json.loads((run/'result.json').read_text())
+    if damage=='truncate':rows.pop()
+    elif damage=='payoff':rows[-1]['value']['neural_return_bb']+=.5
+    elif damage=='weight-continuity':rows[-1]['value']['weights_before_sha256']='0'*64
+    else:rows[-1]['value']['weights_after_sha256']='0'*64
+    path.unlink();journal=Journal(path,indexed=True)
+    for i,row in enumerate(rows):journal.record(i,row['label'],row['value'])
+    result['journal_head']=journal.rows[-1]['hash'];journal.close()
+    atomic_json(run/'result.json',result)
+    with pytest.raises(ValueError):RecordedTraining(run,graph,start_hand=0,hands=1)

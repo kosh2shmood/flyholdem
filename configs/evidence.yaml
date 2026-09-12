@@ -12,11 +12,11 @@ gates:
     detail: 82.3% learned versus 47.2% frozen and 50.0% shuffled; five independent seeds, retention and erasure passed. Mechanism is readout suppression, not poker skill.
   - name: Teacher and transfer
     status: pending
-    detail: Small exact-cue surrogate confirmation passed at 94.5% versus 55.2% frozen and 52.2% shuffled, with 128 actual teacher-removal decisions. Local-rule confirmation failed at 77.8%. Conventional poker teacher and corpus qualification remain pending.
+    detail: Small exact-cue surrogate confirmation passed at 94.5% versus 55.2% frozen and 52.2% shuffled, with 128 actual teacher-removal decisions. Local-rule confirmation failed at 77.8%. Full-hand teachers V1–V10 failed the original opponent suite; V11 training is active. Full teacher and corpus qualification remain pending.
   - name: Poker curricula
     status: pending
     detail: Shove/fold, river, 20 BB and 100 BB learning gates remain pending.
-report: https://github.com/kosh2shmood/flyholdem/blob/astra/visual-first/docs/CONDITIONING.md
+report: https://github.com/kosh2shmood/flyholdem/blob/astra/visual-first/docs/RESULTS.md
 
 # Written summaries of the already published confirmation findings in
 # docs/CONDITIONING.md and docs/TRANSFER.md. No per-trial data or model artifacts.

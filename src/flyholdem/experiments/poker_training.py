@@ -58,7 +58,7 @@ def _train_arm(player,config,output,*,teacher=None,teacher_sha256=None,shuffled_
     out=Path(output);out.mkdir(parents=True,exist_ok=resume)
     if resume:assert_compatible(json.loads((out/'manifest.json').read_text()),runtime)
     else:atomic_json(out/'manifest.json',runtime)
-    journal=Journal(out/'hands.jsonl',resume);checkpoints=Checkpoints(out/'checkpoints')
+    journal=Journal(out/'hands.jsonl',resume,indexed=True);checkpoints=Checkpoints(out/'checkpoints')
     completed=0;in_hand=False;stopped=False;started=time.perf_counter();last_checkpoint=time.monotonic()
     if resume:
         arrays,extra,_=checkpoints.load(runtime);completed=extra['completed_hands']
