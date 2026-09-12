@@ -1,4 +1,4 @@
-# V11 downstream execution snapshot
+# Downstream execution snapshots
 
 `runs/poker-runtime-v11` prepares later corpus, Gate 2A verification and native curriculum work without changing V11's active training. It combines orchestration from commit `52016bfde9efae1611a6969a961f02d3d98f5da5` with the seven exact policy implementation files from V11's original runtime. Their source checks are preserved, not bypassed. The snapshot is local and ignored; its `SOURCE.json` records every copied source/config/binary hash and each explicitly linked prerequisite.
 
@@ -50,3 +50,43 @@ PYTHONPATH="$PWD/runs/poker-runtime-v11/src" .venv/bin/python -m flyholdem.cli g
 ```
 
 Corpus resume replaces `--output RUN` with `--resume RUN`. Before any actual native curriculum, verify the certificate, stop the advancing full spectator, record the experiment identity and measure resource use at a complete phase boundary. Use the same downstream `PYTHONPATH` with the existing [curriculum commands](POKER_TRAINING.md), its frozen config and `runs/gate2a-v11.json`. The first stage still requires the full teacher/transfer gate; the small-game reference alone does not unlock it.
+
+
+## Conditional V12 downstream runtime
+
+`runs/poker-runtime-v12` now contains the exact reviewed V12 source, configurations and equity binary, plus a separately verified copy of the existing native binary and the same ten explicitly hash-checked prerequisite links. It makes no policy-module substitutions. The original reviewed conventional runtime remains the path for V12 extraction/evaluation; this downstream copy is for corpus, Gate 2A and later native orchestration if V12 qualifies.
+
+| Item | SHA-256 |
+| --- | --- |
+| Checked code commit | `a97506f6dbad5bd3ea33c5439a3b59dcbc41c199` |
+| Source, identical to reviewed V12 | `f70a256a49f9e80274290f1835cb1f9f20d84abb9e573dceff95f4fdb3dd373a` |
+| Final-regret policy implementation | `f6aa18842893bfceb4783ebbac827697cf957c18caf6a230e231491c0d9f1d98` |
+| Copied file ledger | `b1350b32a5b5ccf42f6f5141306e99b309a695223e9ea3f08a7ba606f9d75708` |
+| Original evaluation YAML | `5fb344fad4c27a5a5556764db0d0c43b1f64177ccadafc68b3d81453f52ca9c1` |
+| Corpus YAML | `5e2c85c9b588bae55fa2f7bd50651fa7000d041288df1a18a84e86464e265241` |
+| Native curriculum YAML | `3c4d239ab4e7384e288080366618a3f4ef39668ba5e53cbd07ed8f151b23142a` |
+| Existing native binary copy | `44f5ce277154c953b213f41105b0d7f61e40af0cdd8d685289609c10b06be897` |
+
+Preflight passed in 3.25 seconds. It compared every copied reviewed file, verified the complete ledger, linked prerequisite checksums and both prepared graphs, and rechecked the existing cue and restricted-teacher evidence. It exercised a tiny final-regret policy's actual corpus export and replay without Torch: 83 rows from 17 collection hands, train/validation/test splits 64/12/7, and street counts 38/25/11/9. Targets and complete trajectories reproduced, and completed resume left the files unchanged. Temporary fixture qualification substitutions were confined to that engineering check and restored before exercising the real rejection path. Actual failed V10 development was refused before policy loading, native work or certificate creation. These checks are engineering integration evidence, not a full teacher qualification, scientific corpus or native poker-learning result.
+
+The following commands are conditional on V12 independently passing its original development suite and its subsequent reserved confirmation. V11's original average-policy evaluation still comes first; this runtime does not change candidate order.
+
+```sh
+PYTHONPATH="$PWD/runs/poker-runtime-v12/src" .venv/bin/python -m flyholdem.cli teacher export-corpus \
+  --policy runs/teacher-final-regret-v12-policy \
+  --validation runs/teacher-final-regret-v12-confirmatory/result.json \
+  --config runs/poker-runtime-v12/configs/corpus.yaml \
+  --output runs/teacher-final-regret-v12-corpus
+
+PYTHONPATH="$PWD/runs/poker-runtime-v12/src" .venv/bin/python -m flyholdem.cli teacher verify-qualified-corpus \
+  --policy runs/teacher-final-regret-v12-policy \
+  --validation-run runs/teacher-final-regret-v12-confirmatory \
+  --corpus runs/teacher-final-regret-v12-corpus
+
+PYTHONPATH="$PWD/runs/poker-runtime-v12/src" .venv/bin/python -m flyholdem.cli gate certify-transfer \
+  --policy runs/teacher-final-regret-v12-policy \
+  --confirmation runs/teacher-final-regret-v12-confirmatory \
+  --corpus runs/teacher-final-regret-v12-corpus --output runs/gate2a-v12.json
+```
+
+Use this same downstream source, frozen curriculum registration and `runs/gate2a-v12.json` for dependent native work only after the certificate verifies. Stop the advancing full spectator before starting any full native worker, record exact execution identities and measure the first phase's resource use. No native learning rate, encoder, readout or biological mapping parameter changes follow from teacher poker results.
