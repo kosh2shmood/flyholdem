@@ -34,7 +34,7 @@ Locked dependencies live in `uv.lock`. The UI uses plain browser APIs plus pinne
 - Gate 2A: pending. Exact-cue local transfer improved over controls but missed its registered 80% confirmation threshold at 77.8%. Actual teacher-removal inference passed. All conventional poker-teacher candidates so far failed their validation suite.
 - Gates 3–6 and human heads-up play: pending. No strategic poker-learning claim.
 - Native dashboard: all 166,700 retained neurons rendered, annotated positions distinguished from missing-coordinate grid, actual frozen neural scores drive the table. Full data remain local and checksum-verified.
-- Current local suite: 74 passed / 2 isolated-oracle skips; fixture/live/replay/avatar and native desktop/mobile browser checks pass.
+- Current local suite: 88 passed / 2 isolated-oracle skips; fixture/live/replay/avatar and native desktop/mobile browser checks pass.
 
 See [PROGRESS.md](PROGRESS.md), [visual gate report](docs/VISUAL_GATE.md), [protocol](docs/PROTOCOL.md), [model card](docs/MODEL_CARD.md), and [browser evidence](docs/review/browser-check.json). Live logs are written to ignored, timestamped `runs/live-*/events.jsonl` directories, flushed at every completed hand. Hash chains detect modifications; seeds regenerate the loop exactly on the same locked runtime. Cross-architecture numerical comparison uses absolute 1e-12 tolerance for floating diagnostics with exact cards/actions/spike counts; recorded playback is byte-exact everywhere. V0 does not yet resume a running neural state from a checkpoint.
 
@@ -68,3 +68,8 @@ The native point cloud uses annotated soma positions for 139,662 neurons; the re
 ```
 
 Native replay uses `--mode full --replay <complete-native-log.jsonl>` (or circuit); it checks the recorded graph and population registration before displaying activity. Native live streams are recorded in ignored timestamped runs/live-*/events.jsonl directories. For experiment commands, checkpoints, results and explicit failures, see docs/CONDITIONING.md, docs/TRANSFER.md, docs/TEACHER.md and PROGRESS.md. Environment installation commands may change installed extras; do not run setup/sync while an experiment is active.
+
+
+## Play a private heads-up match
+
+Open either dashboard and choose **Play against fly**. Your hand stays readable beside the community-card strip, the fly's cards remain private until shown at showdown, and both rigs animate their actual actions. Buttons reflect server-validated legal wagers. Deal next hand alternates the button and resets both stacks to 20 BB; reload keeps the current match while the server is running. Select Live or Recorded replay to leave the match. The current native model has confirmed cue learning but no validated poker strategy. Details and browser-check commands are in docs/UI.md.

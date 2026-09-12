@@ -3,6 +3,7 @@ const names = ['Fold', 'Check / call', 'Raise ½ pot', 'Raise pot', 'All-in'];
 const suits = {c:'♣', d:'♦', h:'♥', s:'♠'};
 let socket, mode='live', paused=false, latest=null, timer, replayEvents=[], replayIndex=0, graph=null;
 let activity=Array(126).fill(0), shown=Array(126).fill(0);
+let playSession=null,playRevision=-1,playEpoch=0,playBusy=false,playHeartbeat=null;
 let decisionHand=null, avatar=null, brainCloud=null, graphLoading=null, spikeTotal=0;
 const errors=[];
 window.addEventListener('error', e => errors.push(e.message));
@@ -32,6 +33,13 @@ function resetPlasticity(){
 }
 function render(event){
  latest=event;
+ const human=event.viewer==='human';document.body.dataset.viewer=human?'human':'spectator';
+ const otherName=human?'You':'Station';
+ $('return-label').textContent=human?'FLY’S MATCH RESULT':'FLY’S DEMO RESULT';
+ $('fly-seat-name').textContent=event.mode==='fixture'?'FIXTURE FLY':'NATIVE FLY';
+ $('table-caption').textContent=human?'Your cards are visible. Fly cards appear only if shown at showdown.':'Opponent cards hidden until revealed at showdown';
+ $('hand-inset-caption').textContent=human?'YOUR HAND':'FLY’S HAND · FACE UP FOR YOU';
+ $('avatar-opponent-name').textContent=human?'YOU':'CALLING STATION';$('opponent-seat-name').textContent=human?'YOU':'CALLING STATION';$('other-stack-label').textContent=human?'YOU':'OPPONENT';
  if(graph?.mode!==event.mode)ensureGraph(event.mode).catch(e=>errors.push(e.message));
  $('run-label').textContent=event.label;
  $('run-scope').textContent=event.mode==='fixture'?'Play chips only · No demonstrated learning':'Play chips only · No validated poker learning';
@@ -41,17 +49,20 @@ function render(event){
  $('plasticity-note').textContent=event.plasticity_enabled===false?'Learning is disabled. Chip outcomes are recorded; no dopamine pulse or synaptic update is delivered.':'Dopamine × eligibility × learning rate. Weight movement is a mechanism check, not evidence of learning.';
  if(event.plasticity_enabled===false){$('dopamine').textContent='Not delivered';$('changed').textContent='0';$('weight-delta').textContent='0';$('eligibility').textContent='Disabled';$('ratios').textContent='Frozen model';$('pulse').style.width='0'}
  if(event.sequence===0){resetPlasticity();spikeTotal=0;brainCloud?.setActivity([],[])}
+ if(human)$('event-counter').textContent=`EVENT ${event.sequence} · PRIVATE MATCH`;
  avatar?.update(event);
- cards("avatar-cards",event.table.hole,2);cards("avatar-community-cards",event.table.board,5);$("avatar-board-stage").textContent=event.table.street;
+ cards("avatar-cards",human?event.table.opponent_hole:event.table.hole,2);cards("avatar-community-cards",event.table.board,5);$("avatar-board-stage").textContent=event.table.street;
  $("avatar-stack-fly").textContent=event.table.stacks[0];$("avatar-stack-other").textContent=event.table.stacks[1];$("avatar-pot").textContent=event.table.pot;
  if(event.kind==="hand_start"){$("avatar-action").textContent="Looking at its cards";$("avatar-motion").textContent="A new hand. Waiting for neural output."}
- if(event.decision){
-  const d=event.decision;$("avatar-action").textContent=names[d.selected];
+ const flyAction=[...event.table.history].reverse().find(a=>a.actor===0);
+ if(flyAction){
+  const d={selected:flyAction.action,observation:{to_call:flyAction.paid}};$("avatar-action").textContent=names[d.selected];
   $("avatar-motion").textContent=d.selected===0?"Slides both cards into the muck":d.selected===1?(d.observation.to_call===0?"Taps the felt to check":"Pushes chips forward to call"):d.selected===4?"Both hands push the stack in":"Reaches forward with a raise";
  }
  if(event.kind==='hand_start'){$('avatar-opponent-action').textContent='Looking at its cards';$('avatar-opponent-motion').textContent='Waiting for its turn';resetDecision()}
- if(event.kind==='opponent_action'){
-  const a=event.action;$('avatar-opponent-action').textContent=a.action===1?(a.paid?'Call':'Check'):names[a.action];
+ const otherAction=[...event.table.history].reverse().find(a=>a.actor===1);
+ if(otherAction){
+  const a=otherAction;$('avatar-opponent-action').textContent=a.action===1?(a.paid?'Call':'Check'):names[a.action];
   $('avatar-opponent-motion').textContent=a.action===0?'Slides its cards away':a.action===1?(a.paid?'Pushes chips forward':'Taps the felt'):a.action===4?'Both hands push the stack in':'Reaches forward with a raise';
  }
  const t=event.table;
@@ -61,9 +72,9 @@ function render(event){
  $('fly-button').textContent=t.button===0?'Ⓓ':'';$('opp-button').textContent=t.button===1?'Ⓓ':'';
  cards('hole',t.hole,2);cards('opponent-cards',t.opponent_hole,2);cards('board',t.board,5);
  $('history').replaceChildren();
- for(const h of t.history.slice(-6)){const span=document.createElement('span');span.className='history-chip';span.textContent=`${h.actor===0?'Fly':'Station'} · ${h.name}${h.paid?' '+h.paid:''}`;$('history').append(span)}
+ for(const h of t.history.slice(-6)){const span=document.createElement('span');span.className='history-chip';span.textContent=`${h.actor===0?'Fly':otherName} · ${h.name}${h.paid?' '+h.paid:''}`;$('history').append(span)}
  if(!t.history.length)$('history').textContent='Blinds posted. A fresh 20 BB hand.';
- $('action-callout').textContent=event.kind==='settlement'?`Settled · ${event.net_bb>=0?'+':''}${event.net_bb} BB to fly · weights frozen`:event.kind==='reinforcement'?`Settled · ${event.plasticity.raw_net_bb>=0?'+':''}${event.plasticity.raw_net_bb} BB to fly`:event.action?`${event.actor===0?'Fly':'Station'} → ${event.action.name}`:'Information enters the circuit';
+ $('action-callout').textContent=event.kind==='settlement'?`Settled · ${event.net_bb>=0?'+':''}${event.net_bb} BB to fly · weights frozen`:event.kind==='reinforcement'?`Settled · ${event.plasticity.raw_net_bb>=0?'+':''}${event.plasticity.raw_net_bb} BB to fly`:event.action?`${event.actor===0?'Fly':otherName} → ${event.action.name}`:'Information enters the circuit';
  if(event.decision){
   const d=event.decision;decisionHand=event.hand;showActivity(d);
   $('chosen').textContent=names[d.selected];$('decision-context').textContent=`Hand ${event.hand} · decision #${event.sequence} · before action commit`;
@@ -95,8 +106,8 @@ function connect(){
  socket.onerror=()=>{if(mode==='live')$('connection').textContent='Connection error'};
  socket.onclose=()=>{if(mode==='live'){$('connection').textContent='Disconnected';$('lamp').className='';setTimeout(()=>{if(mode==='live')connect()},2000)}};
 }
-function setMode(value){resetPlasticity();mode=value;$('live').classList.toggle('active',mode==='live');$('replay').classList.toggle('active',mode==='replay');$('source').textContent=mode==='live'?'LIVE STREAM':'CHECKED-IN REPLAY';resetDecision()}
-$('live').onclick=()=>{clearTimeout(timer);setMode('live');connect()};
+function setMode(value){resetPlasticity();mode=value;$('live').classList.toggle('active',mode==='live');$('replay').classList.toggle('active',mode==='replay');$('play').classList.toggle('active',mode==='play');$('source').textContent=mode==='play'?'YOUR PRIVATE MATCH':mode==='live'?'LIVE STREAM':'CHECKED-IN REPLAY';resetDecision()}
+$('live').onclick=async()=>{await stopPlay();clearTimeout(timer);setMode('live');connect()};
 async function validateReplay(events){
  let previous='0'.repeat(64);
  // Python canonical JSON is validated by the server for --replay. Browser also
@@ -110,16 +121,67 @@ async function replay(){
  }catch(error){errors.push(error.message);$('connection').textContent=error.message}
 }
 function tickReplay(){if(mode!=='replay')return;if(!paused){render(replayEvents[replayIndex]);replayIndex=(replayIndex+1)%replayEvents.length}timer=setTimeout(tickReplay,Number($('speed').value))}
-$('replay').onclick=replay;
+$('replay').onclick=async()=>{await stopPlay();replay()};
 $('pause').onclick=()=>{paused=!paused;avatar?.setPaused(paused);brainCloud?.setPaused(paused);$('pause').textContent=paused?'▶':'Ⅱ';$('pause').setAttribute('aria-label',paused?'Resume display':'Pause display');$('connection').textContent=paused?'Display paused':mode==='live'?'Live WebSocket':'Deterministic replay'};
 async function init(){
- await installGraph(await(await fetch('/api/graph')).json());connect();draw();loadEvidence();
+ await installGraph(await(await fetch('/api/graph')).json());draw();loadEvidence();
+ const saved=sessionStorage.getItem('flyholdem-play-session');if(saved){await resumePlay(saved)}else connect();
  try{const {createFlyViewer}=await import('/assets/fly-avatar.js');avatar=createFlyViewer($('fly-avatar'),message=>{$('avatar-error').hidden=false;$('avatar-error').textContent=message});if(latest)avatar.update(latest)}
  catch(e){$('avatar-error').hidden=false;$('avatar-error').textContent='3D fly unavailable: '+e.message;errors.push(e.message)}
 }
 $('view-fly').onclick=()=>{$('avatar-stage').hidden=false;$('table-map').hidden=true;$('view-fly').classList.add('active');$('view-table').classList.remove('active')};
 $('view-table').onclick=()=>{$('avatar-stage').hidden=true;$('table-map').hidden=false;$('view-fly').classList.remove('active');$('view-table').classList.add('active')};
 $('reset-camera').onclick=()=>avatar?.resetCamera();
+
+
+function setPlayBusy(value){playBusy=value;$('play').disabled=value;for(const b of $('play-actions').children)b.disabled=value||b.dataset.legal!=='true';$('play-next').disabled=value}
+async function playRequest(path,body){
+ const response=await fetch(path,{method:body===undefined?'GET':'POST',headers:body===undefined?{}:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});
+ const data=await response.json();if(!response.ok)throw Error(data.detail||'Play request failed');return data;
+}
+function enterPlay(){
+ clearTimeout(timer);socket?.close();setMode('play');paused=false;avatar?.setPaused(false);brainCloud?.setPaused(true);brainCloud?.setActivity([],[]);
+ $('pause').disabled=true;$('pause').textContent='Ⅱ';$('pause').setAttribute('aria-label','Pause display');
+ $('play-controls').hidden=false;$('connection').textContent='Your private match';$('lamp').className='online';
+ document.body.dataset.viewer='human';resetDecision();
+}
+async function stopPlay(){
+ ++playEpoch;clearInterval(playHeartbeat);playHeartbeat=null;const token=playSession;playSession=null;sessionStorage.removeItem('flyholdem-play-session');
+ $('play-controls').hidden=true;$('pause').disabled=false;document.body.dataset.viewer='spectator';brainCloud?.setPaused(false);setPlayBusy(false);
+ if(token){try{await playRequest(`/api/play/${token}/end`,{})}catch(error){$('connection').textContent=error.message}}
+}
+function playControls(state){
+ playRevision=state.revision;$('play-actions').replaceChildren();
+ for(const action of state.actions){const button=document.createElement('button');button.textContent=action.name;button.dataset.action=action.index;button.dataset.legal=String(action.legal);button.disabled=!action.legal||playBusy;button.onclick=()=>takePlayAction(action.index);$('play-actions').append(button)}
+ $('play-next').hidden=!state.done;$('play-next').disabled=playBusy;
+ $('play-status').textContent=state.halted?'Neural player stopped. Start a new match.':state.done?`Hand complete · Your match result ${state.hero_return_bb>=0?'+':''}${state.hero_return_bb.toFixed(1)} BB`:state.human_turn?'Your turn':'The fly is thinking…';
+}
+async function applyPlay(state,epoch,animate=true){
+ if(epoch!==playEpoch||mode!=='play')return;
+ playSession=state.session;sessionStorage.setItem('flyholdem-play-session',playSession);
+ for(const event of state.events){if(epoch!==playEpoch||mode!=='play')return;render(event);if(animate)await new Promise(resolve=>setTimeout(resolve,event.action?850:350))}
+ if(epoch===playEpoch&&mode==='play'){setPlayBusy(false);playControls(state)}
+}
+function heartbeatPlay(){
+ clearInterval(playHeartbeat);playHeartbeat=setInterval(async()=>{if(mode!=='play'||!playSession||playBusy)return;try{await playRequest(`/api/play/${playSession}`)}catch(error){$('play-status').textContent=error.message}},25000);
+}
+async function startPlay(){
+ const epoch=++playEpoch;enterPlay();setPlayBusy(true);$('play-status').textContent='Preparing a frozen neural player…';$('play-actions').replaceChildren();$('play-next').hidden=true;
+ try{const state=await playRequest('/api/play/start',{});if(epoch!==playEpoch){playRequest(`/api/play/${state.session}/end`,{}).catch(()=>{});return}await applyPlay(state,epoch);heartbeatPlay()}
+ catch(error){if(epoch===playEpoch){setPlayBusy(false);$('play-status').textContent=error.message}}
+}
+async function resumePlay(token){
+ const epoch=++playEpoch;enterPlay();setPlayBusy(true);
+ try{const state=await playRequest(`/api/play/${token}`);await applyPlay(state,epoch,false);heartbeatPlay()}
+ catch(error){sessionStorage.removeItem('flyholdem-play-session');setPlayBusy(false);$('play-status').textContent='This match has expired. Start a new match.'}
+}
+async function takePlayAction(action){
+ if(playBusy||!playSession)return;const epoch=playEpoch;setPlayBusy(true);$('play-status').textContent='Action submitted · the fly is thinking…';
+ try{await applyPlay(await playRequest(`/api/play/${playSession}/action`,{revision:playRevision,action}),epoch)}
+ catch(error){if(epoch===playEpoch){setPlayBusy(false);$('play-status').textContent=error.message;try{const state=await playRequest(`/api/play/${playSession}`);playControls(state)}catch{}}}
+}
+$('play').onclick=startPlay;
+$('play-next').onclick=async()=>{if(playBusy||!playSession)return;const epoch=playEpoch;setPlayBusy(true);$('play-status').textContent='Dealing…';try{await applyPlay(await playRequest(`/api/play/${playSession}/hand`,{revision:playRevision}),epoch)}catch(error){setPlayBusy(false);$('play-status').textContent=error.message}};
 
 function showActivity(data){
  if(data.activity){activity=data.activity;spikeTotal=activity.reduce((a,b)=>a+b,0)}
@@ -134,7 +196,7 @@ async function installGraph(value){
  $('neuron-detail').hidden=true;
  if(native){const {createBrainCloud}=await import('/assets/brain-cloud.js');
   brainCloud=await createBrainCloud($('brain-native'),value,node=>{$('neuron-detail').hidden=false;$('neuron-detail').textContent=`Body ${node.body_id} · ${node.type||node.class||node.superclass||'unclassified'} · ${node.role} · ${node.has_soma_coordinate?'annotated soma position':'no soma coordinate; schematic grid'}`});
-  brainCloud.setPaused(paused);brainCloud.setFilter($('brain-filter').value);
+  brainCloud.setPaused(paused||mode==='play');brainCloud.setFilter($('brain-filter').value);
   if(latest?.mode===value.mode&&latest.decision)showActivity(latest.decision);
  }else{activity=Array(value.neuron_count).fill(0);shown=Array(value.neuron_count).fill(0)}
 }

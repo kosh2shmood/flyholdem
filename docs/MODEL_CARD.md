@@ -1,31 +1,29 @@
 # FlyHoldem model card
 
-**Version:** M4 conditioning/teacher engineering checkpoint; live poker remains the fixture prototype. **Status:** development. **Money:** play chips only.
+**Version:** Native spectator and private heads-up interface; conditioning and small exact transfer confirmed. **Status:** development. **Money:** play chips only.
 
-## What exists
+## What works
 
-A fixed synthetic LIF graph acts through five neural spike readouts in a real PokerKit heads-up game. A bounded eligibility/RPE mechanism updates existing synthetic synapses. The live/replay dashboard shows actual canonical events, exact visible information, activity and plasticity.
+A synthetic fixture, the 4,505-neuron mushroom-body circuit and the full retained 166,700-neuron MaleCNS graph produce actions through five fixed neural spike readouts in genuine PokerKit heads-up Hold'em. Native topology contains 25,582,938 retained edges. Full controllability passed at uniform 0.25 synaptic scale (signed contact gain 0.06875), preserving topology and transmitter signs. Circuit retains its separate base-gain registration. Population mappings were selected only on annotations/connectivity/controllability, never poker profit.
 
-The full retained MaleCNS graph and the declared 4,505-cell circuit now import, audit and run in the native solver. Circuit and full controllability passed their registered checks. The full passing configuration uses a uniform 0.25 synaptic scale relative to the initial model (signed contact gain 0.06875); earlier full failures remain published. No topology was removed. A second preparation reproduced every artifact hash; the independent numerical oracle and complete-state continuation checks passed. See docs/RUNTIME.md for measured resources. The viewer uses original illustrative player rigs and displays canonical public cards and balances.
+The native live/recorded dashboard renders every retained neuron and shows actual action scores/activity. Anatomical soma coordinates and the explicitly schematic missing-coordinate grid are distinguished. The side-seated fly and abstract opponent use original illustrative action gestures, readable hand/community insets and balance-driven chip piles. Human play isolates each private information set, freezes an independent neural player, validates every action on the server and supports browser reload while the server remains running.
 
-## What does not yet exist
+## Confirmed evidence and limits
 
-A native population controller and bounded local rule now exist; the live poker backend remains the fixture. Full-graph conditioning passed five independent seeds: mean 82.3% versus 47.2% frozen and 50.0% shuffled, with retention and exact weight-erasure checks. Its mechanism is learned suppression of a competing readout under the fixed binary legal decoder; see docs/CONDITIONING.md. No validated poker teacher, actual distilled-connectome checkpoint or confirmatory poker evaluation exists. The confirmatory learning claim is limited to these two engineered cues. Poker learning is unproven. The synthetic DAN/KC/MBON labels describe engineering roles, not anatomically reconstructed cells. V0's Euler solver and schematic coordinates are development assumptions.
+Full local conditioning passed five independent seeds: 82.3% versus 47.2% frozen and 50.0% shuffled, with retention and erasure. Its mechanism is competing-readout suppression and partly silent legal tie selection. It establishes learned selection for two engineered cues only, not poker strategy. See CONDITIONING.md.
 
-## Intended use
+Local exact-cue transfer qualified in development but **failed** confirmation at 77.8%, below 80%. A separately registered, explicitly nonbiological direct-readout surrogate subsequently passed circuit confirmation: 94.5% versus 55.2% frozen and 52.2% shuffled-teacher. It changes only bounded multipliers on 10,450 existing registered KC-to-readout edges, uses actual native forward scores and adds no adapter/decoder/bypass. The backward approximation omits recurrent and threshold derivatives. Silent ties still contribute. All 128 actual exported-model decisions remained byte-identical after teacher/corpus deletion, and changed cue source was rejected. See TRANSFER.md.
 
-Inspect the neural/game information boundary and mechanism during software development. Run data-free tests and replay the checked-in log. Do not interpret chips won, spike activity or changing weights as evidence of strategic learning or biological validity.
+The 25k v1, 250k v1 250k visible-card v2 and 250k visible-equity v3 conventional NFSP policies failed the complete held-out opponent suite; none may teach the fly. No validated poker teacher/corpus or poker-trained student exists yet. Whole Gate 2A and poker Gates 3–6 remain pending. The full model shown in the dashboard and available for human play is the cue-conditioned model, **unvalidated for poker**.
 
-## Reproducibility
+## Reproducibility and intended use
 
-Python 3.11, dependency pins in uv.lock, fixed graph/mapping seed 1729, default demo seed 20260912. Recorded truth: examples/fixture-demo.jsonl. Review: docs/review/browser-check.json and screenshots. The separate 0.1 ms full/circuit solver has passed scalar Python and Brian2 parity checks. Native conditioning checkpoints include weights, eligibility and reward baselines; interrupted and logged-tail continuation reproduced the entire journal exactly. Teacher optimizer/replay recovery and teacher-disconnected native fixture inference tests pass. Integrated native poker learning/recovery remains subsequent work.
+Inspect the neural/game information boundary, reproduce registered experiments and play against the frozen development controller. Do not treat demo chips won, activity or weight movement as evidence of poker learning. Native numerical checks cover scalar Python/Brian2 parity and complete-state continuation. Experiment journals, atomic checkpoints and frozen runtime bundles preserve source/config/binary/environment identities. See RUNTIME.md and PROGRESS.md for exact commands and negative results. Models/data/logs remain local and ignored; uv.lock pins the environment.
 
-## Claims
+The default fixture is a synthetic Euler prototype with schematic engineering roles, distinct from the native 0.1 ms solver and reconstructed cells. Human sessions are local single-user play-chip games, not a real-money or production service. Neither gesture animation nor surrogate optimization is claimed as faithful biological motor/learning dynamics.
 
-The intended full-data public wording remains: “A simulated network using the wiring of one reconstructed male fruit-fly central nervous system controls an engineered heads-up no-limit Hold'em interface.” This statement is not a claim about the synthetic V0 fixture. No living fly, consciousness, faithful whole-brain emulation, or proven learning is claimed.
+## Public wording
 
-## Native spectator and transfer status update
+“A simulated network using the wiring of one reconstructed male fruit-fly central nervous system controls an engineered heads-up no-limit Hold'em interface.”
 
-The full/circuit dashboard executes frozen native neural decisions. The full view represents every retained neuron and distinguishes actual annotated soma coordinates from a separately labeled missing-coordinate grid. Learning and reinforcement delivery are disabled in this spectator mode. The conditioning-trained full model remains unvalidated for poker. The default synthetic fixture remains separately labeled.
-
-Exact-cue circuit local transfer met development criteria and its actual frozen model passed a 64-decision teacher/corpus deletion test. Confirmation nevertheless failed its registered 0.8 fidelity requirement at mean 0.778125. This is not a complete Gate 2A pass. The 25k v1, 250k v1 and 250k visible-card v2 conventional NFSP candidates all failed the full held-out opponent suite; none may generate a teaching corpus. Surrogate transfer, poker curricula, stronger validated poker training and human play remain pending. See TRANSFER.md and TEACHER.md for exact boundaries and written negative findings.
+This describes the native full-data controller, not the synthetic fixture. No living fly, consciousness, faithful whole-brain emulation or proven poker learner is claimed.

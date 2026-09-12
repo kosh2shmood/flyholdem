@@ -271,13 +271,19 @@ export function createFlyViewer(canvas,onFailure){
  let event=null,clock=0,last=performance.now(),paused=false,frame=0,disposed=false,visible=true,lastEventHash=null;
  function setStack(group,value){group.children.forEach((c,i)=>c.visible=i<Math.min(group.children.length,Math.ceil(value/2)))}
  function update(e){
-  if(e.hash===lastEventHash)return;event=e;lastEventHash=e.hash;const t=e.table;
+  if(e.hash===lastEventHash)return;const firstForHand=!event||event.hand!==e.hand||event.viewer!==e.viewer||event.mode!==e.mode;event=e;lastEventHash=e.hash;const t=e.table;
   fly.cards.forEach((c,i)=>{changeCard(c,t.hole[i]||'??');c.visible=Boolean(t.hole[i])});
   other.cards.forEach((c,i)=>{changeCard(c,t.opponent_hole[i]||'??');c.visible=Boolean(t.opponent_hole[i])});
   board.forEach((c,i)=>{c.visible=Boolean(t.board[i]);if(c.visible)changeCard(c,t.board[i])});
   setStack(fly.bank,t.stacks[0]);setStack(other.bank,t.stacks[1]);setStack(pot,t.pot);
-  if(e.kind==='hand_start')players.forEach(resetPlayer);
-  if((e.kind==='decision'&&e.actor===0&&e.decision)||(e.kind==='opponent_action'&&e.actor===1)){
+  if(e.kind==='hand_start'||firstForHand)players.forEach(resetPlayer);
+  if(firstForHand&&t.history.length){
+   // A reload may resume from the latest public event, after the action.
+   for(const p of players){const a=[...t.history].reverse().find(h=>h.actor===players.indexOf(p));if(!a)continue;
+    p.action={id:a.action,paid:a.paid,check:a.action===1&&a.paid===0};p.elapsed=2;p.actionHash=e.hash;p.folded=a.action===0;p.laidDown=a.action===4;
+   }
+  }
+  if((e.kind==='decision'&&e.actor===0&&e.action)||(e.kind==='opponent_action'&&e.actor===1)){
    const p=players[e.actor],id=e.action.action;
    p.action={id,paid:e.action.paid,check:id===1&&e.action.paid===0};
    p.elapsed=0;p.actionHash=e.hash;p.actionFrames=0;p.folded=id===0;if(id===4)p.laidDown=true;

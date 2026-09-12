@@ -35,3 +35,19 @@ The point cloud contains every retained neuron and follows exact per-neuron spik
 `/api/graph` provides mode/count/checksum metadata. `/api/graph/positions` and `/api/graph/roles` contain compact typed geometry; `/api/graph/neuron/<index>` supplies a selected cell's annotation. Large body IDs are strings. `/api/evidence` serves explicitly maintained written gate findings. Live native logs carry graph and registration identities; native replay rejects different identities. Fixture replay remains separately labeled and switches back to its 126-cell schematic.
 
 Verified with Chromium 151.0.7922.34: all 166,700 points rendered; binary geometry checksums match; displayed activity equals native counts; annotation/filter/pause controls work; fixture replay and return to native live work; desktop 1440×1200 and mobile 390×844 have no overflow or console/page errors. Existing fixture tests again verified all six fly gestures, opponent check/call, clear fly/community cards at 0/3/4/5 public cards, both chip piles and card privacy. Three.js Points/BufferGeometry/ShaderMaterial and OrbitControls use the installed pinned library. See scripts/native_browser_check.py for reproducible checks. Generated screenshots and results remain local.
+
+
+## Play against the fly
+
+Choose **Play against fly** in either the fixture or native dashboard. The same server creates one private heads-up match: 1/2 blinds, 20 BB stacks, alternating button, play chips only, stacks reset each hand. Your two cards appear in the readable inset and the right player's hands; community cards use the matching five-slot strip. The fly's cards remain hidden unless PokerKit shows them at showdown. Folded/mucked cards and all neural observations, encodings, scores and activity stay out of the human event stream. Both players' gestures follow committed actions, including the fly's redacted action events. Reload restores the current hand, captions and poses while the server remains running.
+
+The server validates the capability session, exact request fields, current revision, turn and legal/nonduplicate action before applying it. Duplicate/stale submissions cannot act twice. Neural failure halts the hand; no fallback policy is used. Human matches use unpredictable private deal seeds and an independent neural state, with weights frozen at match start. The original spectator pauses during the match, avoiding simultaneous full-graph advancement, and resumes when you select Live or Recorded replay. A new match replaces the previous local match; inactive sessions expire after 30 minutes. This is a single-user local interface, not a production service. Server restart ends a match; private diagnostic records are retained locally under ignored runs/live-*/play-private with restricted filesystem permissions.
+
+The human session token is kept in browser session storage, not in the page URL. API: POST /api/play/start; GET /api/play/{token}; POST /api/play/{token}/action with revision/action; POST /api/play/{token}/hand with revision; POST /api/play/{token}/end. Public human event hashes are computed only from redacted public information. The private logs and frozen changed weights are never served. The full conditioning model is currently unvalidated for poker; the interface does not imply strategic strength.
+
+```sh
+.venv/bin/python scripts/human_browser_check.py --url http://127.0.0.1:8766 --output runs/human-browser-fixture
+.venv/bin/python scripts/human_browser_check.py --url http://127.0.0.1:8767 --output runs/human-browser-full
+```
+
+Verified in Chromium 151.0.7922.34 on fixture and actual full native graph: legal action buttons, both players' motions, own/fly card privacy, community correspondence, reload recovery, leave/resume spectator, desktop/mobile overflow and no console/page errors. Native state-isolation and no-fallback tests run without full data. Generated screenshots/reports stay local.

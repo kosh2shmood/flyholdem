@@ -2,8 +2,9 @@ import asyncio
 from contextlib import asynccontextmanager
 import json
 import os
+import time
 from pathlib import Path
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Request
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from .events import Demo, dumps, verify_stream
@@ -37,12 +38,16 @@ def create_app(seed=20260912, replay=None, interval=.9, log_path=None, mode='fix
                 for event in recorded):
             raise ValueError('Recorded native graph or population registration differs from the viewer')
     latest = None
+    play_session = None
+    play_opening = False
+    play_lock = asyncio.Lock()
+    spectator_idle = asyncio.Event(); spectator_idle.set()
     log_path = Path(log_path or 'runs/live/events.jsonl')
 
     @asynccontextmanager
     async def lifespan(app):
         async def produce():
-            nonlocal latest
+            nonlocal latest, play_session
             stream = None
             if recorded is None:
                 log_path.parent.mkdir(parents=True, exist_ok=True)
@@ -50,8 +55,18 @@ def create_app(seed=20260912, replay=None, interval=.9, log_path=None, mode='fix
             try:
                 index = 0
                 while True:
+                    if play_opening or play_session is not None:
+                        if play_session is not None and time.monotonic()-play_session.last_access>1800 and not play_lock.locked():
+                            async with play_lock:
+                                await asyncio.to_thread(play_session.close);play_session=None
+                        await asyncio.sleep(.1)
+                        continue
                     # CPU work off the event loop; exactly one canonical simulation.
-                    event = recorded[index % len(recorded)] if recorded else await asyncio.to_thread(demo.next_event)
+                    spectator_idle.clear()
+                    try:
+                        event = recorded[index % len(recorded)] if recorded else await asyncio.to_thread(demo.next_event)
+                    finally:
+                        spectator_idle.set()
                     index += 1
                     latest = event
                     if stream:
@@ -78,6 +93,8 @@ def create_app(seed=20260912, replay=None, interval=.9, log_path=None, mode='fix
             await task
         except asyncio.CancelledError:
             pass
+        if play_session is not None:
+            play_session.close()
 
     app = FastAPI(title='FlyHoldem neural poker laboratory', lifespan=lifespan)
     app.mount('/assets', StaticFiles(directory=ROOT/'ui/src'), name='assets')
@@ -92,7 +109,7 @@ def create_app(seed=20260912, replay=None, interval=.9, log_path=None, mode='fix
     @app.get('/api/health')
     def health():
         task = getattr(app.state, 'producer', None)
-        return {'ok': bool(task and not task.done()), 'mode': mode, 'replay': bool(recorded), 'weights_frozen': mode != 'fixture'}
+        return {'ok': bool(task and not task.done()), 'mode': mode, 'replay': bool(recorded), 'weights_frozen': mode != 'fixture', 'spectator_paused_for_play': play_opening or play_session is not None}
 
     @app.get('/api/graph')
     def graph(mode: str | None = None):
@@ -122,6 +139,79 @@ def create_app(seed=20260912, replay=None, interval=.9, log_path=None, mode='fix
     def evidence():
         import yaml
         return yaml.safe_load((ROOT/'configs/evidence.yaml').read_text())
+
+    def check_origin(request):
+        origin=request.headers.get('origin')
+        if origin and origin.rstrip('/')!=str(request.base_url).rstrip('/'):
+            raise HTTPException(403,'Play requests must come from this local dashboard')
+
+    async def play_payload(request,fields):
+        check_origin(request)
+        try: value=await request.json()
+        except Exception: raise HTTPException(422,'A JSON action request is required')
+        if not isinstance(value,dict) or set(value)!=set(fields):
+            raise HTTPException(422,'Unexpected play request fields')
+        return value
+
+    def active_session(token):
+        if play_session is None or token!=play_session.token:
+            raise HTTPException(410,'This match has expired. Start a new match.')
+        return play_session
+
+    @app.post('/api/play/start')
+    async def start_play(request: Request):
+        nonlocal play_session,play_opening
+        check_origin(request)
+        from .play import FrozenPlayer,HumanSession,PlayError
+        async with play_lock:
+            play_opening=True
+            try:
+                # Finish the spectator's current operation before allocating a
+                # private neural player. Never advance two full workers together.
+                await spectator_idle.wait()
+                if play_session is not None:
+                    await asyncio.to_thread(play_session.close);play_session=None
+                player=await asyncio.to_thread(FrozenPlayer,demo)
+                play_session=HumanSession(player,log_path.parent/'play-private')
+                return await asyncio.to_thread(play_session.new_hand)
+            except PlayError as error:
+                raise HTTPException(error.status,str(error))
+            finally:
+                play_opening=False
+
+    @app.get('/api/play/{token}')
+    async def play_state(token: str):
+        async with play_lock:
+            return active_session(token).response()
+
+    @app.post('/api/play/{token}/action')
+    async def play_action(token: str,request: Request):
+        from .play import PlayError
+        value=await play_payload(request,('revision','action'))
+        async with play_lock:
+            try:
+                return await asyncio.to_thread(active_session(token).act,value['revision'],value['action'])
+            except PlayError as error:
+                raise HTTPException(error.status,str(error))
+
+    @app.post('/api/play/{token}/hand')
+    async def play_hand(token: str,request: Request):
+        from .play import PlayError
+        value=await play_payload(request,('revision',))
+        async with play_lock:
+            try:
+                return await asyncio.to_thread(active_session(token).new_hand,value['revision'])
+            except PlayError as error:
+                raise HTTPException(error.status,str(error))
+
+    @app.post('/api/play/{token}/end')
+    async def end_play(token: str,request: Request):
+        nonlocal play_session
+        check_origin(request)
+        async with play_lock:
+            session=active_session(token)
+            await asyncio.to_thread(session.close);play_session=None
+            return {'closed':True}
 
     @app.get('/api/example')
     def example():

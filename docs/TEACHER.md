@@ -81,3 +81,10 @@ PYTHONPATH="$PWD/runs/teacher-runtime-v3/src" .venv/bin/python -m flyholdem.teac
 ```
 
 Resume adds --resume; export/evaluation also use this PYTHONPATH. Do not rebuild the equity utility or change the installed environment while the experiment is active. No result or teacher qualification is assumed at registration.
+
+
+## Visible-equity v3 result — development failed
+
+V3 completed 250,000 hands in 1,674.43 s from the immutable teacher-runtime-v3 snapshot. Frozen policy SHA-256: 6d86d320863d3aadc6f6765492b846d5c6b14316032bb418f2538e24a7f2e3ce. The same 128 paired development deals per opponent returned +1.1796875 BB/hand against random, −0.34765625 against calling station, −0.25 against tight-aggressive and −1.587890625 against equity-bucket. None had a positive suite-adjusted lower bound. This is a failed development result; no reserved confirmation seeds or teaching corpus are used. The 32 hidden-hole/future-deck/teacher-label mutation decisions passed exactly.
+
+Evaluation manifest SHA-256: 9066cd8afbb172300e065d578dcdd2b0b38cbea815aa8fc0b21a9d2c34a1ca75. Training journal head: db0a465be116f4f397a767d3e268764da0b5bbe4c406e24ebd6c0175275fda75; evaluation journal head: 1e50990c95581dc2791226cb0d616537187fb5a7309e8f728212c10b4b8bedfd. Full generated records remain local under runs/teacher-nfsp-equity-v3 and sibling policy/development directories. Visible equity alone did not solve teacher training. Next diagnose continuation-value estimates and average-policy behavior before registering another conventional candidate; never select fly populations or biological parameters from these poker results.

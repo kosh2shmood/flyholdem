@@ -68,3 +68,14 @@ PYTHONPATH="$PWD/runs/surrogate-runtime-v1/src" .venv/bin/python -m flyholdem.ex
 ```
 
 Add --resume after interruption. Export and actual teacher-removal checks use the same snapshot. Confirmation has not yet run at this checkpoint; Gate 2A remains pending independent teacher/corpus qualification as well.
+
+
+## Surrogate independent confirmation and actual teacher removal
+
+The first registered surrogate rate, 0.1, passed all five reserved confirmation seeds in 324.24 s / 134.4 MiB peak RSS. Learned accuracies were 0.9453125, 0.9453125, 0.96875, 0.921875 and 0.9453125: mean **0.9453125**. Frozen/restored mean was 0.5515625; shuffled-teacher mean was 0.521875. Paired improvements were 0.39375 (95% seed bootstrap interval 0.3859375–0.4046875) and 0.4234375 (0.3890625–0.459375). Each one-sided paired sign-flip p was 0.03125. Retention exactly reproduced post-training decisions; weight restoration exactly reproduced initial decisions. The original local-rule failure remains unchanged.
+
+An independent audit recomputed all 9,865 journal hashes, actual legal argmax choices, per-seed accuracy, retention/restoration and shuffled-target multisets. Every training record used actual native forward scores, no dopamine, and bounded ratios. Cue 0 accuracy was 100%, with 49.6875% silent legal readouts; cue 1 accuracy was 89.0625%, with 10.3125% silent readouts. Thus the result still partly uses the fixed silent-tie rule, while cue 1 also produces active winning output. It does not establish arbitrary five-action poker control or faithful biological learning.
+
+The actual confirmed model exported from the best exact-cue checkpoint (seed 75203) has SHA-256 c3876173e83c739738706ee4bd2e0a28c7854b934e63fc67ffbaba90b9e6defb. All **128** actual held-out decisions reproduced after deleting the teacher and corpus, with no teacher/learning/experiment imports. Decision bytes SHA-256: 6fb3340bc2982622e3d2d458530143f9c1b950a5d30e246e807e0ad88815d099. Mutating the separately pinned cue driver was rejected. Manifest SHA-256: f33ef9ae87f3646256fac72693144cb0b76c63f6d1760cc2cb7a18a3573ee1e7; frozen source hash: 0ba41f497c48a2ffad355f97433691664845b4449dc7edd8236844c08f90b988.
+
+Generated evidence/model remain local in runs/exact-surrogate-circuit-confirm-v1 and its sibling -model directory. The small exact-transfer and actual teacher-removal components now pass. **Whole Gate 2A remains pending** independent conventional poker-teacher validation and disjoint corpus validation. No poker-learning claim follows.

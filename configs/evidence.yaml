@@ -12,7 +12,7 @@ gates:
     detail: 82.3% learned versus 47.2% frozen and 50.0% shuffled; five independent seeds, retention and erasure passed. Mechanism is readout suppression, not poker skill.
   - name: Teacher and transfer
     status: pending
-    detail: Exact-cue circuit development and actual teacher-removal checks passed; confirmation failed its 80% fidelity threshold at 77.8%. Conventional poker teachers have not passed validation.
+    detail: Small exact-cue surrogate confirmation passed at 94.5% versus 55.2% frozen and 52.2% shuffled, with 128 actual teacher-removal decisions. Local-rule confirmation failed at 77.8%. Conventional poker teacher and corpus qualification remain pending.
   - name: Poker curricula
     status: pending
     detail: Shove/fold, river, 20 BB and 100 BB learning gates remain pending.
