@@ -6,7 +6,7 @@ import torch
 from flyholdem.neural.checkpoint import Checkpoints
 from flyholdem.provenance import manifest, identity
 from flyholdem.connectome.registry import digest
-from flyholdem.interface.encoder import CHANNELS
+from .features import feature_names, V1
 from .nfsp import NFSPAgent
 from .policy import export_policy
 
@@ -16,7 +16,7 @@ def export_training(run_path, output, which='latest'):
     saved = json.loads((root / 'manifest.json').read_text())
     config = saved['config']
     torch.set_num_threads(config['torch_threads']); torch.use_deterministic_algorithms(True)
-    runtime = manifest(config, 'conventional-teacher-no-connectome', identity(CHANNELS),
+    runtime = manifest(config, 'conventional-teacher-no-connectome', identity(feature_names(config['agent'].get('feature_version', V1))),
                        identity({'algorithm': 'NFSP-average-policy', 'actions': 5}), 'pytorch-cpu')
     arrays, extra, metadata = Checkpoints(root / 'checkpoints').load(runtime, which)
     agents = [NFSPAgent(config['agent'], config['seed'] + 100 * seat) for seat in range(2)]

@@ -7,35 +7,31 @@ hand. No hidden cards, full game object or equity labels enter these networks.
 import numpy as np
 import torch
 from torch import nn
-from flyholdem.interface.encoder import encode_player_state, CHANNELS
-from flyholdem.poker.infoset import canonical_state
+from .features import features, feature_names, V1
 from .memory import Memory
 from .serialization import pack, unpack
 
 
-def features(observation):
-    state = canonical_state(observation)
-    return encode_player_state(state).astype(np.float32)
-
-
-def network(hidden):
-    return nn.Sequential(nn.Linear(len(CHANNELS), hidden), nn.ReLU(),
+def network(hidden, dimension=None):
+    return nn.Sequential(nn.Linear(len(feature_names(V1)) if dimension is None else dimension, hidden), nn.ReLU(),
                          nn.Linear(hidden, hidden), nn.ReLU(), nn.Linear(hidden, 5))
 
 
 class NFSPAgent:
     def __init__(self, config, seed):
         self.config = dict(config)
+        self.feature_version = config.get('feature_version', V1)
+        self.dimension = len(feature_names(self.feature_version))
         torch.manual_seed(seed)
-        self.q = network(config['hidden'])
-        self.target = network(config['hidden'])
+        self.q = network(config['hidden'], self.dimension)
+        self.target = network(config['hidden'], self.dimension)
         self.target.load_state_dict(self.q.state_dict())
         self.target.requires_grad_(False)
-        self.average = network(config['hidden'])
+        self.average = network(config['hidden'], self.dimension)
         self.q_optimizer = torch.optim.Adam(self.q.parameters(), lr=config['q_lr'])
         self.average_optimizer = torch.optim.Adam(self.average.parameters(), lr=config['average_lr'])
         self.rng = np.random.default_rng(seed + 1)
-        dimension = len(CHANNELS)
+        dimension = self.dimension
         self.replay = Memory(config['replay_capacity'], {
             'observation': ((dimension,), np.float32), 'action': ((), np.int64),
             'reward': ((), np.float32), 'next_observation': ((dimension,), np.float32),
@@ -51,7 +47,7 @@ class NFSPAgent:
 
     @torch.no_grad()
     def probabilities(self, observation):
-        x = features(observation)
+        x = features(observation, self.feature_version)
         legal = np.asarray(observation['legal_mask'], dtype=bool)
         logits = self.average(torch.from_numpy(x))
         logits = logits.masked_fill(~torch.from_numpy(legal), -torch.inf)
@@ -61,7 +57,7 @@ class NFSPAgent:
     def act(self, observation, epsilon, record=True):
         if not 0 <= epsilon <= 1:
             raise ValueError('Exploration probability must be in [0,1]')
-        x = features(observation)
+        x = features(observation, self.feature_version)
         legal = np.asarray(observation['legal_mask'], dtype=bool)
         if self.episode_br:
             if self.rng.random() < epsilon:
@@ -80,7 +76,7 @@ class NFSPAgent:
     def transition(self, previous, reward, next_observation=None):
         x, action = previous
         terminal = next_observation is None
-        next_x = np.zeros(len(CHANNELS), dtype=np.float32) if terminal else features(next_observation)
+        next_x = np.zeros(self.dimension, dtype=np.float32) if terminal else features(next_observation, self.feature_version)
         next_legal = np.zeros(5, dtype=bool) if terminal else np.asarray(next_observation['legal_mask'], dtype=bool)
         self.replay.add(observation=x, action=action, reward=reward, next_observation=next_x,
                         next_legal=next_legal, terminal=terminal)

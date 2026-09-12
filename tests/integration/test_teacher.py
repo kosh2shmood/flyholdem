@@ -16,11 +16,15 @@ CONFIG = dict(stack_bb=20, torch_threads=1, seed=71100, hands=30, deal_seed_star
                          gradient_clip=5, target_update_steps=10))
 
 
-def test_teacher_complete_checkpoint_matches_uninterrupted_optimizer_and_replay(tmp_path):
+@pytest.mark.parametrize('feature_version', [None, 'canonical-visible-card-structure-v2'])
+def test_teacher_complete_checkpoint_matches_uninterrupted_optimizer_and_replay(tmp_path, feature_version):
     full, resumed = tmp_path / 'full', tmp_path / 'resumed'
-    train(CONFIG, full)
-    train(CONFIG, resumed, stop_after=13)
-    train(CONFIG, resumed, resume=True)
+    config = copy.deepcopy(CONFIG)
+    if feature_version:
+        config['agent']['feature_version'] = feature_version
+    train(config, full)
+    train(config, resumed, stop_after=13)
+    train(config, resumed, resume=True)
     assert (full / 'hands.jsonl').read_bytes() == (resumed / 'hands.jsonl').read_bytes()
     assert json.loads((resumed / 'result.json').read_text())['allowed_as_teacher'] is False
     assert (resumed / 'checkpoints/latest.json').exists()
@@ -88,3 +92,24 @@ def test_teacher_checks_actual_private_holes_and_future_deck_invariance():
     report = verify_information_boundary(TeacherPolicy([a.average for a in agents]), seeds=(713, 714))
     assert report['hidden_hole_future_deck_and_teacher_label_invariance']
     assert report['decisions_checked'] >= 8
+
+
+def test_visible_card_structure_stays_inside_teacher_and_has_no_hidden_inputs(tmp_path):
+    from flyholdem.teacher.features import V2, feature_names
+    from flyholdem.interface.encoder import encode_player_state, CHANNELS
+    from flyholdem.teacher.evaluation import verify_information_boundary
+    hand = Hand(19); hand.act(1); hand.act(1)
+    obs = dict(hand.observation(), hole=['As','Ah'], board=['Ac','2d','3h'])
+    x = features(obs, V2); names = feature_names(V2)
+    assert x.shape == (354,) and len(CHANNELS) == 237
+    assert np.array_equal(x[:237], encode_player_state(obs).astype(np.float32))
+    assert x[names.index('own_pair:A')] == 1
+    assert x[names.index('visible_made_category:THREE_OF_A_KIND')] == 1
+    config = dict(CONFIG['agent'], feature_version=V2)
+    agents = [NFSPAgent(config, 201 + seat) for seat in range(2)]
+    policy = TeacherPolicy([a.average for a in agents], V2)
+    report = verify_information_boundary(policy, seeds=(713, 714))
+    assert report['hidden_hole_future_deck_and_teacher_label_invariance']
+    export_policy(agents, tmp_path/'v2-policy', {'stack_bb':20,'status':'engineering-fixture'})
+    restored,_ = load_policy(tmp_path/'v2-policy')
+    assert np.array_equal(policy.probabilities(obs), restored.probabilities(obs))

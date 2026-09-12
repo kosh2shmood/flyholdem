@@ -7,7 +7,7 @@ import time
 import numpy as np
 import torch
 import yaml
-from flyholdem.interface.encoder import CHANNELS
+from .features import feature_names, V1
 from flyholdem.poker.engine import Hand
 from flyholdem.poker.infoset import canonical_information_id
 from flyholdem.provenance import manifest, identity, assert_compatible
@@ -56,7 +56,7 @@ def train(config, output, resume=False, stop_after=None):
     torch.use_deterministic_algorithms(True)
     torch.manual_seed(config['seed'])
     agents = [NFSPAgent(config['agent'], config['seed'] + 100 * seat) for seat in range(2)]
-    runtime = manifest(config, 'conventional-teacher-no-connectome', identity(CHANNELS),
+    runtime = manifest(config, 'conventional-teacher-no-connectome', identity(feature_names(config['agent'].get('feature_version', V1))),
                        identity({'algorithm': 'NFSP-average-policy', 'actions': 5}), 'pytorch-cpu')
     output = Path(output); output.mkdir(parents=True, exist_ok=resume)
     if resume:
