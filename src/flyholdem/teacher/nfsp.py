@@ -2,7 +2,8 @@
 
 Two independent agents retain Q replay, a uniform reservoir of their own
 best-response behavior and an average policy. The mixture is sampled once per
-hand. No hidden cards, full game object or equity labels enter these networks.
+hand. No hidden cards or full game object enter these networks. Optional teacher
+features sample hypothetical unknown cards from the visible information set.
 """
 import numpy as np
 import torch
@@ -17,9 +18,32 @@ def network(hidden, dimension=None):
                          nn.Linear(hidden, hidden), nn.ReLU(), nn.Linear(hidden, 5))
 
 
+@torch.no_grad()
+def bootstrap_values(online, target, next_observation, next_legal, terminal, method='dqn'):
+    """Same-player continuation values; Double DQN selects online, evaluates target.
+
+    Terminal transitions return exactly zero and never require a legal action.
+    This changes conventional teacher training only, never fly inference.
+    """
+    if method not in ('dqn','double-dqn'):
+        raise ValueError('Unknown conventional value-learning method')
+    legal=next_legal.clone()
+    legal[terminal,0]=True
+    target_values=target(next_observation)
+    if method=='double-dqn':
+        selected=online(next_observation).masked_fill(~legal,-torch.inf).argmax(dim=1)
+        values=target_values.gather(1,selected[:,None]).squeeze(1)
+    else:
+        values=target_values.masked_fill(~legal,-torch.inf).max(dim=1).values
+    return values.masked_fill(terminal,0)
+
+
 class NFSPAgent:
     def __init__(self, config, seed):
         self.config = dict(config)
+        self.value_learning=config.get("value_learning","dqn")
+        if self.value_learning not in ("dqn","double-dqn"):
+            raise ValueError("Unknown conventional value-learning method")
         self.feature_version = config.get('feature_version', V1)
         self.dimension = len(feature_names(self.feature_version))
         torch.manual_seed(seed)
@@ -87,11 +111,9 @@ class NFSPAgent:
         if self.replay.size >= max(batch_size, self.config['warmup_transitions']):
             sample = {key: torch.from_numpy(value) for key, value in self.replay.sample(batch_size).items()}
             with torch.no_grad():
-                legal = sample['next_legal'].clone()
-                # Terminal rows need a finite placeholder before multiplication by zero.
-                legal[sample['terminal'], 0] = True
-                q_next = self.target(sample['next_observation']).masked_fill(~legal, -torch.inf).max(dim=1).values
-                target = sample['reward'] + self.config['discount'] * q_next * (~sample['terminal'])
+                q_next = bootstrap_values(self.q,self.target,sample['next_observation'],
+                    sample['next_legal'],sample['terminal'],self.value_learning)
+                target = sample['reward'] + self.config['discount'] * q_next
             predicted = self.q(sample['observation']).gather(1, sample['action'][:, None]).squeeze(1)
             loss = nn.functional.smooth_l1_loss(predicted, target)
             self.q_optimizer.zero_grad(set_to_none=True)

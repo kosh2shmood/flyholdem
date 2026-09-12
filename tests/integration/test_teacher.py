@@ -16,10 +16,11 @@ CONFIG = dict(stack_bb=20, torch_threads=1, seed=71100, hands=30, deal_seed_star
                          gradient_clip=5, target_update_steps=10))
 
 
-@pytest.mark.parametrize('feature_version', [None, 'canonical-visible-card-structure-v2', 'canonical-visible-uniform-equity-v3'])
-def test_teacher_complete_checkpoint_matches_uninterrupted_optimizer_and_replay(tmp_path, feature_version):
+@pytest.mark.parametrize('feature_version,value_learning', [(None,'dqn'), ('canonical-visible-card-structure-v2','dqn'), ('canonical-visible-uniform-equity-v3','dqn'), ('canonical-visible-uniform-equity-v3','double-dqn')])
+def test_teacher_complete_checkpoint_matches_uninterrupted_optimizer_and_replay(tmp_path, feature_version,value_learning):
     full, resumed = tmp_path / 'full', tmp_path / 'resumed'
     config = copy.deepcopy(CONFIG)
+    if value_learning!='dqn':config['agent']['value_learning']=value_learning
     if feature_version:
         config['agent']['feature_version'] = feature_version
     train(config, full)
@@ -131,3 +132,17 @@ def test_teacher_equity_representation_is_private_invariant_and_export_pins_bina
     restored,record=load_policy(tmp_path/'v3')
     assert np.array_equal(policy.probabilities(obs),restored.probabilities(obs))
     assert record['implementation']['feature_runtime']['visible_equity_native']['binary_sha256']==backend_identity()['binary_sha256']
+
+
+
+def test_double_dqn_selects_online_and_evaluates_target_with_legality_and_terminal_mask():
+    from flyholdem.teacher.nfsp import bootstrap_values
+    class Fixed(torch.nn.Module):
+        def __init__(self,values):super().__init__();self.values=torch.tensor(values,dtype=torch.float32)
+        def forward(self,x):return self.values.expand(len(x),-1)
+    online=Fixed([5,4,100,0,0]);target=Fixed([1,9,1000,0,0])
+    x=torch.zeros(2,3);legal=torch.tensor([[True,True,False,False,False],[False]*5]);terminal=torch.tensor([False,True])
+    assert torch.equal(bootstrap_values(online,target,x,legal,terminal,'double-dqn'),torch.tensor([1.,0.]))
+    assert torch.equal(bootstrap_values(online,target,x,legal,terminal,'dqn'),torch.tensor([9.,0.]))
+    assert not bootstrap_values(online,target,x,legal,terminal,'double-dqn').requires_grad
+    with pytest.raises(ValueError):bootstrap_values(online,target,x,legal,terminal,'unknown')

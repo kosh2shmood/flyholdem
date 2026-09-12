@@ -88,3 +88,18 @@ Resume adds --resume; export/evaluation also use this PYTHONPATH. Do not rebuild
 V3 completed 250,000 hands in 1,674.43 s from the immutable teacher-runtime-v3 snapshot. Frozen policy SHA-256: 6d86d320863d3aadc6f6765492b846d5c6b14316032bb418f2538e24a7f2e3ce. The same 128 paired development deals per opponent returned +1.1796875 BB/hand against random, −0.34765625 against calling station, −0.25 against tight-aggressive and −1.587890625 against equity-bucket. None had a positive suite-adjusted lower bound. This is a failed development result; no reserved confirmation seeds or teaching corpus are used. The 32 hidden-hole/future-deck/teacher-label mutation decisions passed exactly.
 
 Evaluation manifest SHA-256: 9066cd8afbb172300e065d578dcdd2b0b38cbea815aa8fc0b21a9d2c34a1ca75. Training journal head: db0a465be116f4f397a767d3e268764da0b5bbe4c406e24ebd6c0175275fda75; evaluation journal head: 1e50990c95581dc2791226cb0d616537187fb5a7309e8f728212c10b4b8bedfd. Full generated records remain local under runs/teacher-nfsp-equity-v3 and sibling policy/development directories. Visible equity alone did not solve teacher training. Next diagnose continuation-value estimates and average-policy behavior before registering another conventional candidate; never select fly populations or biological parameters from these poker results.
+
+
+## Registered v4 Double DQN candidate
+
+V4 changes only the NFSP best-response bootstrap from a target-network maximum to Double DQN: choose the legal next action with the online Q network and evaluate that action with the frozen target network. Terminal continuation values are exactly zero. This follows [van Hasselt, Guez and Silver (2015)](https://arxiv.org/abs/1509.06461), which addresses maximization overestimation in deep Q-learning. It is a controlled algorithm candidate, not a claim that the v3 failure has been diagnosed conclusively. A training-deal-only inspection found weak separation in v3's average-policy behavior across visible equity buckets; it used no reserved confirmation deals or profit-based biological tuning.
+
+Config configs/teacher_nfsp_double_v4.yaml keeps v3's 357 visible features, 250k hands, 71001 seed, network/optimizers/memories, exploration, 20 BB stacks and original four-opponent validation suite. Average-policy export remains the fixed equal mixture of both agents; no evaluation-time Q override is introduced. V1–v3 remain preserved in immutable runtime bundles. Exact short-run interruption/resume and target-choice/legality/terminal tests pass. No v4 poker result exists at registration.
+
+After committing, copy src, uv.lock, the config and the unchanged teacher equity binary/metadata into ignored runs/teacher-runtime-v4. Run from that immutable source:
+
+```sh
+PYTHONPATH="$PWD/runs/teacher-runtime-v4/src" .venv/bin/python -m flyholdem.teacher.training --config runs/teacher-runtime-v4/configs/teacher_nfsp_double_v4.yaml --output runs/teacher-nfsp-double-v4
+```
+
+Add --resume after interruption. Export/evaluation must use the same PYTHONPATH. Do not change the snapshot, installed environment or copied binary while it runs. A passing development suite is required before reserved confirmation and corpus creation; no fly learning claim follows from conventional teacher training.
