@@ -1,0 +1,19 @@
+schema: dashboard-evidence-v1
+scope: Separate registered experiments; the current table return is not evidence of learning.
+gates:
+  - name: Rules and leakage
+    status: passed
+    detail: Golden rules, paired-seat software checks, byte-level private-information invariance.
+  - name: Neural controllability
+    status: passed
+    detail: Circuit and full quarter-strength graph; all five actions passed 20/20 confirmation trials.
+  - name: Full-graph conditioning
+    status: passed
+    detail: 82.3% learned versus 47.2% frozen and 50.0% shuffled; five independent seeds, retention and erasure passed. Mechanism is readout suppression, not poker skill.
+  - name: Teacher and transfer
+    status: pending
+    detail: Exact-cue circuit development and actual teacher-removal checks passed; confirmation failed its 80% fidelity threshold at 77.8%. Conventional poker teachers have not passed validation.
+  - name: Poker curricula
+    status: pending
+    detail: Shove/fold, river, 20 BB and 100 BB learning gates remain pending.
+report: https://github.com/kosh2shmood/flyholdem/blob/astra/visual-first/docs/CONDITIONING.md

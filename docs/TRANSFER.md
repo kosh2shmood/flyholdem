@@ -1,6 +1,6 @@
 # Exact-cue transfer integrity
 
-Status: circuit development qualified; independent confirmation pending. This is one component of Gate 2A; the conventional poker teacher must independently pass its opponent suite, and corpus checks must pass before the complete gate can pass. No poker transfer or strategic learning is claimed.
+Status: circuit local transfer confirmation failed its registered fidelity threshold. Development and actual teacher-removal checks passed; no complete Gate 2A pass. This is one component of Gate 2A; the conventional poker teacher must independently pass its opponent suite, and corpus checks must pass before the complete gate can pass. No poker transfer or strategic learning is claimed.
 
 The exact two-state teacher gives one-hot probabilities for two declared actions. Its only input is the visible cue token. During training, twice the difference between the selected action probability and the uniform-legal mean supplies the signed teaching signal. The already registered local eligibility rule subtracts a past-only signal baseline and changes only existing KC-to-MBON edges within 0.1–2.0 of their original signed strengths. The teacher is queried after the neural action, only in training. Evaluation scores come from the native circuit alone.
 
@@ -35,3 +35,9 @@ PYTHONPATH="$PWD/runs/exact-runtime-v1/src" .venv/bin/python -m flyholdem.experi
 ```
 
 Add --resume after interruption. Export/audit must use that same frozen runtime. Independent checkout implementation may continue; the snapshot, native binary, source data and installed environment must remain unchanged.
+
+## Independent confirmation — failed fidelity threshold
+
+The five reserved seeds finished in 341.67 s / 139.2 MB. Learned accuracies were 0.796875, 0.8046875, 0.765625, 0.7265625 and 0.796875: mean 0.778125, below the registered 0.8 requirement. Frozen/restored mean was 0.5421875 and shuffled mean 0.5546875. Both improvements had positive paired-seed bootstrap bounds and one-sided sign-flip p=0.03125; retention and exact erasure passed. These positive mechanism checks do not override the failed threshold. Confirmation is recorded as **fail**; no confirmatory model is exported and the full transfer gate stays pending. Generated result: runs/exact-transfer-circuit-confirm-v1/result.json, manifest SHA-256 973b95cbc5943cca6366dabb78652978bb4472dff5f1d9f5a971ff29055482b5.
+
+The next permitted transfer method is a separately registered, explicitly nonbiological surrogate optimization restricted to bounded parameters on existing preregistered edges. It must retain the native simulation as the only inference score source and preserve this negative result.

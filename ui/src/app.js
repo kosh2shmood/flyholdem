@@ -3,10 +3,10 @@ const names = ['Fold', 'Check / call', 'Raise ½ pot', 'Raise pot', 'All-in'];
 const suits = {c:'♣', d:'♦', h:'♥', s:'♠'};
 let socket, mode='live', paused=false, latest=null, timer, replayEvents=[], replayIndex=0, graph=null;
 let activity=Array(126).fill(0), shown=Array(126).fill(0);
-let decisionHand=null, avatar=null;
+let decisionHand=null, avatar=null, brainCloud=null, graphLoading=null, spikeTotal=0;
 const errors=[];
 window.addEventListener('error', e => errors.push(e.message));
-window.flyholdem = {get latest(){return latest}, get mode(){return mode}, get avatar(){return avatar}, errors};
+window.flyholdem = {get latest(){return latest}, get mode(){return mode}, get avatar(){return avatar}, get graph(){return graph}, get brainCloud(){return brainCloud}, errors};
 function card(value){
  const el=document.createElement('span'); el.className='card';el.dataset.card=value||'';
  if(value==='??'){el.classList.add('back');el.textContent='◇';return el}
@@ -32,7 +32,15 @@ function resetPlasticity(){
 }
 function render(event){
  latest=event;
- if(event.sequence===0)resetPlasticity();
+ if(graph?.mode!==event.mode)ensureGraph(event.mode).catch(e=>errors.push(e.message));
+ $('run-label').textContent=event.label;
+ $('run-scope').textContent=event.mode==='fixture'?'Play chips only · No demonstrated learning':'Play chips only · No validated poker learning';
+ $('mode-graph').textContent=event.mode.toUpperCase()+' GRAPH';$('mode-learning').textContent=event.learning_mode;
+ $('mode-status').textContent=event.evaluation?'Frozen evaluation · Development':event.status;
+ $('plasticity-mode').textContent=event.plasticity_enabled===false?'FROZEN WEIGHTS':'LOCAL RULE';
+ $('plasticity-note').textContent=event.plasticity_enabled===false?'Learning is disabled. Chip outcomes are recorded; no dopamine pulse or synaptic update is delivered.':'Dopamine × eligibility × learning rate. Weight movement is a mechanism check, not evidence of learning.';
+ if(event.plasticity_enabled===false){$('dopamine').textContent='Not delivered';$('changed').textContent='0';$('weight-delta').textContent='0';$('eligibility').textContent='Disabled';$('ratios').textContent='Frozen model';$('pulse').style.width='0'}
+ if(event.sequence===0){resetPlasticity();spikeTotal=0;brainCloud?.setActivity([],[])}
  avatar?.update(event);
  cards("avatar-cards",event.table.hole,2);cards("avatar-community-cards",event.table.board,5);$("avatar-board-stage").textContent=event.table.street;
  $("avatar-stack-fly").textContent=event.table.stacks[0];$("avatar-stack-other").textContent=event.table.stacks[1];$("avatar-pot").textContent=event.table.pot;
@@ -55,12 +63,12 @@ function render(event){
  $('history').replaceChildren();
  for(const h of t.history.slice(-6)){const span=document.createElement('span');span.className='history-chip';span.textContent=`${h.actor===0?'Fly':'Station'} · ${h.name}${h.paid?' '+h.paid:''}`;$('history').append(span)}
  if(!t.history.length)$('history').textContent='Blinds posted. A fresh 20 BB hand.';
- $('action-callout').textContent=event.kind==='reinforcement'?`Settled · ${event.plasticity.raw_net_bb>=0?'+':''}${event.plasticity.raw_net_bb} BB to fly`:event.action?`${event.actor===0?'Fly':'Station'} → ${event.action.name}`:'Information enters the circuit';
+ $('action-callout').textContent=event.kind==='settlement'?`Settled · ${event.net_bb>=0?'+':''}${event.net_bb} BB to fly · weights frozen`:event.kind==='reinforcement'?`Settled · ${event.plasticity.raw_net_bb>=0?'+':''}${event.plasticity.raw_net_bb} BB to fly`:event.action?`${event.actor===0?'Fly':'Station'} → ${event.action.name}`:'Information enters the circuit';
  if(event.decision){
-  const d=event.decision;decisionHand=event.hand;activity=d.activity;
+  const d=event.decision;decisionHand=event.hand;showActivity(d);
   $('chosen').textContent=names[d.selected];$('decision-context').textContent=`Hand ${event.hand} · decision #${event.sequence} · before action commit`;
   const max=Math.max(...d.scores,.01);
-  for(let i=0;i<5;i++){const row=$(`score-${i}`);row.className=`score ${d.legal_mask[i]?'':'illegal'} ${i===d.selected?'selected':''}`;row.querySelector('.mask').textContent=d.legal_mask[i]?'01':'00';row.querySelector('.score-value').textContent=d.scores[i].toFixed(3);row.querySelector('i').style.width=`${100*d.scores[i]/max}%`}
+  for(let i=0;i<5;i++){const row=$(`score-${i}`);row.className=`score ${d.legal_mask[i]?'':'illegal'} ${i===d.selected?'selected':''}`;row.querySelector('.mask').textContent=d.legal_mask[i]?'01':'00';row.querySelector('.score-value').textContent=d.scores[i].toFixed(3);row.querySelector('i').style.width=`${100*Math.max(0,d.scores[i])/max}%`}
   $('temperature').textContent=d.temperature.toFixed(2);$('silent').textContent=`${d.silent?'yes':'no'} / ${d.decoder_fallback?'yes':'no'}`;
   $('input-hash').textContent=d.encoded_hash.slice(0,14);$('input-hash').title=d.encoded_hash;
   $('channels').replaceChildren();for(const [label,value] of d.encoded){const line=document.createElement('div');const name=document.createElement('span'),v=document.createElement('span');name.textContent=label;v.textContent=Number(value).toFixed(6);line.append(name,v);$('channels').append(line)}
@@ -68,13 +76,13 @@ function render(event){
   $('event-counter').textContent=`EVENT ${event.sequence} · NEURAL TIME ${(d.virtual_time_ms/1000).toFixed(2)} s`;
  }
  if(event.plasticity){
-  const p=event.plasticity;activity=p.activity;
+  const p=event.plasticity;showActivity(p);
   $('dopamine').replaceChildren(document.createTextNode(`${p.dopamine>=0?'+':''}${p.dopamine.toFixed(3)}`));const label=document.createElement('span');label.textContent=' RPE';$('dopamine').append(label);
   const pulse=Math.min(1,Math.abs(p.dopamine))*50;$('pulse').style.width=`${pulse}%`;$('pulse').style.left=`${p.dopamine<0?50-pulse:50}%`;
   $('changed').textContent=p.changed_synapses.toLocaleString();$('weight-delta').textContent=p.absolute_update.toFixed(5);$('eligibility').textContent=p.eligibility_mean.toFixed(5);$('ratios').textContent=p.weight_ratio_range.map(x=>x.toFixed(4)).join('–');
   $('event-counter').textContent=`EVENT ${event.sequence} · NEURAL TIME ${(p.virtual_time_ms/1000).toFixed(2)} s`;
  }
- $('spikes').textContent=`${activity.reduce((a,b)=>a+b,0).toLocaleString()} SPIKES · LAST WINDOW`;
+ $('spikes').textContent=`${spikeTotal.toLocaleString()} SPIKES · LAST WINDOW`;
  $('return').replaceChildren(document.createTextNode(`${event.return_bb>=0?'+':''}${event.return_bb.toFixed(1)} `));const bb=document.createElement('small');bb.textContent='BB';$('return').append(bb);
  $('event-hash').textContent=event.hash.slice(0,20);$('event-hash').title=event.hash;
  if(event.kind==='opponent_action'&&decisionHand)$('decision-context').textContent=`Last fly decision · hand ${decisionHand} · pre-action information`;
@@ -103,20 +111,52 @@ async function replay(){
 }
 function tickReplay(){if(mode!=='replay')return;if(!paused){render(replayEvents[replayIndex]);replayIndex=(replayIndex+1)%replayEvents.length}timer=setTimeout(tickReplay,Number($('speed').value))}
 $('replay').onclick=replay;
-$('pause').onclick=()=>{paused=!paused;avatar?.setPaused(paused);$('pause').textContent=paused?'▶':'Ⅱ';$('pause').setAttribute('aria-label',paused?'Resume display':'Pause display');$('connection').textContent=paused?'Display paused':mode==='live'?'Live WebSocket':'Deterministic replay'};
+$('pause').onclick=()=>{paused=!paused;avatar?.setPaused(paused);brainCloud?.setPaused(paused);$('pause').textContent=paused?'▶':'Ⅱ';$('pause').setAttribute('aria-label',paused?'Resume display':'Pause display');$('connection').textContent=paused?'Display paused':mode==='live'?'Live WebSocket':'Deterministic replay'};
 async function init(){
- graph=await(await fetch('/api/graph')).json();connect();draw();
+ await installGraph(await(await fetch('/api/graph')).json());connect();draw();loadEvidence();
  try{const {createFlyViewer}=await import('/assets/fly-avatar.js');avatar=createFlyViewer($('fly-avatar'),message=>{$('avatar-error').hidden=false;$('avatar-error').textContent=message});if(latest)avatar.update(latest)}
  catch(e){$('avatar-error').hidden=false;$('avatar-error').textContent='3D fly unavailable: '+e.message;errors.push(e.message)}
 }
 $('view-fly').onclick=()=>{$('avatar-stage').hidden=false;$('table-map').hidden=true;$('view-fly').classList.add('active');$('view-table').classList.remove('active')};
 $('view-table').onclick=()=>{$('avatar-stage').hidden=true;$('table-map').hidden=false;$('view-fly').classList.remove('active');$('view-table').classList.add('active')};
 $('reset-camera').onclick=()=>avatar?.resetCamera();
+
+function showActivity(data){
+ if(data.activity){activity=data.activity;spikeTotal=activity.reduce((a,b)=>a+b,0)}
+ else{spikeTotal=data.activity_total||0;brainCloud?.setActivity(data.activity_indices||[],data.activity_counts||[])}
+}
+async function installGraph(value){
+ brainCloud?.dispose();brainCloud=null;graph=value;
+ const native=Boolean(value.native_cloud);document.body.dataset.nativeGraph=String(native);$('brain').hidden=native;$('brain-native').hidden=!native;$('brain-tools').hidden=!native;
+ $('brain-title').textContent=native?(value.mode==='full'?'Full retained connectome':'Mushroom-body circuit'):'Fixture circuit';
+ $('brain-note').textContent=native?`${value.neuron_count.toLocaleString()} retained neurons · ${value.edge_count.toLocaleString()} edges`:'126 synthetic cells · 1,920 existing edges';
+ $('brain-layout').textContent=native?`${value.located_neurons.toLocaleString()} annotated soma positions · ${value.unlocated_neurons.toLocaleString()} without coordinates in the separate grid · no edges drawn`:'Schematic layout · 120 sampled edges drawn · No anatomical claim';
+ $('neuron-detail').hidden=true;
+ if(native){const {createBrainCloud}=await import('/assets/brain-cloud.js');
+  brainCloud=await createBrainCloud($('brain-native'),value,node=>{$('neuron-detail').hidden=false;$('neuron-detail').textContent=`Body ${node.body_id} · ${node.type||node.class||node.superclass||'unclassified'} · ${node.role} · ${node.has_soma_coordinate?'annotated soma position':'no soma coordinate; schematic grid'}`});
+  brainCloud.setPaused(paused);brainCloud.setFilter($('brain-filter').value);
+  if(latest?.mode===value.mode&&latest.decision)showActivity(latest.decision);
+ }else{activity=Array(value.neuron_count).fill(0);shown=Array(value.neuron_count).fill(0)}
+}
+async function ensureGraph(value){
+ if(!['fixture','circuit','full'].includes(value))throw Error('Unknown event graph mode');
+ if(graphLoading?.mode===value)return graphLoading.promise;
+ const promise=(async()=>{const response=await fetch('/api/graph?mode='+value);if(!response.ok)throw Error('Event graph unavailable');await installGraph(await response.json())})();
+ graphLoading={mode:value,promise};try{await promise}finally{if(graphLoading?.promise===promise)graphLoading=null}
+}
+$('brain-filter').onchange=()=>brainCloud?.setFilter($('brain-filter').value);
+async function loadEvidence(){
+ try{const response=await fetch('/api/evidence');if(!response.ok)throw Error('Evidence unavailable');const data=await response.json();$('evidence-scope').textContent=data.scope;$('gate-list').replaceChildren();
+  for(const gate of data.gates){const item=document.createElement('span'),dot=document.createElement('i'),name=document.createElement('span'),status=document.createElement('b');dot.className=gate.status==='passed'?'passed':'pending';name.textContent=gate.name;status.textContent=gate.status;item.append(dot,name,status);item.title=gate.detail;$('gate-list').append(item)}
+  const link=document.createElement('a');link.href=data.report;link.textContent='Read the registered evidence ↗';link.target='_blank';link.rel='noopener';$('gate-list').append(link);
+ }catch(error){$('evidence-scope').textContent='Registered evidence unavailable: '+error.message;errors.push(error.message)}
+}
+
 function draw(){
  const canvas=$('brain'),ctx=canvas.getContext('2d'),r=canvas.getBoundingClientRect(),scale=devicePixelRatio||1;
  if(canvas.width!==Math.round(r.width*scale)||canvas.height!==Math.round(r.height*scale)){canvas.width=Math.round(r.width*scale);canvas.height=Math.round(r.height*scale)}
  ctx.setTransform(scale,0,0,scale,0,0);ctx.clearRect(0,0,r.width,r.height);
- if(graph){
+ if(graph&&!graph.native_cloud){
   const positions=graph.nodes.map(n=>[r.width*.56+n.x*r.width*.38,r.height*.37+n.y*r.height*.43]);
   shown=shown.map((v,i)=>v+(activity[i]-v)*.065);
   for(const [a,b] of graph.sample_edges){const intensity=Math.min(1,(shown[a]+shown[b])/12);ctx.strokeStyle=`rgba(146,181,152,${.025+intensity*.13})`;ctx.lineWidth=.6;ctx.beginPath();ctx.moveTo(...positions[a]);ctx.lineTo(...positions[b]);ctx.stroke()}

@@ -61,3 +61,7 @@ Both versions pass exact complete-checkpoint recovery. V2 passes actual hidden-c
 ```sh
 PYTHONPATH="$PWD/runs/teacher-runtime-v2/src" .venv/bin/python -m flyholdem.teacher.training --config configs/teacher_nfsp_cards_v2.yaml --output runs/teacher-nfsp-cards-v2
 ```
+
+## Visible-card teacher v2 — validation failed
+
+The registered 250,000-hand v2 run completed in 1,410.12 s. Policy SHA-256: 9ec0bc011ec48ad84191ee25c0084bfece4a3d56414dc3913914bc736a06bf77. Held-out development return was +0.977 / +0.348 / −0.523 / −1.619 BB per hand against random/station/TAG/equity. None had a positive suite-adjusted lower confidence bound. The 32 actual private-data invariance checks passed, but strength validation failed. Confirmation seeds remain unused and no corpus exists. Exact evidence is local in runs/teacher-nfsp-cards-v2-development. Additional visible-card features alone did not qualify this teacher; a stronger training procedure is required. The next candidate should address its opponent distribution and value learning under a separately committed protocol, rather than treating longer training or visible activity as success.

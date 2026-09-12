@@ -23,3 +23,9 @@ Python 3.11, dependency pins in uv.lock, fixed graph/mapping seed 1729, default 
 ## Claims
 
 The intended full-data public wording remains: “A simulated network using the wiring of one reconstructed male fruit-fly central nervous system controls an engineered heads-up no-limit Hold'em interface.” This statement is not a claim about the synthetic V0 fixture. No living fly, consciousness, faithful whole-brain emulation, or proven learning is claimed.
+
+## Native spectator and transfer status update
+
+The full/circuit dashboard executes frozen native neural decisions. The full view represents every retained neuron and distinguishes actual annotated soma coordinates from a separately labeled missing-coordinate grid. Learning and reinforcement delivery are disabled in this spectator mode. The conditioning-trained full model remains unvalidated for poker. The default synthetic fixture remains separately labeled.
+
+Exact-cue circuit local transfer met development criteria and its actual frozen model passed a 64-decision teacher/corpus deletion test. Confirmation nevertheless failed its registered 0.8 fidelity requirement at mean 0.778125. This is not a complete Gate 2A pass. The 25k v1, 250k v1 and 250k visible-card v2 conventional NFSP candidates all failed the full held-out opponent suite; none may generate a teaching corpus. Surrogate transfer, poker curricula, stronger validated poker training and human play remain pending. See TRANSFER.md and TEACHER.md for exact boundaries and written negative findings.

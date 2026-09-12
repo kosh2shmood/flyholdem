@@ -1,6 +1,6 @@
 # FlyHoldem
 
-A play-money-only, inspectable poker experiment. **Current release: fixture visual prototype.**
+A play-money-only, inspectable poker experiment. **Current build: fixture and native-connectome dashboards; full-graph conditioning passed, poker learning remains unvalidated.**
 
 ## Run the real fixture demo
 
@@ -29,8 +29,12 @@ Locked dependencies live in `uv.lock`. The UI uses plain browser APIs plus pinne
 
 - V0: a working live/replay fixture vertical slice, with automated browser evidence.
 - Software Gate 0: passed locally at M1; 29 tests and the 2,512-hand registered symmetry check. Machine-readable evidence is in `docs/review/software-gate0.json`.
-- Gates 1–6 and teacher Gate 2A: pending. No conditioning, teacher transfer, or poker learning claim.
-- No MaleCNS data has been downloaded for V0. The full-graph runtime and both experiment modes are subsequent milestones.
+- Gate 1: circuit and full quarter-strength controllability passed; earlier failures remain documented.
+- Gate 2: full-graph conditioning passed five independent seeds, retention and erasure. This demonstrates engineered cue-dependent readout suppression, not poker skill.
+- Gate 2A: pending. Exact-cue local transfer improved over controls but missed its registered 80% confirmation threshold at 77.8%. Actual teacher-removal inference passed. All conventional poker-teacher candidates so far failed their validation suite.
+- Gates 3–6 and human heads-up play: pending. No strategic poker-learning claim.
+- Native dashboard: all 166,700 retained neurons rendered, annotated positions distinguished from missing-coordinate grid, actual frozen neural scores drive the table. Full data remain local and checksum-verified.
+- Current local suite: 74 passed / 2 isolated-oracle skips; fixture/live/replay/avatar and native desktop/mobile browser checks pass.
 
 See [PROGRESS.md](PROGRESS.md), [visual gate report](docs/VISUAL_GATE.md), [protocol](docs/PROTOCOL.md), [model card](docs/MODEL_CARD.md), and [browser evidence](docs/review/browser-check.json). Live logs are written to ignored, timestamped `runs/live-*/events.jsonl` directories, flushed at every completed hand. Hash chains detect modifications; seeds regenerate the loop exactly on the same locked runtime. Cross-architecture numerical comparison uses absolute 1e-12 tolerance for floating diagnostics with exact cards/actions/spike counts; recorded playback is byte-exact everywhere. V0 does not yet resume a running neural state from a checkpoint.
 
@@ -38,10 +42,29 @@ See [PROGRESS.md](PROGRESS.md), [visual gate report](docs/VISUAL_GATE.md), [prot
 
 “A simulated network using the wiring of one reconstructed male fruit-fly central nervous system controls an engineered heads-up no-limit Hold'em interface.”
 
-That wording describes the intended full-data system, not this synthetic fixture. Do not call this a living fly, consciousness, faithful whole-brain emulation, or proven learner. The remaining implementation follows `flyholdem_build_spec.md`; scientific gates cannot be replaced by a visually compelling demonstration.
+That wording describes the native full-data controller. The default fixture remains a separately labeled synthetic prototype. Do not call this a living fly, consciousness, faithful whole-brain emulation, or proven learner. The remaining implementation follows `flyholdem_build_spec.md`; scientific gates cannot be replaced by a visually compelling demonstration.
 
 Original code is MIT licensed. Data and dependencies retain their own terms; see [THIRD_PARTY.md](THIRD_PARTY.md). No real-money service, account, or execution integration is included.
 
 ## Official data preparation
 
 After the fixture demo, `make fetch-malecns` explicitly downloads and verifies the three pinned source files. `make prepare-malecns` installs the locked data extra, accounts for all retained/excluded objects and contacts, then compiles full and circuit CSR arrays. `make audit-malecns` verifies all hashes/counts and runs the registered sequential resource smoke checks. Data and generated reports remain ignored under `connectome_data/` and `runs/data-audit/`. `make test-data` exercises import/preparation with tiny synthetic data; it never downloads MaleCNS.
+
+## Native full/circuit dashboard
+
+After checksum-verified data preparation and a passing controllability registration, use the existing locked data environment:
+
+```sh
+.venv/bin/flyholdem serve --mode full --port 8767
+.venv/bin/flyholdem serve --mode circuit --port 8767
+```
+
+These commands freeze the original registered weights. To inspect an exported frozen model, add `--model runs/conditioning-full-confirm-v1-model` (the locally exported full conditioning model) or another matching native model directory. The model is not shipped in Git. This is explicitly unvalidated poker evaluation; it delivers no reinforcement and changes no weights. The default fixture still runs with `make demo` on port 8766.
+
+The native point cloud uses annotated soma positions for 139,662 neurons; the remaining 27,038 occupy a separately labeled schematic grid. Every retained neuron is represented; the 25,582,938 edges are simulated but are not all drawn. Filter input/readout/dopamine or recent activity, orbit/zoom, and click a cell to inspect its annotation. Source switching retains correct fixture/native labels and geometry. The evidence panel reports separate experiments, not a learning claim about the current table.
+
+```sh
+.venv/bin/python scripts/native_browser_check.py --url http://127.0.0.1:8767 --output runs/native-browser-check
+```
+
+Native replay uses `--mode full --replay <complete-native-log.jsonl>` (or circuit); it checks the recorded graph and population registration before displaying activity. Native live streams are recorded in ignored timestamped runs/live-*/events.jsonl directories. For experiment commands, checkpoints, results and explicit failures, see docs/CONDITIONING.md, docs/TRANSFER.md, docs/TEACHER.md and PROGRESS.md. Environment installation commands may change installed extras; do not run setup/sync while an experiment is active.

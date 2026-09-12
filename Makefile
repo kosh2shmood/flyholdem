@@ -5,6 +5,7 @@ setup:
 check-ui:
 	node --check ui/src/app.js
 	node --check ui/src/fly-avatar.js
+	node --check ui/src/brain-cloud.js
 test: check-ui
 	uv run --frozen pytest -q
 demo: setup
