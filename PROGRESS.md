@@ -1,7 +1,16 @@
 # FlyHoldem progress
 
 ## Current phase
-Card-readability revision passed local browser checks and is ready to save/push. Larger 3D cards, matched fly/community insets and visible opponent chip piles now work on desktop/mobile. Previous side-seating checkpoint 80a32fd passed CI (run 34677267958). All three official MaleCNS files have downloaded and independently matched the committed byte counts/SHA-256 expectations. Import/preparation code is a tested draft, not yet run on the full data; save its own checkpoint/config before starting the import. No teacher or poker training started.
+M2 import/preparation/audit implementation is committed at 04b86b2e4775cdc1d13b84f489390b630ed9e657. Five data-free tests passed: exact large IDs, loss accounting, annotation retention, transmitter ambiguity, batch-size-independent all-edge CSR, and prepared-file tamper rejection. Full sources are downloaded and checksum-verified; next run is the first actual normalization/preparation and sequential resource audit. All visualization steering is implemented and browser-verified through 0b05d88.
+
+## Registered M2 execution
+- Code/config commit: 04b86b2e4775cdc1d13b84f489390b630ed9e657.
+- Raw config SHA-256: b8a2f2aa0fb8eb06b07bb2f2fa5441658f9d06e4f7d913c968f0db7615d019ae (`configs/runtime.yaml`).
+- Source data identity: the three exact SHA-256 values in committed data-provenance/malecns_v1/source.lock.json, independently verified after download.
+- Run: `make prepare-malecns && make audit-malecns`.
+- Preparation resumes by verifying completed immutable output directories; incomplete `.partial-*` generations are never loaded. No active long training state exists yet.
+- Results: ignored `runs/data-audit/full.json`, `full-benchmark.json`, `circuit.json`, `circuit-benchmark.json`; each benchmark includes exact execution commit, source/config/binary/environment hashes, stimulus IDs and all measured resources.
+- One sequential full worker; 16 GiB RAM. Input stimulus is 64 annotation-selected Kenyon cells, seed 1729, 50 ms no-input and 100 ms at drive 12. This is a resource/determinism check, unrelated to poker and not a learning gate.
 
 ## Completed acceptance checks
 - Read execution brief/specification/setup context and applicable ancestor AGENTS.md paths (none existed).
@@ -77,4 +86,4 @@ V0: 2bd2d3c2fc6158248c4f633690b5d170add14b32 (visual-demo-v0), pushed. M0: fa873
 No long training experiment started. Reproduce visual run with `make demo`; replay with `make replay`. Current local live worker logs into a timestamped ignored runs/live-* directory.
 
 ## Next step
-Save/push the verified card-readability revision. Then finalize/importer audit tests and the exact runtime config, commit them, and run `make prepare-malecns`. Sources are verified and remain in ignored connectome_data/malecns_v1. Hardware measured: 16 GiB RAM, 77 GiB free before download. Run one full-data/runtime worker at a time; measure real peak memory and throughput before conditioning. No biological or poker learning gate has passed yet.
+Run the committed `make prepare-malecns`, then `make audit-malecns`. Verify official full retained counts and reproduce the CSR byte identity in a second output generation. Save compact actual results and resource measurements. If M2 passes, begin M3 annotation/connectivity-only neural mapping and controllability preregistration. No conditioning or poker learning gate is yet passed.
