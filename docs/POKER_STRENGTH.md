@@ -38,7 +38,7 @@ Operational order: finish V11 and record its original average-policy development
 
 The exported numeric policy includes the exact final regret tensor and its original checkpoint checksum. Loading verifies source/runtime identities, every tensor checksum, complete legal information keys and exact recomputation of every probability from those regrets. Rehashing a changed probability file cannot substitute another strategy. Frozen inference needs neither the training run nor PyTorch.
 
-Freeze the checked new source/configs and existing equity binary into a separate `runs/teacher-runtime-v12-reviewed` before using these commands. Do not modify `runs/teacher-runtime-v11` or the earlier downstream snapshot.
+The checked source/configs and copied existing equity binary are ready in `runs/teacher-runtime-v12-reviewed`; its exact identities and successful preflight are recorded below. Do not modify `runs/teacher-runtime-v11` or the earlier downstream snapshot.
 
 ```sh
 PYTHONPATH="$PWD/runs/teacher-runtime-v12-reviewed/src" .venv/bin/python -m flyholdem.cli teacher export-final-regret --config runs/teacher-runtime-v12-reviewed/configs/teacher_final_regret_v12.yaml --output runs/teacher-final-regret-v12-policy
@@ -61,7 +61,7 @@ V12 conventional runtime is now frozen and preflighted at runs/teacher-runtime-v
 
 Independent review found that the first V12 loader bound its regret values to the final checkpoint but did not separately bind the key mapping and legal masks. Swapping two valid information keys with the same legal mask, then rehashing the exported key file, could reassign the probabilities to different states. Export and loading now preserve and verify the original checkpoint hashes for all four defining arrays: key offsets, key bytes, legal masks and regrets. The original regret checksum remains checked. A regression uses an actual tiny trained table to reject the key swap; missing/partial checkpoint bindings are also rejected.
 
-The earlier `runs/teacher-runtime-v12` snapshot is retained as historical preflight evidence. Do not use it for actual policy exports. Freeze and use the reviewed runtime named in the commands above. The method, fixed final iteration and extraction configuration are unchanged. Neither V11's original runtime nor any existing native model was altered.
+The earlier `runs/teacher-runtime-v12` snapshot is retained as historical preflight evidence. Do not use it for actual policy exports. Use the now-frozen reviewed runtime named in the commands above. The method, fixed final iteration and extraction configuration are unchanged. Neither V11's original runtime nor any existing native model was altered.
 
 `scripts/audit_teacher_play.py` independently reruns every complete recorded pair with the loaded policy, actual PokerKit rules, original opponents and exact evaluation RNGs. It requires every payoff and five-action count to reproduce, then separates check from call and reports actions by street and opponent. The CLI accepts the original registered suite only. This is a read-only replay of already evaluated deals, not an additional trial or qualification gate. Its report includes the audit script hash, full decision-trace hash and original evaluation identities.
 
@@ -76,3 +76,10 @@ The audit was exercised on V10's unchanged failed development result: all 512 pa
 Eleven focused extraction tests passed in 4.88 seconds. Seven new audit tests passed in 6.46 seconds. Expected action counts come from instrumenting committed PokerKit payments in the original evaluator, covering both numeric policy kinds, all streets and both seats. Coherently rehashed false payoffs/action counts pass the older offline statistical consistency check but fail actual replay. Artifact/source immutability, no-Torch numeric execution and the public registration boundary are also checked.
 
 Complete integration verification for the checkpoint-binding fix and actual-play audit: 257 tests passed, with two isolated-oracle skips and two existing dependency deprecations, in 99.59 seconds. No browser-facing code, neural policy parameters, active runtime or environment changed.
+
+
+## Reviewed execution runtime ready
+
+The reviewed V12 runtime is frozen at `runs/teacher-runtime-v12-reviewed` from checked commit `a97506f6dbad5bd3ea33c5439a3b59dcbc41c199`. Source SHA `f70a256a49f9e80274290f1835cb1f9f20d84abb9e573dceff95f4fdb3dd373a`; file ledger `8392816361bf644c0a3469349283ca7e906cf8972aa7ccd9c7bdeeb561c542b2`; policy implementation `f6aa18842893bfceb4783ebbac827697cf957c18caf6a230e231491c0d9f1d98`. Extraction configuration remains `a3bd05a204bb8603ffd3e0e5946e3ff27bc2214619c97c2e4832e593c68d356a` and the original evaluation configuration remains `5fb344fad4c27a5a5556764db0d0c43b1f64177ccadafc68b3d81453f52ca9c1`. The copied existing equity binary remains `80846bbc3357982b6310ef05c3c8f9921621c0caa9db1d0c17a1c54cc43207ea`. All frozen files verified. Four actual tiny extraction/evaluation/replay checks passed in 7.11 seconds through this exact runtime, including key-rebinding refusal; Torch was absent before and after, and original V11 source was unchanged. No full model or new held-out trial was produced by preflight. Use this reviewed runtime for conditional V12 execution; retain the older snapshot only as history.
+
+The checkpoint-binding/play-audit milestone passed CI [34714885981](https://github.com/kosh2shmood/flyholdem/actions/runs/34714885981), including the fixture, oracle and browser jobs. The complete local suite remains 257 passed / 2 isolated-oracle skips in 99.59 seconds. These checks establish engineering integrity, not poker strength.
