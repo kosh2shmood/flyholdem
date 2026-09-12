@@ -1,0 +1,25 @@
+{
+  "normalized_exact_match": true,
+  "prepared": {
+    "full": {
+      "graph_hash": "70c9daefc6185272d0e001700d75aaa8718648c02d9aa59bbadbe6b4cd9e4c06",
+      "metrics": {
+        "nodes": 166700,
+        "edges": 25582938,
+        "ambiguous_sign_nodes": 3718,
+        "synaptic_contacts": 124177617
+      },
+      "all_file_hashes_match": true
+    },
+    "circuit": {
+      "graph_hash": "d85be4e7fe4f78b2747f859b575a5c48ef4d85f8f7e6eab24dd7e80cbb463f94",
+      "metrics": {
+        "nodes": 4505,
+        "edges": 1018725,
+        "ambiguous_sign_nodes": 342,
+        "synaptic_contacts": 2794887
+      },
+      "all_file_hashes_match": true
+    }
+  }
+}
