@@ -49,3 +49,24 @@ def test_isolated_native_poker_evaluation_denies_teacher_and_resumes_exactly(tmp
     path=tmp_path/'isolated/runtime/src/flyholdem/poker/engine.py';path.write_text(path.read_text()+'\n# changed\n')
     with pytest.raises(ValueError,match='runtime copy changed'):
         evaluate_disconnected(config,tmp_path/'isolated',model,graph,resume=True)
+
+
+
+def test_synthetic_topology_exports_with_its_own_graph_and_reloads_exact_native_decisions(tmp_path):
+    from flyholdem.learning.poker_controls import shuffled_connectome,shuffled_encoder,export_control_graph
+    from flyholdem.interface.frozen import load_frozen
+    from flyholdem.poker.engine import Hand
+    config,model,graph=native_model(tmp_path);original=load_frozen(model,graph)
+    encoder=shuffled_encoder(original,42)
+    assert encoder.brain is original.brain and encoder.registration['ensembles']==original.registration['ensembles']
+    assert sorted(encoder.registration['projection_indices'])==sorted(original.registration['projection_indices'])
+    assert encoder.registration['projection_indices']!=original.registration['projection_indices']
+    control=shuffled_connectome(original,42);exported=export_control_graph(control,graph,tmp_path/'null-graph')
+    null_record=json.loads((tmp_path/'null-graph/manifest.json').read_text())
+    assert not null_record['retained_malecns_graph'] and exported.registration['mode']=='fixture-native-shuffled-control'
+    export_frozen(exported,np.arange(10),[.1,2],'bio-plastic',tmp_path/'null-model',{'scope':'synthetic control only'},{'status':'engineering-only'})
+    restored=load_frozen(tmp_path/'null-model',tmp_path/'null-graph')
+    a=exported.decide(Hand(17400).observation());b=restored.decide(Hand(17400).observation())
+    assert a['counts'].tobytes()==b['counts'].tobytes() and a['scores']==b['scores'] and a['selected']==b['selected']
+    with pytest.raises(ValueError,match='base graph mismatch'):load_frozen(tmp_path/'null-model',graph)
+    again=export_control_graph(control,graph,tmp_path/'null-graph');assert again.registration==exported.registration
